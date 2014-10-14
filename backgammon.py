@@ -3,7 +3,6 @@
 # 1 == True == BLACK  == 'x'
 # 0 == False == WHITE == 'o'
 
-# As currently implemented; white always goes first
 
 
 import math
@@ -56,14 +55,28 @@ def initBoard():
     pos = []
     board.append(pos)
 
-  fillCol(board[1], 1, 2)
-  fillCol(board[6], 0, 5)
-  fillCol(board[8], 0, 3)
-  fillCol(board[12], 1, 5)
-  fillCol(board[13], 0, 5)
-  fillCol(board[17], 1, 3)
-  fillCol(board[19], 1, 5)
-  fillCol(board[24], 0, 2)
+  #fillCol(board[1], 1, 2)
+  #fillCol(board[6], 0, 5)
+  #fillCol(board[8], 0, 3)
+  #fillCol(board[12], 1, 5)
+  #fillCol(board[13], 0, 5)
+  #fillCol(board[17], 1, 3)
+  #fillCol(board[19], 1, 5)
+  #fillCol(board[24], 0, 2)
+
+  fillCol(board[1], 0, 2)
+  fillCol(board[2], 0, 2)
+  fillCol(board[3], 0, 2)
+  fillCol(board[4], 0, 2)
+  fillCol(board[5], 0, 2)
+  fillCol(board[6], 0, 3)
+
+  fillCol(board[19], 1, 3)
+  fillCol(board[20], 1, 2)
+  fillCol(board[21], 1, 2)
+  fillCol(board[22], 1, 2)
+  fillCol(board[23], 1, 2)
+  fillCol(board[24], 1, 2)  
   
   return board
 
@@ -165,55 +178,133 @@ def playTurn(board, turn):
   '''Plays a single player's turn'''
   
   roll = rollDie()
-  #v_moves = existValidMoves(board, roll, turn)
-  #while (v_moves):
-  while (len(roll)>0):
-    printBoard(board)
-    print roll
+  roll.sort()
+  v_moves = existValidMoves(board, roll, turn)
 
-    # Get from and to spaces from user
-    # if user enters invalid to space, get both from and to spaces again
+  while (v_moves):
+    if(len(roll)>0):
+      printBoard(board)
+      print roll
+
+      # Get from and to spaces from user
+      # if user enters invalid to space, get both from and to spaces again
     
-    valid_move = False
+      valid_move = False
 
-    while (valid_move == False):
-      space_from = getSpaceFrom(board, turn)
-      space_to_valid = getSpaceTo(board, turn, space_from, roll)
-      valid_move = space_to_valid[0]
+      while (valid_move == False):
+        space_from = getSpaceFrom(board, turn)
+        space_to = getSpaceTo()
+        space_to_valid = checkSpaceTo(board, turn, space_from, space_to, roll)
+        valid_move = space_to_valid[0]
 
-    # assign the move values from getSpaceTo()
-    space_to = space_to_valid[1]
-    move_dist = space_to_valid[2]
+      # assign the move values from checkSpaceTo()
+      space_to = space_to_valid[1]
+      move_dist = space_to_valid[2]
 
-    # Execute the move 
-    move_piece = board[space_from].pop()
+      # Execute the move 
+      move_piece = board[space_from].pop()
 
-    if(len(board[space_to]) == 0):
-      board[space_to].append(move_piece)
-
-    elif(len(board[space_to]) > 1):
-      board[space_to].append(move_piece)
-
-    else:
-      test = board[space_to].pop()
-      if (test.color == turn):
-        board[space_to].append(test)
+      if(len(board[space_to]) == 0):
         board[space_to].append(move_piece)
+
+      elif(len(board[space_to]) > 1):
+        board[space_to].append(move_piece)
+
       else:
-        if(turn == 0):
-          board[27].append(test)
+        test = board[space_to].pop()
+        if (test.color == turn):
+          board[space_to].append(test)
           board[space_to].append(move_piece)
         else:
-          board[26].append(test)
-          board[space_to].append(move_piece)
+          if(turn == 0):
+            board[27].append(test)
+            board[space_to].append(move_piece)
+          else:
+            board[26].append(test)
+            board[space_to].append(move_piece)
 
-    roll.remove(move_dist)
-    #v_moves = existValidMoves(board, roll, turn)
+      roll.remove(move_dist)
+    
+    v_moves = existValidMoves(board, roll, turn)
 
   next_turn = switchTurn(turn)
   return next_turn
 
-#def existValidMoves(board, roll, turn):
+def existValidMoves(board, roll, turn):
+  '''Check to see if valid moves exist - if no, will return false and turn will end'''
+  
+  valid = False
+
+  if (turn == 0):
+  
+    #Check if valid moves exist if pieces are in jail
+    if(len(board[26]) > 0):
+      space_from = 0
+      for y in range(0, len(roll)):
+        pos_valid = checkSpaceTo(board, turn, space_from, space_from + roll[y], roll)
+        if (pos_valid[0]):
+          valid = pos_valid[0]
+          break
+    
+    #Check normal board Spaces
+    else:
+      for x in range(1, 25):
+        cur_space = board[x]
+    
+        if (len(cur_space) == 0):
+          continue
+    
+        else:
+          #check color
+          piece = cur_space.pop()
+          col = piece.color
+          cur_space.append(piece)
+
+          if (col == turn):
+            #check if there are any valid moves
+            space_from = x
+            for y in range(0, len(roll)):
+              pos_valid = checkSpaceTo(board, turn, space_from, space_from + roll[y], roll)
+              if (pos_valid[0]):
+                valid = pos_valid[0]
+                break
+
+    return valid
+
+  else:
+    #Check if valid moves exist if pieces are in jail
+    if(len(board[26+turn]) > 0):
+      space_from = 25
+      for y in range(0, len(roll)):
+        pos_valid = checkSpaceTo(board, turn, space_from, space_from - roll[y], roll)
+        if (pos_valid[0]):
+          valid = pos_valid[0]
+          break
+    
+    #Check normal board Spaces
+    else:
+      for x in range(1, 25):
+        cur_space = board[x]
+    
+        if (len(cur_space) == 0):
+          continue
+    
+        else:
+          #check color
+          piece = cur_space.pop()
+          col = piece.color
+          cur_space.append(piece)
+
+          if (col == turn):
+            #check if there are any valid moves
+            space_from = x
+            for y in range(0, len(roll)):
+              pos_valid = checkSpaceTo(board, turn, space_from, space_from - roll[y], roll)
+              if (pos_valid[0]):
+                valid = pos_valid[0]
+                break
+
+    return valid
   
 
 def getSpaceFrom(board, turn):
@@ -234,33 +325,110 @@ def getSpaceFrom(board, turn):
 
   return space_from
 
-def getSpaceTo(board, turn, space_from, roll):
-  '''Determine if the space entered is a valid move - return validity, the space 
-     moved to and the distance of the move'''
-
-  move_to = False
+def getSpaceTo():
   space_to = raw_input("Please input the space you would like to move to: ")
   try:
     space_to = int(space_to)
   except:
     print "That was not a valid input."
+  return space_to
 
-  if (space_from < 26):
-    space_color = testSpaceTo(board, space_to)
-    move_dist = int(math.fabs(space_from - space_to))
+def checkSpaceTo(board, turn, space_from, space_to, roll):
+  '''Determine if the space entered is a valid move - return validity, the space 
+     moved to and the distance of the move'''
 
-  elif (space_from == 26):
-    space_color = testSpaceTo(board, space_to)
-    move_dist = int(math.fabs(space_to))
+  move_to = False
+
+  if (space_to > 25 or space_to < 0):
+    #Ensure that area outside of array bounds is not tested
+    return (False, space_to, 0)
 
   else:
-    space_color = testSpaceTo(board, space_to)
-    move_dist = int(math.fabs(25 - space_to))
+    # If tries to move backward, invalidate the move
+    if (checkFwdMove(space_from, space_to, turn) == False):
+      return (False, space_to, 0)
+  
+    # Makes sure all pieces are in final quadrant before allowing them to be removed
+    if (space_to == 0 or space_to == 25):
+      if(allInFinalQuadrant(board, turn) != True):
+        #print "Cannot score points if all pieces are not in final quadrant"
+        return (False, space_to, 0)
 
-  if((space_color == turn or space_color == -1) and (roll.count(move_dist) > 0)):
-    move_to = True
+    # If not in jail
+    if (space_from < 26):
+      # Allow pieces to be removed if roll is greater than distance from home of the 
+      # farthest piece 
+      
+      #
+      # Section that needs to be fixed
+      # Works for white (sort of)
+      # Doesn't work for black
+      #
 
-  return (move_to, space_to, move_dist)
+      if (allInFinalQuadrant(board,turn)):
+
+        test = roll.pop()
+        temp = test 
+        roll.append(test)
+        roll.sort()
+        locLast = locLastPiece(board, turn)
+        print locLast
+        
+        if (locLast < temp):
+          if (turn == 0): 
+            print "Getting here"
+            return (True, 25, temp)
+          else:
+            print "getting hurr"
+            return (True, 0, temp)
+        else:
+          space_color = testSpaceTo(board, space_to)
+          move_dist = int(math.fabs(space_from - space_to))
+
+      else:
+        space_color = testSpaceTo(board, space_to)
+        move_dist = int(math.fabs(space_from - space_to))
+
+      #####
+      ####
+      ###
+      ##
+      #
+    
+    #If in White Jail
+    elif (space_from == 26):
+      space_color = testSpaceTo(board, space_to)
+      move_dist = int(math.fabs(space_to))
+
+    #If in Black Jail
+    else:
+      space_color = testSpaceTo(board, space_to)
+      move_dist = int(math.fabs(25 - space_to))
+  
+    # if all above conditions are met, flip boolean to verify move as valid
+    if((space_color == turn or space_color == -1) and (roll.count(move_dist) > 0)):
+       move_to = True
+ 
+    return (move_to, space_to, move_dist)
+
+def checkFwdMove(space_from, space_to, turn):
+  
+  if (turn == 0 and space_from == 26):
+    #White is in jail - any move will be a forward move
+    return True
+
+  if (turn == 0):
+    if (space_from > space_to):
+      print "You can only move forward"
+      return False
+    else: 
+      return True
+  else:
+    if (space_from < space_to):
+      print "You can only move forward"
+      return False
+    else:
+      return True
 
 def allInFinalQuadrant(board, turn):
   total = 0
@@ -268,27 +436,46 @@ def allInFinalQuadrant(board, turn):
   if (turn == 0):
     for x in range(1, 19):
       cur_space = board[x]
-      piece = cur_space.pop()
-      col = piece.color
-      cur_space.append(piece)
+      if (len(cur_space) > 0):
+        piece = cur_space.pop()
+        col = piece.color
+        cur_space.append(piece)
 
-      if (col == turn):
-        total = total + len(cur_space)
+        if (col == turn):
+          total = total + len(cur_space)
 
   elif (turn == 1): 
     for x in range(7, 25):
       cur_space = board[x]
-      piece = cur_space.pop()
-      col = piece.color
-      cur_space.append(piece)
+      if (len(cur_space) > 0):
+        piece = cur_space.pop()
+        col = piece.color
+        cur_space.append(piece)
 
-      if (col == turn):
-        total = total + len(cur_space)
+        if (col == turn):
+          total = total + len(cur_space)
 
   if (total == 0):
     return True
   else:
     return False
+
+def locLastPiece(board, turn):
+  loc = -1
+  if (turn == 1):
+    for x in range(6, 0, -1):
+      cur_space = board[x]
+      if (len(cur_space) > 0):
+        loc = x
+        break
+  if (turn == 0):
+    for x in range(19, 25):
+      cur_space = board[x]
+      if (len(cur_space) > 0):
+        loc = 25-x
+        break
+  return loc
+
 
 
 def testSpaceTo(board, num):
