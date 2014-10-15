@@ -375,20 +375,16 @@ def checkSpaceTo(b, turn, space_from, space_to, roll):
   valid_move = True
 
   if((space_to > 25 or space_to < 0) and allInFinalQuadrant(b, turn) == False):
-    print "Failed test 1"
     valid_move = False
     return (valid_move, space_to, -1)
     # move_dist = -1 --> tried to move off the board
 
   # If a piece is in jail, it will start counting the moves from space 0 or 25 respectively
   if (isinstance(b.board[space_from], jailSpace)):
-    print space_from
     space_from = b.board[space_from].getMoveFrom()
-    print space_from
-
+    
   # Check its forwards
   if (checkFwdMove(space_from, space_to, turn) == False):
-    print "Failed test 2"
     valid_move = False
     return (valid_move, space_to, -2)
     # move_dist = -2 --> tried to move backwards
@@ -407,7 +403,6 @@ def checkSpaceTo(b, turn, space_from, space_to, roll):
         return (valid_move, space_to, test)
 
     else:
-      print "Failed test 3"
       valid_move = False
       return (valid_move, space_to, -3)
       # move_dist = -3 --> tried to score points when not allowed
@@ -415,7 +410,6 @@ def checkSpaceTo(b, turn, space_from, space_to, roll):
   # Check space_to is not a stack of the other color
   if((b.board[space_to].color != turn)):
     if(len(b.board[space_to].s) > 1):
-      print "Failed test 4"
       valid_move = False
       return (valid_move, space_to, -4)
       # move_dist = -4 --> tried to move to an occupied square of the other color
@@ -424,7 +418,6 @@ def checkSpaceTo(b, turn, space_from, space_to, roll):
   # Check that the move distance is a remaining roll
   move_dist = math.fabs(space_from - space_to)
   if (roll.count(int(move_dist)) == 0):
-    print "Failed test 5"
     valid_move = False
     return (valid_move, space_to, -5)
     #move_dist = -5 --> tried to move a distance that wasn't rolled
