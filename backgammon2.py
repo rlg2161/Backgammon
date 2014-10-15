@@ -490,9 +490,9 @@ def testGameOver(b):
   scores = b.getScore()
   done = -1
 
-  if (scores[0] == 13):
+  if (scores[0] == 15):
     done = WHITE
-  elif(scores[1] == 13):
+  elif(scores[1] == 15):
     done = BLACK
 
   return done
