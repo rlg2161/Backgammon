@@ -62,7 +62,7 @@ class jailSpace(space):
       return 0
 
 class oneDie():
-  
+  '''Represents one die (of variable side number)'''
   def __init__(self, sides = None):
     if (sides is None):
       self.num_sides = 6
@@ -97,13 +97,13 @@ class board():
     self.board[19].fillSpace(1, 5)
     self.board[24].fillSpace(0, 2)
 
+    #Board configuration for testing endgame
     #self.board[1].fillSpace(0,2)
     #self.board[2].fillSpace(0,2)
     #self.board[3].fillSpace(0,2)
     #self.board[4].fillSpace(0,2)
     #self.board[5].fillSpace(0,2)
     #self.board[6].fillSpace(0,3)
-   
     #self.board[19].fillSpace(1,3)
     #self.board[20].fillSpace(1,2)
     #self.board[21].fillSpace(1,2)
