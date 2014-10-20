@@ -1,7 +1,7 @@
 # A basic backgammon game that interfaces with console
 
+import dice
 import math
-import random
 
 
 WHITE = 0
@@ -61,17 +61,17 @@ class jailSpace(space):
     elif (c == BLACK):
       return 0
 
-class oneDie():
-  '''Represents one die (of variable side number)'''
-  def __init__(self, sides = None):
-    if (sides is None):
-      self.num_sides = 6
-    else:
-      self.num_sides = sides
+#class oneDie():
+  #'''Represents one die (of variable side number)'''
+  #def __init__(self, sides = None):
+    #if (sides is None):
+      #self.num_sides = 6
+    #else:
+      #self.num_sides = sides
 
-  def roll(self):
-    get_roll = math.floor(random.random()*(self.num_sides)) + 1
-    return int(get_roll)
+  #def roll(self):
+    #get_roll = math.floor(random.random()*(self.num_sides)) + 1
+    #return int(get_roll)
 
 class board():
   '''Represents the board'''
@@ -98,18 +98,28 @@ class board():
     self.board[24].fillSpace(0, 2)
 
     #Board configuration for testing endgame
-    #self.board[1].fillSpace(0,2)
-    #self.board[2].fillSpace(0,2)
-    #self.board[3].fillSpace(0,2)
-    #self.board[4].fillSpace(0,2)
-    #self.board[5].fillSpace(0,2)
-    #self.board[6].fillSpace(0,3)
+    #self.board[0].fillSpace(0,5)
+    #self.board[1].fillSpace(0,7)
+    #self.board[2].fillSpace(0,8)
+    #self.board[3].fillSpace(0,5)
+    #self.board[4].fillSpace(0,3)
+    #self.board[5].fillSpace(0,9)
+    #self.board[6].fillSpace(0,1)
+    #self.board[7].fillSpace(0,2)
+    #self.board[8].fillSpace(0,2)
+    #self.board[9].fillSpace(0,2)
+    ##self.board[10].fillSpace(0,3)
+    #self.board[11].fillSpace(0,3)
+    #self.board[12].fillSpace(0,3)
     #self.board[19].fillSpace(1,3)
-    #self.board[20].fillSpace(1,2)
-    #self.board[21].fillSpace(1,2)
+    #self.board[20].fillSpace(1,3)
+    #self.board[21].fillSpace(1,3)
     #self.board[22].fillSpace(1,2)
     #self.board[23].fillSpace(1,2)
     #self.board[24].fillSpace(1,2)
+    #self.board[25].fillSpace(1, 15)
+    #self.board[26].fillSpace(0, 3)
+    #self.board[27].fillSpace(1,3)
 
 
   def getScore(self):
@@ -163,7 +173,7 @@ def play():
   '''Play a game'''
   b = board()
   b.initBoard()
-  die = oneDie(6)
+  die = dice.oneDie(6)
 
   gf = goesFirst(die)
   turn = gf[0]
