@@ -65,18 +65,6 @@ class jailSpace(space):
     elif (c == BLACK):
       return 0
 
-#class oneDie():
-  #'''Represents one die (of variable side number)'''
-  #def __init__(self, sides = None):
-    #if (sides is None):
-      #self.num_sides = 6
-    #else:
-      #self.num_sides = sides
-
-  #def roll(self):
-    #get_roll = math.floor(random.random()*(self.num_sides)) + 1
-    #return int(get_roll)
-
 class board():
   '''Represents the board'''
 
@@ -423,7 +411,7 @@ def existValidMoves(b, roll, turn):
           
           if (pos_valid[0]):
             val_moves = True
-            print pos_valid
+            
             break
   
   return val_moves
@@ -452,20 +440,16 @@ def playCompTurn(b, roll, turn):
 
     while (valid_move == False):
       # Generate computer moves and check if they are valid
-      print "Valid move tuple: " + str(existValidMoves(b, roll, turn)) + str(roll)
       space_from = getCompSpaceFrom(b, turn, roll)
       space_to = getCompSpaceTo(b, roll, turn, space_from) # will have to include a last quadrant logical section
       space_to_valid = checkSpaceTo(b, turn, space_from, space_to, roll)
       valid_move = space_to_valid[0]
       if (valid_move != True):
-        print space_from, space_to
         printError(space_to_valid[2])
 
     #assign valid move values to actual move varialbes
     space_to = space_to_valid[1]
     move_dist = space_to_valid[2]
-
-    print (space_from, space_to)
 
     # Execute move
     move_piece = b.board[space_from].s.pop()
@@ -495,7 +479,7 @@ def playCompTurn(b, roll, turn):
 
     # Check if there are any valid moves with remaining rolls
     val_moves = existValidMoves(b, roll, turn)
-    print val_moves
+    
 
   next_turn = switchTurn(turn)
   return next_turn
@@ -543,10 +527,6 @@ def playHumanTurn(b, roll, turn):
       # If space_from is empty and not a jail space, update color to -1
       if (len(b.board[space_from].s) == 0):
         b.board[space_from].updateColor(-1)
-
-    #col = getColor(board[space_to])
-    #if (col != turn):
-       # If it turns out we need to get color before updating space color
 
     if (b.board[space_to].color != turn):
       if (len(b.board[space_to].s) == 1):
@@ -734,11 +714,7 @@ def checkSpaceTo(b, turn, space_from, space_to, roll):
 
   # Check you are not removing pieces prematurely
   if(space_to <= 0 or space_to >= 25):
-    if(allInFinalQuadrant(b, turn) == False):
-      valid_move = False
-      return (valid_move, space_to, -3)
-      
-    else:
+    if(allInFinalQuadrant(b, turn)):
       # move_dist = -3 --> tried to score points when not allowed#If all pieces are in final quadrant
       check_last_space = lastOccupiedSpace(b, turn)
       temp = roll.pop()
@@ -748,6 +724,10 @@ def checkSpaceTo(b, turn, space_from, space_to, roll):
       if ((math.fabs(space_from - space_to) == check_last_space) and \
         (test >= check_last_space)):
         return (valid_move, space_to, test)
+      
+    else:
+      valid_move = False
+      return (valid_move, space_to, -3)
 
   # Check space_to is not a stack of the other color
   if((b.board[space_to].color != turn)):
