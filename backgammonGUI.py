@@ -186,7 +186,7 @@ class backgammonGUI:
       cur_roll = bg.rollDie(die)
       message = 'Roll: ' + str(cur_roll)
       roll.set(message)
-      return
+      return cur_roll
 
     def doubleButton():
       print "Not implemented yet"

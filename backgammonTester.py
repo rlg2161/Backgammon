@@ -8,10 +8,12 @@ def main():
 
   die = dice.oneDie(6)
   gf = bg.goesFirst(die)
+  roll = gf[1]
+  turn = gf[0]
   board = bg.board()
   board.initBoard()
 
-  gui = bgGUI.backgammonGUI(board, gf[1], gf[0])
+  gui = bgGUI.backgammonGUI(board, roll, turn)
   
 
   again = play(board, die, gui)
@@ -22,6 +24,20 @@ def main():
 def play(board, die, gui):
   
   gui.redraw(board)
+
+  #turn = playTurn(b, roll, turn)
+  #b.printBoard()
+
+  #winner = -1
+  
+
+  #while(winner == -1):
+    #printTurn(turn)  gui.updateTurn(turn)??????
+    #roll = rollDie(die)
+    #turn = playTurn(b, roll, turn)
+    #winner = testGameOver(b)
+
+  #gui.redraw(board)
 
   #if(len(board.board[2].s) == 1):
     #print "Game over!"
