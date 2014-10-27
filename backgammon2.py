@@ -11,6 +11,13 @@ BLACK = 1
 stateList = [] # keeps track of every move and remaining dice at that time
                # creates a LL of game states for undo's
 
+hflag = True
+cflag = False
+roll_dict = {1 : float(11)/36, 2: float(12)/36, 3: float(13)/36, 4: float(14)/36,\
+            5: float(15)/36, 6: float(16)/36, 7: float(6)/36, 8: float(5)/36, \
+            9: float(4)/36, 10 : float(3)/36, 11: float(2)/36, 12 : float(1)/36}
+            #Dictionary with roll probabilites
+
 class piece():
   '''Represents a board piece'''
 
@@ -37,7 +44,7 @@ class space():
     self.color = color
 
   def getColor(self):
-    return color
+    return self.color
 
   def peek(self):
     temp = self.s.pop()
@@ -77,6 +84,7 @@ class board():
     self.board.append(js)
     js = jailSpace(BLACK)
     self.board.append(js)
+
 
   def initBoard(self):
     
@@ -120,7 +128,7 @@ class board():
     w_score = len(self.board[0].s)
     b_score = len(self.board[25].s)
     return (w_score, b_score)
-    
+
   def printBoard(self):
     for x in range(0, len(self.board)):
       cur_space = self.board[x]
@@ -206,6 +214,7 @@ class state():
     self.board = copy.deepcopy(board)
     self.turn = copy.copy(turn)
     self.roll = list(roll)
+    self.pip_count = getPipCount(board)
 
   def printState(self):
     if (self.turn == 0):
@@ -215,6 +224,8 @@ class state():
 
     print self.roll
     print " " 
+    print "White pip count: " + str(self.pip_count[0]),
+    print "Black pip count: " + str(self.pip_count[1])
     self.board.printBoard()
 
   def __str__(self):
@@ -225,12 +236,13 @@ class state():
     else:
       return_string = return_string + "Black's Turn"
 
-    return_string = return_string + str(self.roll)
+    return_string = return_string + str(self.roll) + "\n"
+    return_string = return_string + "White pip count: " + str(self.pip_count[0])
+    return_string = return_string + "Black pip count: " + str(self.pip_count[1])
     return_string = return_string + "\n" 
     return_string = return_string + str(self.board)
 
     return return_string
-
 
 def main():
 
@@ -249,15 +261,10 @@ def main():
     except:
       computer = raw_input("Please enter 0 to play against a person or 1 for computer or 2 for 2 computers against eachother:  ")
   
-  
-
   again = play(int(computer))
 
   while(again):
     again = play(int(computer))
-
-  
-  
 
 def play(comp):
   '''Play a game'''
@@ -276,18 +283,16 @@ def play(comp):
   if (comp == 0): # Play 2 humans
   
     printTurn(turn)
-    turn = playHumanTurn(b, roll, turn)
-    #b.printBoard()
-
+    turn = playTurn(b, roll, turn, hflag)
+    
     while(winner == -1):
       printTurn(turn)
       roll = rollDie(die)
-      turn = playHumanTurn(b, roll, turn)
+      turn = playTurn(b, roll, turn, hflag, )
       winner = testGameOver(b)
 
-    #b.printBoard()
     lastState = state(b, turn, roll)
-    #lastState.printState()
+    lastState.printState()
     stateList.append(lastState)
     
     
@@ -296,32 +301,32 @@ def play(comp):
     printTurn(turn)
 
     if (turn == 0):
-      turn = playHumanTurn(b, roll, turn)
+      turn = playTurn(b, roll, turn, hflag)
 
     else:
-      turn = playCompTurn(b, roll, turn)
+      turn = playTurn(b, roll, turn, cflag)
 
     while(winner == -1):
       printTurn(turn)
       roll = rollDie(die)
       if (turn == 0):
-        turn = playHumanTurn(b, roll, turn)
+        turn = playTurn(b, roll, turn, hflag)
       else:
-        turn = playCompTurn(b, roll, turn)
+        turn = playTurn(b, roll, turn, cflag)
       winner = testGameOver(b)
 
     lastState = state(b, turn, roll)
-    #lastState.printState()
+    lastState.printState()
     stateList.append(lastState)
 
   else: # play 2 computers
     printTurn(turn)
-    turn = playCompTurn(b, roll, turn)
+    turn = playTurn(b, roll, turn, cflag)
 
     while(winner == -1):
       printTurn(turn)
       roll = rollDie(die)
-      turn = playCompTurn(b, roll, turn)
+      turn = playTurn(b, roll, turn, cflag)
       winner = testGameOver(b)
 
     lastState = state(b, turn, roll)
@@ -351,13 +356,493 @@ def play(comp):
 
 def pieceInJail(b, turn): 
 
-  #board.printBoard()
-  
   if (len(b.board[26+turn].s) > 0):
     return True
   else:
     return False
-   
+  
+
+def genPosMoves(st, move_list):
+  '''Generates a list of possible move for computer to consider'''
+  
+  b = st.board
+  turn = st.turn
+  roll = st.roll
+  #pip_count = state.pip_count
+
+  val_moves = existValidMoves(b, roll, turn)
+
+  if (val_moves == False):
+    print "no valid moves"
+    return 
+
+  else: #There exist at lease one valid move
+    print "Getting here?"
+    if(pieceInJail(b, turn)):
+      print "Pieces in jail"
+      #Must move piece from jail if possible
+      space_from = 26 + turn 
+      for x in range(0, len(roll)):
+        pos_valid = checkSpaceTo(b, turn, space_from, roll[x], roll)
+        if (pos_valid[0]):
+          space_to = pos_valid[1]
+          move_dist = pos_valid[2]
+          space_from = pos_valid[3]
+
+          # Execute move
+          b_copy = copy.deepcopy(b)
+          r_copy = copy.copy(roll)
+          move_piece = b_copy.board[space_from].s.pop()
+    
+          #Check if the current space is now empty - if so and not a jail space, update color
+          if (isinstance(b_copy.board[space_from], jailSpace) == False):
+            if (len(b_copy.board[space_from].s) == 0):
+              b_copy.board[space_from].updateColor(-1)
+
+          # Capture opponent piece and put it in jail
+          if (b_copy.board[space_to].color != turn):
+            if (len(b_copy.board[space_to].s) == 1):
+              cap_piece = b_copy.board[space_to].s.pop()
+              if (turn == WHITE):
+                b_copy.board[27].s.append(cap_piece)
+              elif (turn == BLACK):
+                b_copy.board[26].s.append(cap_piece)
+
+          b_copy.board[space_to].s.append(move_piece)
+          # If space_to was empty, update color to turn
+          b_copy.board[space_to].updateColor(turn)
+
+          # Remove used roll from roll list
+          r_copy.remove(move_dist)
+
+          next_state = state(b_copy, turn, r_copy)
+          move_list.append(next_state)
+
+
+    else:
+      print "No pieces in jail"
+      # If no pieces in jail
+      for x in range(1,25):
+      
+        # If current space is not same color as the player, continue
+        cur_space = b.board[x]
+        if (cur_space.color != turn):
+          continue
+
+        else:
+          space_from = x
+          for y in range(0, len(roll)):
+            pos_valid = checkSpaceTo(b, turn, space_from, space_from + roll[y], roll)
+            if (pos_valid[0]):
+              space_to = pos_valid[1]
+              move_dist = pos_valid[2]
+              space_from = pos_valid[3]
+
+              # Execute move
+              b_copy = copy.deepcopy(b)
+              r_copy = copy.copy(roll)
+              move_piece = b_copy.board[space_from].s.pop()
+    
+              #Check if the current space is now empty - if so and not a jail space, update color
+              if (isinstance(b_copy.board[space_from], jailSpace) == False):
+                if (len(b_copy.board[space_from].s) == 0):
+                  b_copy.board[space_from].updateColor(-1)
+
+              # Capture opponent piece and put it in jail
+              if (b_copy.board[space_to].color != turn):
+                if (len(b_copy.board[space_to].s) == 1):
+                  cap_piece = b_copy.board[space_to].s.pop()
+                  if (turn == WHITE):
+                    b_copy.board[27].s.append(cap_piece)
+                  elif (turn == BLACK):
+                    b_copy.board[26].s.append(cap_piece)
+
+              b_copy.board[space_to].s.append(move_piece)
+              # If space_to was empty, update color to turn
+              b_copy.board[space_to].updateColor(turn)
+
+              # Remove used roll from roll list
+              r_copy.remove(move_dist)
+
+              next_state = state(b_copy, turn, r_copy)
+              move_list.append(next_state)
+              print "here " + str(len(move_list))
+
+  
+    move_list.remove(st)
+
+
+def compGenMoves(st):
+
+  move_list = [st]
+  
+  genPosMoves(move_list[0], move_list)
+  
+  for x in range(0, len(move_list)):
+    genPosMoves(move_list[x], move_list)
+    print len(move_list)
+
+  return move_list
+
+def playStratCompTurn(b, roll, turn):
+  '''Calculate and return a valid move based on programmed strategy'''
+  move_list = compGenMoves(state(b,turn,roll))
+  
+  cur_max = -1000000
+  best_move = []
+
+  for x in range(0, len(move_list)):
+    
+    temp = calcMoveValue(move_list[x])
+
+    if (temp > cur_max):
+      # If temp move better than current best, remove current best and store temp
+      cur_max = temp
+      best_move = []
+      best_move.append(move_list[x])
+
+    elif (temp == cur_max):
+      # If temp is equal to current best, store both moves and decide which one later
+      best_move.append(move_list[x])
+
+
+    print str(x) + ":   "
+    move_list[x].printState()
+
+  return best_move
+
+
+def calcMoveValue(st):
+  
+  move_value = 0
+
+  b = st.board
+  turn = st.turn
+  roll = st.roll
+  pip_count = st.pip_count
+
+  uncovered_score = 0
+  blocade_score = 0
+
+  # subtract points for uncovered pieces
+  for x in range(0, 25):
+    cur_space = b.board[x]
+    if (cur_space.color != turn):
+      continue
+
+    else: 
+      if (len(cur_space.s) == 1):
+        if (turn == 0):
+          blot_points = 10 * ((25-x)*.25) # 10 times distance from home/4 (just made it up)
+        else:
+          blot_points = 10 * ((x)*.25)
+        uncovered_score = uncovered_score + blot_points
+
+  # add points for blocades
+  for x in range(0, 25):
+    blocade_count = 0
+    cur_space = b.board[x]
+
+    if (len(cur_space.s) < 2 or cur_space.color != turn):
+      # if reached end of the blocade
+      blocade_score = blocade_score + (blocade_count*10)
+      blocade_count = 0
+  
+    else:
+      blocade_count += 1
+  
+  adj_pip_score = int(pip_count[turn])*.1
+  move_value = blocade_score - uncovered_score - adj_pip_score
+
+  return move_value
+
+def playRandCompTurn(b, roll, turn):
+  '''Calculate and return a valid, random Computer move'''
+ 
+  space_from = getCompSpaceFrom(b, turn, roll)
+  space_to = getCompSpaceTo(b, roll, turn, space_from)
+  space_to_valid = checkSpaceTo(b, turn, space_from, space_to, roll)
+  
+  return space_to_valid
+
+def playHumanTurn(b, roll, turn):
+  '''Receive move from human play and check its validity'''
+  space_from = getSpaceFrom(b, turn)
+  space_to = getSpaceTo()
+  space_to_valid = checkSpaceTo(b, turn, space_from, space_to, roll)
+  
+  return space_to_valid
+
+def playTurn(b, roll, turn, bool_flag):
+  ''' Play one turn  - return the turn value of the other player'''
+  
+  val_moves = existValidMoves(b, roll, turn)
+
+  if (val_moves == False):
+    turnState = state(b, turn, roll)
+    stateList.append(turnState)
+    print "No valid moves exist - next player's turn."
+    turnState.printState()
+    
+  while (val_moves):
+
+    turnState = state(b, turn, roll)
+    stateList.append(turnState)
+    
+    turnState.printState()
+    
+    valid_move = False
+
+    while (valid_move == False):
+      # Generate player moves and check if they are valid
+      if (bool_flag):
+        space_to_valid = playHumanTurn(b, roll, turn)
+      else:
+        #space_to_valid = playRandCompTurn(b, roll, turn)
+        list_moves = playStratCompTurn(b, roll, turn)
+        i = int(math.floor(random.random()*len(list_moves)))
+        print (list_moves[i])
+        space_to_valid = list_moves[i]
+      valid_move = space_to_valid[0]
+      if (valid_move != True):
+        printError(space_to_valid[2])
+
+    #assign valid move values to actual move varialbes
+    space_to = space_to_valid[1]
+    move_dist = space_to_valid[2]
+    space_from = space_to_valid[3]
+
+    # Execute move
+    move_piece = b.board[space_from].s.pop()
+    
+    #Check if the current space is now empty - if so and not a jail space, update color
+    if (isinstance(b.board[space_from], jailSpace) == False):
+      if (len(b.board[space_from].s) == 0):
+        b.board[space_from].updateColor(-1)
+
+    # Capture opponent piece and put it in jail
+    if (b.board[space_to].color != turn):
+      if (len(b.board[space_to].s) == 1):
+        cap_piece = b.board[space_to].s.pop()
+        if (turn == WHITE):
+          b.board[27].s.append(cap_piece)
+        elif (turn == BLACK):
+          b.board[26].s.append(cap_piece)
+
+    b.board[space_to].s.append(move_piece)
+    # If space_to was empty, update color to turn
+    b.board[space_to].updateColor(turn)
+
+    # Remove used roll from roll list
+    roll.remove(move_dist)
+    #if (len(roll) > 0):
+      #print roll
+
+    # Check if there are any valid moves with remaining rolls
+    val_moves = existValidMoves(b, roll, turn)
+    
+
+  next_turn = switchTurn(turn)
+  return next_turn
+
+
+def getSpaceFrom(b, turn):
+  '''Get space to move from from user'''
+  if(len(b.board[26+turn].s) > 0):
+    print "You must move your piece from Jail."
+    space_from = (26+turn)
+  else:
+    move_from = False
+    while (move_from == False):
+      space_from = raw_input("Please input the space you would like to move from: ")
+      try:
+        space_from = int(space_from)
+      except:
+        print "That was not a valid input."
+
+      if (space_from < 27 and space_from >= 0):
+        space_color = b.board[space_from].color
+        if(space_color == turn):
+          move_from = True
+  
+  return space_from
+
+def getSpaceTo():
+  '''Get space to move to from user'''
+  again = True
+  while (again):
+    space_to = raw_input("Please input the space you would like to move to: ")
+    try:
+      space_to = int(space_to)
+      again = False
+    except:
+      print "That was not a valid input."
+  
+  return space_to
+
+def getCompSpaceFrom(b, turn, roll):
+  '''Get space from the computer'''
+  if(len(b.board[26 + turn].s) >0):
+    print "Computer must move piece from Jail."
+    space_from = (26 + turn)
+  else:
+    test = roll.pop()
+    if (allInFinalQuadrant(b, turn)):
+      # All pieces in final quadrant
+      if (lastOccupiedSpace(b,turn) < test):
+        # If largest roll is greater than distance from home of farthest away space
+        if (turn == 0):
+          space_from = lastOccupiedSpace(b,turn)
+        else:
+          space_from = 25 - lastOccupiedSpace(b,turn)
+      else:
+        # If largest roll is smaller than furthest away piece
+        move_from = False
+        while (move_from == False):
+          test_space = int(math.floor(random.random()*(24)) + 1)
+          if (b.board[test_space].color == turn):
+            move_from = True
+            space_from = test_space
+    else:
+      # No piece in jail and not all in final quadrant
+      move_from = False
+      while (move_from == False):
+        test_space = int(math.floor(random.random()*(24)) + 1)
+        if (b.board[test_space].color == turn):
+          move_from = True
+          space_from = test_space
+
+    roll.append(test)
+  
+  #print space_from
+  return space_from
+
+def getCompSpaceTo(b, roll, turn, space_from):
+  ''' Return's the comps select space plus the largest remaining dice roll'''
+  rollcpy = copy.copy(roll)
+
+  if (random.random() > .5):
+    # Check the higher or lower value 50% of time - allows both high and low rolls to be
+    # checked by comp
+    rollcpy.reverse()
+  
+  if (turn == 1):
+    if (space_from == 26 + turn):
+      # If comp is in jail
+      
+      test = rollcpy.pop()
+      space_to = test
+    
+
+    elif (allInFinalQuadrant(b, turn) == False):
+      # Comp not in jail && not all in final quadrant
+      test = rollcpy.pop()
+      space_to = space_from + test
+      #roll.append(test)
+    
+    else:
+      # If all pieces in final quadrant
+      # To account for when 
+      test = rollcpy.pop()
+      space_to = space_from + test
+      if (space_to > 25):
+        space_to = 25
+      #roll.append(test)
+  
+  elif (turn == 0):
+    if (space_from == 26 + turn):
+      # If comp is in jail
+      if (random.random() > .5):
+        rollcpy.reverse()
+      test = rollcpy.pop()
+      space_to = 25-test
+
+    elif (allInFinalQuadrant(b, turn) == False):
+      # Comp not in jail && not all in final quadrant
+      test = rollcpy.pop()
+      space_to = space_from - test
+
+    else:
+      # If all pieces in final quadrant
+      # To account for when 
+      test = rollcpy.pop()
+      space_to = space_from - test
+      if (space_to < 0):
+        space_to = 0
+
+  #print space_to
+  return space_to
+
+
+def checkFwdMove(space_from, space_to, turn):
+  '''Check if inputted move is a forward move'''
+  if (turn == WHITE):
+    if (space_to < space_from):
+      return True
+    else:
+      return False
+  else:
+    if (space_to > space_from):
+      return True
+    else:
+      return False
+
+def checkSpaceTo(b, turn, space_from, space_to, roll):
+  '''Check if the space to move to is a valid location. If location is invalid, \
+     return a specific negative move distance that will correlate to a specific error'''
+  
+  orig_space_from = space_from
+
+  valid_move = True
+
+  if((space_to > 25 or space_to < 0) and allInFinalQuadrant(b, turn) == False):
+    valid_move = False
+    return (valid_move, space_to, -1)
+    # move_dist = -1 --> tried to move off the board
+
+  # If a piece is in jail, it will start counting the moves from space 0 or 25 respectively
+  if (isinstance(b.board[space_from], jailSpace)):
+    space_from = b.board[space_from].getMoveFrom()
+    
+  # Check its forwards
+  if (checkFwdMove(space_from, space_to, turn) == False):
+    valid_move = False
+    return (valid_move, space_to, -2)
+    # move_dist = -2 --> tried to move backwards
+
+  # Check you are not removing pieces prematurely
+  if(space_to <= 0 or space_to >= 25):
+    if(allInFinalQuadrant(b, turn)):
+      # move_dist = -3 --> tried to score points when not allowed#If all pieces are in final quadrant
+      check_last_space = lastOccupiedSpace(b, turn)
+      temp = roll.pop()
+      test = temp
+      roll.append(temp)
+
+      if ((math.fabs(space_from - space_to) == check_last_space) and \
+        (test >= check_last_space)):
+        return (valid_move, space_to, test, orig_space_from)
+      
+    else:
+      valid_move = False
+      return (valid_move, space_to, -3)
+
+  # Check space_to is not a stack of the other color
+  if((b.board[space_to].color != turn)):
+    if(len(b.board[space_to].s) > 1):
+      valid_move = False
+      return (valid_move, space_to, -4)
+      # move_dist = -4 --> tried to move to an occupied square of the other color
+
+
+  # Check that the move distance is a remaining roll
+  move_dist = math.fabs(space_from - space_to)
+  if (roll.count(int(move_dist)) == 0):
+    valid_move = False
+    return (valid_move, space_to, -5)
+    #move_dist = -5 --> tried to move a distance that wasn't rolled
+
+  return(valid_move, space_to, move_dist, orig_space_from)    
 
 def existValidMoves(b, roll, turn):
   '''Check to see if valid moves exist - if they do not, flip the turn'''
@@ -365,6 +850,7 @@ def existValidMoves(b, roll, turn):
   val_moves = False
 
   if (len(roll) == 0):
+    # no remaining rolls --> no valid moves
     return val_moves
 
   elif (pieceInJail(b, turn)):
@@ -416,335 +902,6 @@ def existValidMoves(b, roll, turn):
   
   return val_moves
 
-def playCompTurn(b, roll, turn):
-  ''' Play one turn for computer - return the turn value of the other player'''
-  
-  val_moves = existValidMoves(b, roll, turn)
-
-  if (val_moves == False):
-    turnState = state(b, turn, roll)
-    stateList.append(turnState)
-    print "No valid moves exist - next player's turn."
-    turnState.printState()
-    #lastGameFile.write(turnState.printState())
-
-  while (val_moves):
-
-    turnState = state(b, turn, roll)
-    stateList.append(turnState)
-    
-    turnState.printState()
-    #lastGameFile.write(turnState.printState())
-
-    valid_move = False
-
-    while (valid_move == False):
-      # Generate computer moves and check if they are valid
-      space_from = getCompSpaceFrom(b, turn, roll)
-      space_to = getCompSpaceTo(b, roll, turn, space_from) # will have to include a last quadrant logical section
-      space_to_valid = checkSpaceTo(b, turn, space_from, space_to, roll)
-      valid_move = space_to_valid[0]
-      if (valid_move != True):
-        printError(space_to_valid[2])
-
-    #assign valid move values to actual move varialbes
-    space_to = space_to_valid[1]
-    move_dist = space_to_valid[2]
-
-    # Execute move
-    move_piece = b.board[space_from].s.pop()
-    
-    #Check if the current space is now empty - if so and not a jail space, update color
-    if (isinstance(b.board[space_from], jailSpace) == False):
-      if (len(b.board[space_from].s) == 0):
-        b.board[space_from].updateColor(-1)
-
-    # Capture opponent piece and put it in jail
-    if (b.board[space_to].color != turn):
-      if (len(b.board[space_to].s) == 1):
-        cap_piece = b.board[space_to].s.pop()
-        if (turn == WHITE):
-          b.board[27].s.append(cap_piece)
-        elif (turn == BLACK):
-          b.board[26].s.append(cap_piece)
-
-    b.board[space_to].s.append(move_piece)
-    # If space_to was empty, update color to turn
-    b.board[space_to].updateColor(turn)
-
-    # Remove used roll from roll list
-    roll.remove(move_dist)
-    #if (len(roll) > 0):
-      #print roll
-
-    # Check if there are any valid moves with remaining rolls
-    val_moves = existValidMoves(b, roll, turn)
-    
-
-  next_turn = switchTurn(turn)
-  return next_turn
-
-
-def playHumanTurn(b, roll, turn):
-  '''Play one turn - return turn value of other player'''
-  
-  val_moves = existValidMoves(b, roll, turn)
-  #print roll
-  if (val_moves == False):
-    turnState = state(b, turn, roll)
-    stateList.append(turnState)    
-    print "No valid moves exist - next player's turn."
-    turnState.printState()
-    #lastGameFile.write(turnState.printState())
-  
-  while (val_moves):
-
-    turnState = state(b, turn, roll)
-    stateList.append(turnState)
-    
-    turnState.printState()
-    #lastGameFile.write(turnState.printState())
-    
-    valid_move = False
-
-    while (valid_move == False):
-      # Get valid target from and to spaces
-      space_from = getSpaceFrom(b, turn)
-      space_to = getSpaceTo()
-      space_to_valid = checkSpaceTo(b, turn, space_from, space_to, roll)
-      valid_move = space_to_valid[0]
-      if (valid_move != True):
-        printError(space_to_valid[2])
-
-    # assign valid move values from checkSpaceTo()
-    space_to = space_to_valid[1]
-    move_dist = space_to_valid[2]
-
-    # Execute move
-    move_piece = b.board[space_from].s.pop()
-
-    if (isinstance(b.board[space_from], jailSpace) == False):
-      # If space_from is empty and not a jail space, update color to -1
-      if (len(b.board[space_from].s) == 0):
-        b.board[space_from].updateColor(-1)
-
-    if (b.board[space_to].color != turn):
-      if (len(b.board[space_to].s) == 1):
-        cap_piece = b.board[space_to].s.pop()
-        if (turn == WHITE):
-          b.board[27].s.append(cap_piece)
-        elif (turn == BLACK):
-          b.board[26].s.append(cap_piece)
-
-    b.board[space_to].s.append(move_piece)
-    # If space_to was empty, update color to turn
-    b.board[space_to].updateColor(turn)
-
-    # Remove used roll from roll list
-    roll.remove(move_dist)
-    #if (len(roll) > 0):
-      #print roll
-
-    # Check if there are any valid moves with remaining rolls
-    val_moves = existValidMoves(b, roll, turn)
-
-  next_turn = switchTurn(turn)
-  return next_turn
-
-
-def getSpaceFrom(b, turn):
-  '''Get space to move from from user'''
-  if(len(b.board[26+turn].s) > 0):
-    print "You must move your piece from Jail."
-    space_from = (26+turn)
-  else:
-    move_from = False
-    while (move_from == False):
-      space_from = raw_input("Please input the space you would like to move from: ")
-      try:
-        space_from = int(space_from)
-      except:
-        print "That was not a valid input."
-
-      if (space_from < 27 and space_from >= 0):
-        space_color = b.board[space_from].color
-        if(space_color == turn):
-          move_from = True
-  
-  return space_from
-
-def getCompSpaceFrom(b, turn, roll):
-  '''Get space from the computer'''
-  if(len(b.board[26 + turn].s) >0):
-    print "Computer must move piece from Jail."
-    space_from = (26 + turn)
-  else:
-    test = roll.pop()
-    if (allInFinalQuadrant(b, turn)):
-      if (lastOccupiedSpace(b,turn) < test):
-        if (turn == 0):
-          space_from = lastOccupiedSpace(b,turn)
-        else:
-          space_from = 25 - lastOccupiedSpace(b,turn)
-      else:
-        move_from = False
-        while (move_from == False):
-          test_space = int(math.floor(random.random()*(24)) + 1)
-          if (b.board[test_space].color == turn):
-            move_from = True
-            space_from = test_space
-    else:
-      move_from = False
-      while (move_from == False):
-        test_space = int(math.floor(random.random()*(24)) + 1)
-        if (b.board[test_space].color == turn):
-          move_from = True
-          space_from = test_space
-
-    roll.append(test)
-  
-  #print space_from
-  return space_from
-
-def getSpaceTo():
-  '''Get space to move to from user'''
-  again = True
-  while (again):
-    space_to = raw_input("Please input the space you would like to move to: ")
-    try:
-      space_to = int(space_to)
-      again = False
-    except:
-      print "That was not a valid input."
-  
-  return space_to
-
-def getCompSpaceTo(b, roll, turn, space_from):
-  ''' Return's the comps select space plus the largest remaining dice roll'''
-  rollcpy = copy.copy(roll)
-
-  if (random.random() > .5):
-    # Check the higher or lower value 50% of time - allows both high and low rolls to be
-    # checked by comp
-    rollcpy.reverse()
-  
-  if (turn == 1):
-    if (space_from == 26 + turn):
-      # If comp is in jail
-      
-      test = rollcpy.pop()
-      space_to = test
-    
-
-    elif (allInFinalQuadrant(b, turn) == False):
-      # Comp not in jail && not all in final quadrant
-      test = rollcpy.pop()
-      space_to = space_from + test
-      #roll.append(test)
-    
-    else:
-      # If all pieces in final quadrant
-      # To account for when 
-      test = rollcpy.pop()
-      space_to = space_from + test
-      if (space_to > 25):
-        space_to = 25
-      #roll.append(test)
-  
-      
-
-  elif (turn == 0):
-    if (space_from == 26 + turn):
-      # If comp is in jail
-      if (random.random() > .5):
-        rollcpy.reverse()
-      test = rollcpy.pop()
-      space_to = 25-test
-
-    elif (allInFinalQuadrant(b, turn) == False):
-      # Comp not in jail && not all in final quadrant
-      test = rollcpy.pop()
-      space_to = space_from - test
-
-    else:
-      # If all pieces in final quadrant
-      # To account for when 
-      test = rollcpy.pop()
-      space_to = space_from - test
-      if (space_to < 0):
-        space_to = 0
-
-  #print space_to
-  return space_to
-
-
-def checkFwdMove(space_from, space_to, turn):
-  '''Check if inputted move is a forward move'''
-  if (turn == WHITE):
-    if (space_to < space_from):
-      return True
-    else:
-      return False
-  else:
-    if (space_to > space_from):
-      return True
-    else:
-      return False
-
-def checkSpaceTo(b, turn, space_from, space_to, roll):
-  '''Check if the space to move to is a valid location. If location is invalid, \
-     return a specific negative move distance that will correlate to a specific error'''
-  
-  valid_move = True
-
-  if((space_to > 25 or space_to < 0) and allInFinalQuadrant(b, turn) == False):
-    valid_move = False
-    return (valid_move, space_to, -1)
-    # move_dist = -1 --> tried to move off the board
-
-  # If a piece is in jail, it will start counting the moves from space 0 or 25 respectively
-  if (isinstance(b.board[space_from], jailSpace)):
-    space_from = b.board[space_from].getMoveFrom()
-    
-  # Check its forwards
-  if (checkFwdMove(space_from, space_to, turn) == False):
-    valid_move = False
-    return (valid_move, space_to, -2)
-    # move_dist = -2 --> tried to move backwards
-
-  # Check you are not removing pieces prematurely
-  if(space_to <= 0 or space_to >= 25):
-    if(allInFinalQuadrant(b, turn)):
-      # move_dist = -3 --> tried to score points when not allowed#If all pieces are in final quadrant
-      check_last_space = lastOccupiedSpace(b, turn)
-      temp = roll.pop()
-      test = temp
-      roll.append(temp)
-
-      if ((math.fabs(space_from - space_to) == check_last_space) and \
-        (test >= check_last_space)):
-        return (valid_move, space_to, test)
-      
-    else:
-      valid_move = False
-      return (valid_move, space_to, -3)
-
-  # Check space_to is not a stack of the other color
-  if((b.board[space_to].color != turn)):
-    if(len(b.board[space_to].s) > 1):
-      valid_move = False
-      return (valid_move, space_to, -4)
-      # move_dist = -4 --> tried to move to an occupied square of the other color
-
-
-  # Check that the move distance is a remaining roll
-  move_dist = math.fabs(space_from - space_to)
-  if (roll.count(int(move_dist)) == 0):
-    valid_move = False
-    return (valid_move, space_to, -5)
-    #move_dist = -5 --> tried to move a distance that wasn't rolled
-
-  return(valid_move, space_to, move_dist)    
 
 def printError(num):
   '''Print specific error messages depending on why user move was invalid'''
@@ -870,6 +1027,32 @@ def goesFirst(die):
 
   return (turn, totalRoll)
 
+def getPipCount(b):
+  b_pips = 0
+  w_pips = 0
+
+  for x in range(1, 25):
+    cur_col = b.board[x].color
+
+    if (cur_col == -1):
+      continue
+
+    elif (cur_col == 0):
+      space_pip_count = len(b.board[x].s) * x
+      w_pips = w_pips + space_pip_count
+      
+    else:
+      space_pip_count = len(b.board[x].s) * (25 -x)
+      b_pips = b_pips + space_pip_count
+
+  # Calc dist for pieces in white jail
+  space_pip_count = len(b.board[26].s) * 25
+  w_pips = w_pips + space_pip_count
+
+  space_pip_count = len(b.board[27].s) * 25
+  b_pips = b_pips + space_pip_count
+
+  return (w_pips, b_pips)
 
 
 if __name__ == "__main__":
