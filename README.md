@@ -16,3 +16,11 @@ list. At the end of the game, the LL is written to lastGameFile.txt so there is 
 of all moves in the game. Later, I intend to update the game with an undo feature - this
 state register will allow the game to be reset to the state of the game one move earlier 
 (until the beginning of the game).
+
+
+Current Issues:
+
+Need to fix move generator that calculates all possible moves for the computer
+Need to fix move generator/compGenMoves() to avoid infinite loop on doubles
+Have to make sure that the "best" move always uses 2 dice if possible in accordance with rules
+Need to fix move evaluating algorithm

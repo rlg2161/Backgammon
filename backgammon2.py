@@ -85,6 +85,11 @@ class board():
     js = jailSpace(BLACK)
     self.board.append(js)
 
+  def updateFromState(self, state):
+    self.board = copy.deepcopy(state.board.board)
+    #self.board.printBoard()
+
+
 
   def initBoard(self):
     
@@ -214,7 +219,7 @@ class state():
     self.board = copy.deepcopy(board)
     self.turn = copy.copy(turn)
     self.roll = list(roll)
-    self.pip_count = getPipCount(board)
+    self.pip_count = getPipCount(self.board)
 
   def printState(self):
     if (self.turn == 0):
@@ -243,6 +248,17 @@ class state():
     return_string = return_string + str(self.board)
 
     return return_string
+
+#class stateMove():
+  
+  #def __init__(self, state):
+    #self.state = state
+    #self.move_list = []
+
+  #def addMove(self, move_tuple):
+    #self.move_list.append(move_tuple)
+
+
 
 def main():
 
@@ -309,10 +325,12 @@ def play(comp):
     while(winner == -1):
       printTurn(turn)
       roll = rollDie(die)
+      
       if (turn == 0):
         turn = playTurn(b, roll, turn, hflag)
       else:
         turn = playTurn(b, roll, turn, cflag)
+
       winner = testGameOver(b)
 
     lastState = state(b, turn, roll)
@@ -361,8 +379,25 @@ def pieceInJail(b, turn):
   else:
     return False
   
+def compGenMoves(st):
 
-def genPosMoves(st, move_list):
+  state_list = [st]
+    
+  genPosMoves(state_list[0], state_list)
+  #roll = state_list[0].roll
+
+  #while (len(roll) > 0):
+  #NEED TO FIX FOR DOUBLES
+  for x in range(0, len(state_list)):
+    genPosMoves(state_list[x], state_list)
+    print len(state_list)
+
+    #roll = state_list[0].roll
+
+  return state_list
+
+def genPosMoves(st, state_list):
+  # NEED TO FIX MOVE GENERATION
   '''Generates a list of possible move for computer to consider'''
   
   b = st.board
@@ -373,17 +408,17 @@ def genPosMoves(st, move_list):
   val_moves = existValidMoves(b, roll, turn)
 
   if (val_moves == False):
-    print "no valid moves"
+    #print "no valid moves"
     return 
 
-  else: #There exist at lease one valid move
-    print "Getting here?"
+  else: #There exists at least one valid move
+    #print "Getting here?"
     if(pieceInJail(b, turn)):
-      print "Pieces in jail"
+      #print "Pieces in jail"
       #Must move piece from jail if possible
       space_from = 26 + turn 
       for x in range(0, len(roll)):
-        pos_valid = checkSpaceTo(b, turn, space_from, roll[x], roll)
+        pos_valid = checkSpaceTo(b, turn, space_from, space_from + roll[x], roll)
         if (pos_valid[0]):
           space_to = pos_valid[1]
           move_dist = pos_valid[2]
@@ -391,7 +426,6 @@ def genPosMoves(st, move_list):
 
           # Execute move
           b_copy = copy.deepcopy(b)
-          r_copy = copy.copy(roll)
           move_piece = b_copy.board[space_from].s.pop()
     
           #Check if the current space is now empty - if so and not a jail space, update color
@@ -411,12 +445,13 @@ def genPosMoves(st, move_list):
           b_copy.board[space_to].s.append(move_piece)
           # If space_to was empty, update color to turn
           b_copy.board[space_to].updateColor(turn)
-
+          
+          move_tuple = (space_from, space_to, move_dist)
           # Remove used roll from roll list
-          r_copy.remove(move_dist)
+          roll.remove(move_dist)
 
-          next_state = state(b_copy, turn, r_copy)
-          move_list.append(next_state)
+          next_state = state(b_copy, turn, roll)
+          state_list.append(next_state)
 
 
     else:
@@ -465,55 +500,15 @@ def genPosMoves(st, move_list):
               r_copy.remove(move_dist)
 
               next_state = state(b_copy, turn, r_copy)
-              move_list.append(next_state)
-              print "here " + str(len(move_list))
+              state_list.append(next_state)
+              #print "here " + str(len(state_list))
 
   
-    move_list.remove(st)
-
-
-def compGenMoves(st):
-
-  move_list = [st]
-  
-  genPosMoves(move_list[0], move_list)
-  
-  for x in range(0, len(move_list)):
-    genPosMoves(move_list[x], move_list)
-    print len(move_list)
-
-  return move_list
-
-def playStratCompTurn(b, roll, turn):
-  '''Calculate and return a valid move based on programmed strategy'''
-  move_list = compGenMoves(state(b,turn,roll))
-  
-  cur_max = -1000000
-  best_move = []
-
-  for x in range(0, len(move_list)):
-    
-    temp = calcMoveValue(move_list[x])
-
-    if (temp > cur_max):
-      # If temp move better than current best, remove current best and store temp
-      cur_max = temp
-      best_move = []
-      best_move.append(move_list[x])
-
-    elif (temp == cur_max):
-      # If temp is equal to current best, store both moves and decide which one later
-      best_move.append(move_list[x])
-
-
-    print str(x) + ":   "
-    move_list[x].printState()
-
-  return best_move
-
+    state_list.remove(st)
+    #print len(state_list)
 
 def calcMoveValue(st):
-  
+  # NEED TO CHANGE ALGORITHM
   move_value = 0
 
   b = st.board
@@ -545,7 +540,7 @@ def calcMoveValue(st):
 
     if (len(cur_space.s) < 2 or cur_space.color != turn):
       # if reached end of the blocade
-      blocade_score = blocade_score + (blocade_count*10)
+      blocade_score = blocade_score + (blocade_count*20)
       blocade_count = 0
   
     else:
@@ -555,6 +550,38 @@ def calcMoveValue(st):
   move_value = blocade_score - uncovered_score - adj_pip_score
 
   return move_value
+
+
+def playStratCompTurn(b, roll, turn):
+  '''Calculate and return a valid move based on programmed strategy'''
+  move_list = compGenMoves(state(b,turn,roll))
+  #print len(move_list)
+  
+  cur_max = -1000000
+  best_move = []
+
+  for x in range(0, len(move_list)):
+    
+    temp = calcMoveValue(move_list[x])
+
+    if (temp > cur_max):
+      # If temp move better than current best, remove current best and store temp
+      cur_max = temp
+      best_move = []
+      best_move.append(move_list[x])
+
+    elif (temp == cur_max):
+      # If temp is equal to current best, store both moves and decide which one later
+      best_move.append(move_list[x])
+
+
+    print str(x) + ":   "
+    #move_list[x].printState()
+  print "BEST MOVE VALUE: " + str(cur_max)
+  #print best_move[0].printState()
+
+  return best_move
+
 
 def playRandCompTurn(b, roll, turn):
   '''Calculate and return a valid, random Computer move'''
@@ -593,54 +620,56 @@ def playTurn(b, roll, turn, bool_flag):
     
     valid_move = False
 
-    while (valid_move == False):
-      # Generate player moves and check if they are valid
-      if (bool_flag):
+    if(bool_flag == True):
+      while (valid_move == False):
+        # Generate player moves and check if they are valid
         space_to_valid = playHumanTurn(b, roll, turn)
-      else:
-        #space_to_valid = playRandCompTurn(b, roll, turn)
-        list_moves = playStratCompTurn(b, roll, turn)
-        i = int(math.floor(random.random()*len(list_moves)))
-        print (list_moves[i])
-        space_to_valid = list_moves[i]
-      valid_move = space_to_valid[0]
-      if (valid_move != True):
-        printError(space_to_valid[2])
+        valid_move = space_to_valid[0]
+        if (valid_move != True):
+          printError(space_to_valid[2])
+        else:
+          #assign valid move values to actual move varialbes
+          space_to = space_to_valid[1]
+          move_dist = space_to_valid[2]
+          space_from = space_to_valid[3]
 
-    #assign valid move values to actual move varialbes
-    space_to = space_to_valid[1]
-    move_dist = space_to_valid[2]
-    space_from = space_to_valid[3]
-
-    # Execute move
-    move_piece = b.board[space_from].s.pop()
+          # Execute move
+          move_piece = b.board[space_from].s.pop()
     
-    #Check if the current space is now empty - if so and not a jail space, update color
-    if (isinstance(b.board[space_from], jailSpace) == False):
-      if (len(b.board[space_from].s) == 0):
-        b.board[space_from].updateColor(-1)
+          #Check if the current space is now empty - if so and not a jail space, update color
+          if (isinstance(b.board[space_from], jailSpace) == False):
+            if (len(b.board[space_from].s) == 0):
+              b.board[space_from].updateColor(-1)
 
-    # Capture opponent piece and put it in jail
-    if (b.board[space_to].color != turn):
-      if (len(b.board[space_to].s) == 1):
-        cap_piece = b.board[space_to].s.pop()
-        if (turn == WHITE):
-          b.board[27].s.append(cap_piece)
-        elif (turn == BLACK):
-          b.board[26].s.append(cap_piece)
+          # Capture opponent piece and put it in jail
+          if (b.board[space_to].color != turn):
+            if (len(b.board[space_to].s) == 1):
+              cap_piece = b.board[space_to].s.pop()
+              if (turn == WHITE):
+                b.board[27].s.append(cap_piece)
+              elif (turn == BLACK):
+                b.board[26].s.append(cap_piece)
 
-    b.board[space_to].s.append(move_piece)
-    # If space_to was empty, update color to turn
-    b.board[space_to].updateColor(turn)
+          b.board[space_to].s.append(move_piece)
+          # If space_to was empty, update color to turn
+          b.board[space_to].updateColor(turn)
 
-    # Remove used roll from roll list
-    roll.remove(move_dist)
-    #if (len(roll) > 0):
-      #print roll
+          # Remove used roll from roll list 
+          roll.remove(move_dist)
+          #if (len(roll) > 0):
+          #print roll
 
-    # Check if there are any valid moves with remaining rolls
-    val_moves = existValidMoves(b, roll, turn)
-    
+          # Check if there are any valid moves with remaining rolls
+          val_moves = existValidMoves(b, roll, turn)
+    else:
+      list_moves = playStratCompTurn(b, roll, turn)
+      i = int(math.floor(random.random()*len(list_moves)))
+      list_moves[i].printState()
+      b.updateFromState(list_moves[i])
+      #b.printBoard()
+      
+
+      val_moves = False
 
   next_turn = switchTurn(turn)
   return next_turn
@@ -1032,7 +1061,8 @@ def getPipCount(b):
   w_pips = 0
 
   for x in range(1, 25):
-    cur_col = b.board[x].color
+    #print type(b)
+    cur_col = b.board[x].getColor()
 
     if (cur_col == -1):
       continue
