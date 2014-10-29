@@ -30,6 +30,9 @@ class state():
   def updateRoll(self, roll):
     self.roll = list(roll)
 
+  def updatePipCount(self):
+    self.pip_count = self.board.getPipCount()
+
   def printState(self):
     if (self.turn.turn == 0):
       print "White's Turn"
@@ -105,7 +108,7 @@ class state():
 
     if (len(self.roll) == 0):
       # no remaining rolls --> no valid moves
-      #print "no remaining rolls"
+      print "no remaining rolls"
       return val_moves
 
     elif(self.pieceInJail()):
@@ -202,10 +205,12 @@ class state():
     if ((space_to > 25 or space_to < 0) and self.allInFinalQuadrant() == False):
       valid_move = False
       move_dist = -1
+      return (valid_move, orig_space_from, space_to, move_dist)
 
     if (self.checkFwdMove(space_from, space_to) == False):
       valid_move = False
       move_dist = -2
+      return (valid_move, orig_space_from, space_to, move_dist)
 
     if (space_to <= 0 or space_to >= 25):
       if (self.allInFinalQuadrant()):
@@ -217,24 +222,21 @@ class state():
         if ((math.fabs(space_from - space_to) == check_last_space) and \
           (test >= check_last_space)):
           move_dist = test
-
-        #elif :
-          #valid_move = False
-          #move_dist = -3
-          
       else:
        valid_move = False
        move_dist = -3
-       
+       return (valid_move, orig_space_from, space_to, move_dist)       
 
     if (self.board.spaceList[space_to].getColor() != self.turn.turn):
       if (len(self.board.spaceList[space_to]) > 1):
         valid_move = False
         move_dist = -4
+        return (valid_move, orig_space_from, space_to, move_dist)
         
     if (self.roll.count(move_dist) == 0):
       valid_move = False
       move_dist = -5
+      return (valid_move, orig_space_from, space_to, move_dist)
       
     return (valid_move, orig_space_from, space_to, move_dist)
 
