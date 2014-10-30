@@ -27,6 +27,12 @@ class state():
 
     return return_string
 
+  def updateFromState(self, other_state):
+    self.roll = other_state.roll
+    self.turn = other_state.turn
+    self.board = other_state.board
+    self.pip_count = other_state.board.getPipCount()
+
   def updateRoll(self, roll):
     self.roll = list(roll)
 
@@ -108,23 +114,22 @@ class state():
 
     if (len(self.roll) == 0):
       # no remaining rolls --> no valid moves
-      print "no remaining rolls"
+      #print "no remaining rolls"
       return val_moves
 
     elif(self.pieceInJail()):
-      print "piece in jail"
+      #print "piece in jail"
       space_from = 26+self.turn.turn
       if (self.turn.turn): #Black
         for x in range(0, len(self.roll)):
           pos_valid = self.checkSpaceTo(space_from, self.roll[x])
-          print pos_valid
           if (pos_valid[0]):
             val_moves = True
             break
+
       else: #White
         for x in range(0, len(self.roll)):
           pos_valid = self.checkSpaceTo(space_from, 25-self.roll[x])
-          print pos_valid
           if (pos_valid[0]):
             val_moves = True
             break
@@ -135,17 +140,12 @@ class state():
         cur_space = self.board.spaceList[x]
 
         if (val_moves):
-          #print "here?"
           break
 
         elif (cur_space.getColor() != self.turn.turn):
-          #print "elif loop"
-          #print cur_space.getColor()
-          #print self.turn.turn
           continue
 
         else:
-          #print "else loop"
           space_from = x
           
           for y in range(0, len(self.roll)):
@@ -159,12 +159,9 @@ class state():
             elif (self.turn.turn == 0):
              #print "White's turn with no-one in jail"
               if (space_from - self.roll[y] < 0):
-                #print "checking endgame"
                 pos_valid = self.checkSpaceTo(space_from, 0)
               else:
-                #print "checking regular game states"
                 pos_valid = self.checkSpaceTo(space_from, space_from - self.roll[y])
-                print pos_valid
 
             if (pos_valid[0]):
               val_moves = True
@@ -222,6 +219,7 @@ class state():
         if ((math.fabs(space_from - space_to) == check_last_space) and \
           (test >= check_last_space)):
           move_dist = test
+
       else:
        valid_move = False
        move_dist = -3

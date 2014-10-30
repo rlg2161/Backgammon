@@ -57,14 +57,19 @@ def play(num):
       winner = state.testGameOver()
       
   if (num == 1): #Play human v. comp
-    playTurn(state, state.turn.turn)
+    if (state.turn.turn ==0):
+      playTurn(state, 0)
+    else:
+      playTurn(state, 2)
 
     while (winner == -1):
       roll = die.rollDie()
       state.updateRoll(roll)
       state.turn.switchTurn()
-
-      playTurn(state, state.turn.turn)
+      if (state.turn.turn == 0):
+        playTurn(state, 0)
+      else:
+        playTurn(state, 2)
 
       winner = state.testGameOver()
 
@@ -105,68 +110,245 @@ def play(num):
 
 def playTurn(state, num_flag):
   
-  val_moves = state.existValidMoves()
-
-  if (val_moves == False):
-    stateList.append(copy.deepcopy(state))
-    print "No valid moves exist - next player's turn"
-    state.printState()
-
-
-  while (val_moves == True):
-    stateList.append(copy.deepcopy(state))
-    state.printState()
-
-    valid_move = False
-
-    
-    while (valid_move == False):
-      # Generate player moves and check if they are valid
-      if (num_flag == 0): #Human Player
-        space_to_valid = playHumanTurn(state)
-      elif (num_flag == 1): #Random computer player 
-        space_to_valid = playRandCompTurn(state)
-      valid_move = space_to_valid[0]
-      
-      if (valid_move != True and state.turn.turn == 0):
-        # If invalid, print relevant error
-        state.printError(space_to_valid[3])
-
-      
-    #assign valid move values to actual move varialbes
-    print space_to_valid
-    space_from = space_to_valid[1]
-    space_to = space_to_valid[2]
-    move_dist = space_to_valid[3]
-
-    # Execute move
-    move_piece = state.board.spaceList[space_from].s.pop()
-
-    #Check if the current space is now empty - if so and not a jail space, update color
-    if (isinstance(state.board.spaceList[space_from], space.jailSpace) == False):
-      if (len(state.board.spaceList[space_from]) == 0):
-        state.board.spaceList[space_from].updateColor(-1)
-
-    # Capture opponent piece and put it in jail
-    if (state.board.spaceList[space_to].getColor() != state.turn.turn):
-      if (len(state.board.spaceList[space_to]) == 1):
-        cap_piece = state.board.spaceList[space_to].s.pop()
-        if (state.turn.turn == 0): # WHITE
-          state.board.spaceList[27].s.append(cap_piece)
-        else: #BLACK
-          state.board.spaceList[26].s.append(cap_piece)
-
-    state.board.spaceList[space_to].s.append(move_piece)
-    state.board.spaceList[space_to].updateColor(state.turn.turn)
-
-    #print state.roll
-    state.roll.remove(move_dist)
-    #print state.roll
-    state.updatePipCount()
-
+  if (num_flag == 0 or num_flag == 1):
     val_moves = state.existValidMoves()
-    #print val_moves
+
+    if (val_moves == False):
+      stateList.append(copy.deepcopy(state))
+      print "No valid moves exist - next player's turn"
+      state.printState()
+
+
+    while (val_moves == True):
+      stateList.append(copy.deepcopy(state))
+      state.printState()
+
+      valid_move = False
+
+      
+      while (valid_move == False):
+        # Generate player moves and check if they are valid
+        if (num_flag == 0): #Human Player
+          space_to_valid = playHumanTurn(state)
+        elif (num_flag == 1): #Random computer player 
+          space_to_valid = playRandCompTurn(state)
+        valid_move = space_to_valid[0]
+        
+        if (valid_move != True and state.turn.turn == 0):
+          # If invalid, print relevant error
+          state.printError(space_to_valid[3])
+
+        
+      #assign valid move values to actual move varialbes
+      space_from = space_to_valid[1]
+      space_to = space_to_valid[2]
+      move_dist = space_to_valid[3]
+
+      # Execute move
+      move_piece = state.board.spaceList[space_from].s.pop()
+
+      #Check if the current space is now empty - if so and not a jail space, update color
+      if (isinstance(state.board.spaceList[space_from], space.jailSpace) == False):
+        if (len(state.board.spaceList[space_from]) == 0):
+          state.board.spaceList[space_from].updateColor(-1)
+
+      # Capture opponent piece and put it in jail
+      if (state.board.spaceList[space_to].getColor() != state.turn.turn):
+        if (len(state.board.spaceList[space_to]) == 1):
+          cap_piece = state.board.spaceList[space_to].s.pop()
+          if (state.turn.turn == 0): # WHITE
+            state.board.spaceList[27].s.append(cap_piece)
+          else: #BLACK
+            state.board.spaceList[26].s.append(cap_piece)
+
+      state.board.spaceList[space_to].s.append(move_piece)
+      state.board.spaceList[space_to].updateColor(state.turn.turn)
+
+      #print state.roll
+      state.roll.remove(move_dist)
+      #print state.roll
+      state.updatePipCount()
+
+      val_moves = state.existValidMoves()
+      #print val_moves
+    
+  else:
+    state.printState()
+    new_state = playStrategicCompTurn(state)
+    new_state.printState()
+    state.updateFromState(new_state)
+
+def genAllPossMoves(posStates):
+  #HAVE TO FIGURE OUT WHY INF LOOP IN DOUBLES
+  '''Recursively generate all possible moves given a game-state'''
+  print len(posStates)
+  state = posStates[0]
+
+  if (len(state.roll) == 0 or state.existValidMoves == False):
+    return 
+
+  else:
+    if (state.pieceInJail() == True):
+      print "piece in jail"
+      
+      for x in range(0, len(state.roll)):
+        cpy_state = copy.deepcopy(state)
+        if (state.turn.turn == 0): #White
+          space_to_valid = cpy_state.checkSpaceTo(26, 25- cpy_state.roll[x])
+        else: # Black
+          space_to_valid = cpy_state.checkSpaceTo(27, cpy_state.roll[x])
+        if (space_to_valid[0] == True):
+          space_from = space_to_valid[1]
+          space_to = space_to_valid[2]
+          move_dist = space_to_valid[3]
+
+          # Execute move
+          move_piece = cpy_state.board.spaceList[space_from].s.pop()
+
+          #Check if the current space is now empty - if so and not a jail space, update color
+          if (isinstance(cpy_state.board.spaceList[space_from], space.jailSpace) == False):
+            if (len(cpy_state.board.spaceList[space_from]) == 0):
+              cpy_state.board.spaceList[space_from].updateColor(-1)
+
+          # Capture opponent piece and put it in jail
+          if (cpy_state.board.spaceList[space_to].getColor() != cpy_state.turn.turn):
+            if (len(cpy_state.board.spaceList[space_to]) == 1):
+              cap_piece = cpy_state.board.spaceList[space_to].s.pop()
+              if (cpy_state.turn.turn == 0): # WHITE
+                cpy_state.board.spaceList[27].s.append(cap_piece)
+              else: #BLACK
+                cpy_state.board.spaceList[26].s.append(cap_piece)
+
+          cpy_state.board.spaceList[space_to].s.append(move_piece)
+          cpy_state.board.spaceList[space_to].updateColor(state.turn.turn)
+          cpy_state.roll.remove(cpy_state.roll[x])
+          cpy_state.updatePipCount()
+
+          posStates.append(cpy_state)
+          #cpy_state.printState()
+
+      posStates.remove(state)
+      genAllPossMoves(posStates)
+
+    else:
+      #print "nobody in jail"
+      for x in range(0, 25):
+        #print x
+        
+        cur_space = state.board.spaceList[x]
+        
+        if (cur_space.getColor() != state.turn.turn):
+          continue
+
+        else: 
+          #print "getting here?"
+          for y in range(0, len(state.roll)):
+            cpy_state = copy.deepcopy(state)
+            if (state.turn.turn == 0): #White
+              space_to_valid = cpy_state.checkSpaceTo(x, x - state.roll[y])
+            else: #Black
+              space_to_valid = cpy_state.checkSpaceTo(x, x + state.roll[y])
+            #print space_to_valid
+            if (space_to_valid[0] == True):
+              #print "Exist valid move?"
+              space_from = space_to_valid[1]
+              space_to = space_to_valid[2]
+              move_dist = space_to_valid[3]
+
+              # Execute move
+              move_piece = cpy_state.board.spaceList[space_from].s.pop()
+
+              #Check if the current space is now empty - if so and not a jail space, update color
+              if (isinstance(cpy_state.board.spaceList[space_from], space.jailSpace) == False):
+                if (len(cpy_state.board.spaceList[space_from]) == 0):
+                  cpy_state.board.spaceList[space_from].updateColor(-1)
+
+              # Capture opponent piece and put it in jail
+              if (cpy_state.board.spaceList[space_to].getColor() != cpy_state.turn.turn):
+                if (len(cpy_state.board.spaceList[space_to]) == 1):
+                  cap_piece = cpy_state.board.spaceList[space_to].s.pop()
+                  if (cpy_state.turn.turn == 0): # WHITE
+                    cpy_state.board.spaceList[27].s.append(cap_piece)
+                  else: #BLACK
+                    cpy_state.board.spaceList[26].s.append(cap_piece)
+
+              cpy_state.board.spaceList[space_to].s.append(move_piece)
+              cpy_state.board.spaceList[space_to].updateColor(state.turn.turn)
+              cpy_state.roll.remove(cpy_state.roll[y])
+              cpy_state.updatePipCount()
+
+              posStates.append(cpy_state)
+              #cpy_state.printState()
           
+      posStates.remove(state)
+      genAllPossMoves(posStates)
+
+def evalMoves(posStates):
+  cur_max = -1000000
+  best_move = []
+
+  for x in range(0, len(posStates)):
+
+    temp = calcMoveValue(posStates[x])
+    print temp
+
+    if (temp > cur_max):
+      # If temp move better than current best, remove current best and store temp
+      cur_max = temp
+      best_move = []
+      best_move.append(posStates[x])
+
+    elif (temp == cur_max):
+      # If temp is equal to current best, store both moves and decide which one later
+      best_move.append(posStates[x])
+
+  print "Best Move Value: " + str(cur_max)
+  
+  if (len(best_move) == 1):
+    best = best_move[0]
+  else:
+    test = random.random()*len(best_move)
+    best = best_move[int(math.floor(test))]
+
+  return best
+
+def calcMoveValue(state):
+  
+  uncovered_score = 0
+  
+  blocade_score = 0
+  blocade_count = 0
+
+  for x in range(0, 25):
+    cur_space = state.board.spaceList[x]
+
+    if (cur_space.getColor() != state.turn.turn):
+      blocade_count = 0
+      continue
+
+    else:
+      if (len(cur_space) == 1):
+        blocade_count = 0
+        if (state.turn.turn == 0): #White
+          blot_points = 5 * ((25-x)*.25)
+        else:
+          blot_points = 5 * (x*.25)
+        uncovered_score = uncovered_score + blot_points
+
+      if (len(cur_space) >= 2):
+        blocade_count += 1
+        blocade_score += blocade_count*2
+
+  move_value = blocade_score - uncovered_score
+  return move_value
+  
+def playStrategicCompTurn(state):
+  posStates = [state]
+  genAllPossMoves(posStates)
+  #for item in posStates:
+    #print item.printState()
+  best = evalMoves(posStates)
+  return best
   
 def playRandCompTurn(state):
   '''Calculate and return a valid, random Computer move'''
