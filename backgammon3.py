@@ -57,7 +57,7 @@ def play(num):
       winner = state.testGameOver()
       
   if (num == 1): #Play human v. comp
-    if (state.turn.turn ==0):
+    if (state.turn.turn == 0):
       playTurn(state, 0)
     else:
       playTurn(state, 2)
@@ -74,14 +74,19 @@ def play(num):
       winner = state.testGameOver()
 
   if (num == 2): #Play comp v. comp
-    playTurn(state, 1)
+    if (state.turn.turn == 0):
+      playTurn(state, 2)
+    else:
+      playTurn(state, 1)
 
     while (winner == -1):
       roll = die.rollDie()
       state.updateRoll(roll)
       state.turn.switchTurn()
-
-      playTurn(state, 1)
+      if (state.turn.turn == 0):
+        playTurn(state, 2)
+      else:
+        playTurn(state, 1)
 
       winner = state.testGameOver() 
   
@@ -104,12 +109,11 @@ def play(num):
     again = True
   else:
     again = False
-
   
   return again
 
 def playTurn(state, num_flag):
-  
+  '''Plays one turn'''
   if (num_flag == 0 or num_flag == 1):
     val_moves = state.existValidMoves()
 
@@ -179,12 +183,14 @@ def playTurn(state, num_flag):
     state.updateFromState(new_state)
 
 def genAllPossMoves(posStates):
-  #HAVE TO FIGURE OUT WHY INF LOOP IN DOUBLES
   '''Recursively generate all possible moves given a game-state'''
-  print len(posStates)
+  if (len(posStates) > 1000):
+    for item in posStates:
+      print item
+    exit(1)
   state = posStates[0]
 
-  if (len(state.roll) == 0 or state.existValidMoves == False):
+  if (len(state.roll) == 0 or state.existValidMoves() == False):
     return 
 
   else:
@@ -224,7 +230,8 @@ def genAllPossMoves(posStates):
           cpy_state.roll.remove(cpy_state.roll[x])
           cpy_state.updatePipCount()
 
-          posStates.append(cpy_state)
+          if (compareStateToList(cpy_state, posStates) != True):
+            posStates.append(cpy_state)
           #cpy_state.printState()
 
       posStates.remove(state)
@@ -241,7 +248,6 @@ def genAllPossMoves(posStates):
           continue
 
         else: 
-          #print "getting here?"
           for y in range(0, len(state.roll)):
             cpy_state = copy.deepcopy(state)
             if (state.turn.turn == 0): #White
@@ -277,13 +283,27 @@ def genAllPossMoves(posStates):
               cpy_state.roll.remove(cpy_state.roll[y])
               cpy_state.updatePipCount()
 
-              posStates.append(cpy_state)
+              if (compareStateToList(cpy_state, posStates) != True):
+                posStates.append(cpy_state)
               #cpy_state.printState()
           
       posStates.remove(state)
       genAllPossMoves(posStates)
 
+def compareStateToList(state, stateList):
+  '''Compare state to list of states to determine if it is already in the list'''
+  alreadyInList = False
+  
+  for item in stateList:
+    if (state.compareStates(item) == True):
+      alreadyInList = True
+      break
+
+  return alreadyInList
+
+
 def evalMoves(posStates):
+  '''Evaluate all moves in a list and return move with the highest score'''
   cur_max = -1000000
   best_move = []
 
@@ -313,7 +333,7 @@ def evalMoves(posStates):
   return best
 
 def calcMoveValue(state):
-  
+  '''Calculate the value of a move for a strategy-based computer to determine best move'''
   uncovered_score = 0
   
   blocade_score = 0
@@ -343,6 +363,7 @@ def calcMoveValue(state):
   return move_value
   
 def playStrategicCompTurn(state):
+  '''Plays a computer turn if a non-random strategy is being played'''
   posStates = [state]
   genAllPossMoves(posStates)
   #for item in posStates:
@@ -495,7 +516,7 @@ def getSpaceTo():
 
 
 def createInitialState(die):
-  
+  '''Create initial game state given a die object'''
   b = board.board()
   b.initBoard()
   

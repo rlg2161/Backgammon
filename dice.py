@@ -12,9 +12,6 @@ class oneDie():
     else:
       self.num_sides = sides
 
-#def roll(self):
-  #get_roll = math.floor(random.random()*(self.num_sides)) + 1
-  #return int(get_roll)
 
   def rollDie(self):
     '''Rolls 2 die (returns 4 die if doubles)'''
@@ -28,7 +25,6 @@ class oneDie():
     else:
       totalRoll = [roll1, roll2]
 
-    #totalRoll.sort()
     return totalRoll
  
   def goesFirst(self):
@@ -38,7 +34,6 @@ class oneDie():
     roll1 = int(math.floor(random.random()*(self.num_sides)) + 1)
     roll2 = int(math.floor(random.random()*(self.num_sides)) + 1)
 
-    #print [roll1, roll2]
 
     while (roll1 == roll2):
       roll1 = int(math.floor(random.random()*(self.num_sides)) + 1)
@@ -53,8 +48,5 @@ class oneDie():
       #i.e. Player 2 (black) goes first
   
     totalRoll = [roll1, roll2]
-    #totalRoll.sort()
-
-    #print t
 
     return (t, totalRoll)

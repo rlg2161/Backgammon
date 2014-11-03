@@ -27,7 +27,28 @@ class state():
 
     return return_string
 
+  def compareStates(self, other_state):
+    '''Compare a given state to another state to determine if they are the same'''
+    sameState = True
+    
+    if (self.turn.turn != other_state.turn.turn):
+      sameState = False
+    
+    if (len(self.roll) != len(other_state.roll)):
+      sameState = False
+
+    else:
+      for x in range (0, 27):
+        if (len(self.board.spaceList[x]) == len(other_state.board.spaceList[x])):
+          continue
+        else:
+          sameState = False
+          break
+
+    return sameState
+
   def updateFromState(self, other_state):
+    '''Update a state to match another state'''
     self.roll = other_state.roll
     self.turn = other_state.turn
     self.board = other_state.board
@@ -189,6 +210,12 @@ class state():
   def checkSpaceTo(self, space_from, space_to):
     '''Check if space desired to move to is legal'''
     orig_space_from = space_from
+    orig_space_to = space_to
+
+    if (space_to <= 0):
+      space_to = 0
+    elif (space_to >= 25):
+      space_to = 25
 
     valid_move = True
     
@@ -215,7 +242,7 @@ class state():
         roll_copy = copy.copy(self.roll)
         roll_copy.sort()
         test = roll_copy.pop()
-        
+
         if ((math.fabs(space_from - space_to) == check_last_space) and \
           (test >= check_last_space)):
           move_dist = test
