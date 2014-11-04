@@ -5,9 +5,10 @@ This repository is a backgammon game I wrote from scratch in Python for practice
 As of now, the game is only playable from the terminal. Plays like a normal game of backgammon 
 with error checking of illegal moves. 
 
-Currently, the AI is extremely rudimentary - it will play a strategy of picking a random, 
-valid move for every roll. I intend to add logic to make a rules-based AI, and if possible 
-will later implement some sort of forward-looking AI for better computer play. 
+Currently, the AI has 2 settings - a random player and a player guided by logic (written by me 
+but inspired by http://www.bkgm.com/articles/Berliner/BKG-AProgramThatPlaysBackgammon/). To 
+change the type of computer player, can modify the second argument in any of the play turn 
+functions in play() in backgammon.py.
 
 Features:
 Every before every move (and then after the end of the game to capture the last state), 
@@ -19,8 +20,14 @@ state register will allow the game to be reset to the state of the game one move
 
 
 Current Issues:
-
-Need to fix move generator that calculates all possible moves for the computer
-Need to fix move generator/compGenMoves() to avoid infinite loop on doubles
-Have to make sure that the "best" move always uses 2 dice if possible in accordance with rules
 Need to fix move evaluating algorithm
+Possible bug in computer not taking final dice move if it will cause it to move off the board
+and the previous move was the first to move all pieces into the final quadrant
+
+Completed Issues:
+Need to fix move generator that calculates all possible moves for the computer
+Need to fix move generator/compGenMoves() to avoid infinite loop on doubles - not an infinite
+  loop but a recursion overflow. Fixed by pruning repititve states so that there is not an 
+  explosion of recursive calls when evaluating a double.
+Have to make sure that the "best" move always uses 2 dice if possible in accordance with rules  
+  - possibly reasserting itself in above error
