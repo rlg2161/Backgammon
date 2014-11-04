@@ -77,16 +77,17 @@ def play(num):
     if (state.turn.turn == 0):
       playTurn(state, 2)
     else:
-      playTurn(state, 1)
+      playTurn(state, 2)
 
     while (winner == -1):
+      raw_input("wait")
       roll = die.rollDie()
       state.updateRoll(roll)
       state.turn.switchTurn()
       if (state.turn.turn == 0):
         playTurn(state, 2)
       else:
-        playTurn(state, 1)
+        playTurn(state, 2)
 
       winner = state.testGameOver() 
   
@@ -343,6 +344,19 @@ def calcMoveValue(state):
   opp_jail_score = 0
   blocade_score = 0
   blocade_count = 0
+  covered_score = 0
+
+
+  # Only count once
+  if (state.turn.turn == 0):
+      # Points for opp pieces in jail
+      opp_jail_score = 5*(len(state.board.spaceList[27]))
+      # Points for scoring pieces
+      points_scored = 3*len(state.board.spaceList[25])
+  else:
+    opp_jail_score = 5*(len(state.board.spaceList[26]))
+    points_scored = 3*len(state.board.spaceList[0])
+
 
   for x in range(0, 25):
     cur_space = state.board.spaceList[x]
@@ -353,27 +367,24 @@ def calcMoveValue(state):
       continue
 
     else:
-      # Points for opp pieces in jail
-      if (state.turn.turn == 0):
-        opp_jail_score = 20*(len(state.board.spaceList[27]))
-      else:
-        opp_jail_score = 20*(len(state.board.spaceList[26]))
-
       # Points for uncovered pieces
       if (len(cur_space) == 1):
         blocade_count = 0
-        if (state.turn.turn == 0): #White
-          blot_points = 5 * ((25-x)*.25)
-        else:
-          blot_points = 5 * (x*.25)
-        uncovered_score = uncovered_score + blot_points
+        if (state.allInFinalQuadrant() == False):
+          if (state.turn.turn == 0): #White
+            blot_points = 5 * ((25-x)*.125)
+          else:
+            blot_points = 5 * (x*.125)
+          uncovered_score = uncovered_score + blot_points
 
       # Points for blocades
       if (len(cur_space) >= 2):
+        covered_score += 1
         blocade_count += 1
-        blocade_score += blocade_count*2
+        if (blocade_count > 1):
+          blocade_score += blocade_count*2
 
-  move_value = blocade_score - uncovered_score
+  move_value = points_scored + opp_jail_score + blocade_score - uncovered_score
   return move_value
   
 def playStrategicCompTurn(state):

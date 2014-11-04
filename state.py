@@ -101,7 +101,7 @@ class state():
     return allInFQ
 
   def lastOccupiedSpace(self):
-    '''Returns the last occupied space for the current player'''
+    '''Returns the furthest distance from home for the current player'''
     max_space = 0
 
     if (self.turn.turn): #Black's turn
