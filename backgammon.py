@@ -176,7 +176,7 @@ def playTurn(state, num_flag):
       state.updatePipCount()
 
       val_moves = state.existValidMoves()
-      print val_moves
+      #print val_moves
 
     state.printState()
 
@@ -312,6 +312,7 @@ def elimInvalidMoves(stateList):
   roll_count = 4
 
   for state in stateList:
+
     temp = len(state.roll)
     if (temp <= roll_count):
       roll_count = temp
@@ -359,6 +360,10 @@ def calcMoveValue(state):
   blocade_count = 0
   covered_score = 0
 
+  temp = state.lastOccupiedSpace()
+  last_white_space = temp[0]
+  last_black_space = temp[1]
+
 
   # Only count once
   if (state.turn.turn == 0):
@@ -383,12 +388,14 @@ def calcMoveValue(state):
       # Points for uncovered pieces
       if (len(cur_space) == 1):
         blocade_count = 0
-        if (state.allInFinalQuadrant() == False):
-          if (state.turn.turn == 0): #White
+        if (state.turn.turn == 0): #White
+          if (cur_space > last_black_space): 
             blot_points = 5 * ((25-x)*.125)
-          else:
-            blot_points = 5 * (x*.125)
-          uncovered_score = uncovered_score + blot_points
+        elif (state.turn.turn == 1): #Black
+          if (cur_space < last_white_space):
+            blot_points = 5*((x)*.125)
+        
+        uncovered_score = uncovered_score + blot_points
 
       # Points for blocades
       if (len(cur_space) >= 2):

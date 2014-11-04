@@ -159,7 +159,7 @@ class state():
 
     if (len(self.roll) == 0):
       # no remaining rolls --> no valid moves
-      print "no remaining rolls"
+      #print "no remaining rolls"
       return val_moves
 
     elif(self.pieceInJail()):
