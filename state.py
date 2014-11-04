@@ -101,6 +101,30 @@ class state():
     return allInFQ
 
   def lastOccupiedSpace(self):
+    furthest_white = 0
+    furthest_black = 24
+
+    for x in range(1, 25):
+      cur_space = self.board.spaceList[x]
+      cur_space_color = cur_space.getColor()
+
+      if (cur_space_color == 0): #White
+        if (x > furthest_white):
+          furthest_white = x
+
+      elif (cur_space_color == 1): #Black
+        if (x < furthest_black):
+          furthest_black = x
+
+    if (len(self.board.spaceList[26]) > 0):
+      furthest_white = 25
+    if (len(self.board.spaceList[27]) > 0):
+      furthest_black = 0
+    
+    return (furthest_white, furthest_black)
+
+
+  def furthestFromHome(self):
     '''Returns the furthest distance from home for the current player'''
     max_space = 0
 
@@ -238,7 +262,7 @@ class state():
 
     if (space_to <= 0 or space_to >= 25):
       if (self.allInFinalQuadrant()):
-        check_last_space = self.lastOccupiedSpace()
+        check_last_space = self.furthestFromHome()
         roll_copy = copy.copy(self.roll)
         roll_copy.sort()
         test = roll_copy.pop()

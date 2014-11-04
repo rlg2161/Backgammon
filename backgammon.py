@@ -77,7 +77,7 @@ def play(num):
     if (state.turn.turn == 0):
       playTurn(state, 2)
     else:
-      playTurn(state, 2)
+      playTurn(state, 1)
 
     while (winner == -1):
       raw_input("wait")
@@ -87,7 +87,7 @@ def play(num):
       if (state.turn.turn == 0):
         playTurn(state, 2)
       else:
-        playTurn(state, 2)
+        playTurn(state, 1)
 
       winner = state.testGameOver() 
   
@@ -186,6 +186,7 @@ def playTurn(state, num_flag):
     state.printState()
     new_state = playStrategicCompTurn(state)
     new_state.printState()
+    print new_state.lastOccupiedSpace()
     #stateList.append(new_state)
     state.updateFromState(new_state)
 
@@ -307,11 +308,23 @@ def compareStateToList(state, stateList):
 
   return alreadyInList
 
+def elimInvalidMoves(stateList):
+  roll_count = 4
+
+  for state in stateList:
+    temp = len(state.roll)
+    if (temp <= roll_count):
+      roll_count = temp
+    else:
+      stateList.remove(state)
+
 
 def evalMoves(posStates):
   '''Evaluate all moves in a list and return move with the highest score'''
   cur_max = -1000000
   best_move = []
+
+  elimInvalidMoves(posStates)
 
   for x in range(0, len(posStates)):
 
@@ -417,12 +430,12 @@ def getCompSpaceFrom(state):
     test = roll_copy.pop()
     if (state.allInFinalQuadrant()):
       #All pieces in final quadrant
-      if (state.lastOccupiedSpace() <= test):
+      if (state.furthestFromHome() <= test):
         # If largest roll is greater than or equal to distance from home of farthest piece
         if (state.turn.turn == 0):
-          space_from = state.lastOccupiedSpace()
+          space_from = state.furthestFromHome()
         else:
-          space_from = 25 - state.lastOccupiedSpace()
+          space_from = 25 - state.furthestFromHome()
       else:
         #If largest roll is smaller than furthest away piece
         move_from = False
