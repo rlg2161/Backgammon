@@ -87,7 +87,7 @@ class state():
   def allInFinalQuadrant(self):
     '''Checks if all pieces are in the final quadrant'''
     allInFQ = True
-    if (self.turn): #Black's turn
+    if (self.turn.turn): #Black's turn
       for x in range (1, 19):
         if (self.board.spaceList[x].getColor() == 1):
           allInFQ = False
@@ -135,7 +135,7 @@ class state():
 
     if (len(self.roll) == 0):
       # no remaining rolls --> no valid moves
-      #print "no remaining rolls"
+      print "no remaining rolls"
       return val_moves
 
     elif(self.pieceInJail()):
@@ -178,7 +178,7 @@ class state():
                 pos_valid = self.checkSpaceTo(space_from, space_from + self.roll[y])
 
             elif (self.turn.turn == 0):
-             #print "White's turn with no-one in jail"
+              #print "White's turn with no-one in jail"
               if (space_from - self.roll[y] < 0):
                 pos_valid = self.checkSpaceTo(space_from, 0)
               else:

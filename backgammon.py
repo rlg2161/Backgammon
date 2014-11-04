@@ -114,17 +114,18 @@ def play(num):
 
 def playTurn(state, num_flag):
   '''Plays one turn'''
+  stateList.append(copy.deepcopy(state))
   if (num_flag == 0 or num_flag == 1):
     val_moves = state.existValidMoves()
 
     if (val_moves == False):
-      stateList.append(copy.deepcopy(state))
-      print "No valid moves exist - next player's turn"
+      #stateList.append(copy.deepcopy(state))
+      print "No valid moves"
       state.printState()
 
 
     while (val_moves == True):
-      stateList.append(copy.deepcopy(state))
+      #stateList.append(copy.deepcopy(state))
       state.printState()
 
       valid_move = False
@@ -174,19 +175,23 @@ def playTurn(state, num_flag):
       state.updatePipCount()
 
       val_moves = state.existValidMoves()
-      #print val_moves
+      print val_moves
+
+    state.printState()
+
+    #stateList.append(copy.deepcopy(state))
     
   else:
     state.printState()
     new_state = playStrategicCompTurn(state)
     new_state.printState()
+    #stateList.append(new_state)
     state.updateFromState(new_state)
 
 def genAllPossMoves(posStates):
   '''Recursively generate all possible moves given a game-state'''
   if (len(posStates) > 1000):
-    for item in posStates:
-      print item
+    print "Recursive depth reached - game exited"
     exit(1)
   state = posStates[0]
 
@@ -335,18 +340,26 @@ def evalMoves(posStates):
 def calcMoveValue(state):
   '''Calculate the value of a move for a strategy-based computer to determine best move'''
   uncovered_score = 0
-  
+  opp_jail_score = 0
   blocade_score = 0
   blocade_count = 0
 
   for x in range(0, 25):
     cur_space = state.board.spaceList[x]
 
+    
     if (cur_space.getColor() != state.turn.turn):
       blocade_count = 0
       continue
 
     else:
+      # Points for opp pieces in jail
+      if (state.turn.turn == 0):
+        opp_jail_score = 20*(len(state.board.spaceList[27]))
+      else:
+        opp_jail_score = 20*(len(state.board.spaceList[26]))
+
+      # Points for uncovered pieces
       if (len(cur_space) == 1):
         blocade_count = 0
         if (state.turn.turn == 0): #White
@@ -355,6 +368,7 @@ def calcMoveValue(state):
           blot_points = 5 * (x*.25)
         uncovered_score = uncovered_score + blot_points
 
+      # Points for blocades
       if (len(cur_space) >= 2):
         blocade_count += 1
         blocade_score += blocade_count*2
