@@ -13,13 +13,18 @@ stateList = []
 def main():
   
   print "Would you like to play against another person or the computer?"
-  computer = raw_input("Enter 0 for human or 1 for computer or 2 for 2 computers against eachother:  ")
+  print ""
+  print "0: two people to play each other"
+  print "1: human vs. computer"
+  print "2: comp vs. comp (strategy testing and simulation)"
+  print "3: simulation"
+  computer = raw_input("Please make your selection:   ")
   
   good_input = False
 
   while (good_input != True):
     try:
-      if (int(computer) == 1 or int(computer) == 0 or int(computer) == 2):
+      if (int(computer) == 1 or int(computer) == 0 or int(computer) == 2 or int(computer) == 3):
         good_input = True
         continue
       else:
@@ -27,10 +32,22 @@ def main():
     except:
       computer = raw_input("Please enter 0 to play against a person or 1 for computer or 2 for 2 computers against eachother:  ")
   
-  again = play(int(computer))
-
-  while(again):
+  if (int(computer) < 3):
     again = play(int(computer))
+
+    while(again):
+      again = play(int(computer))
+
+  else: 
+    num_sims = raw_input("How many games would you like to simulate? ")
+    print "What strategies would you like the computer to use? They are, currently: "
+    print "1: Random computer player"
+    print "2: My own, custom algorithm"
+    print "... More to come ..."
+    first_strat = raw_input("Choice for comp 1: ")
+    second_strat = raw_input("Choice for comp 2: ")
+
+    simulateSession(first_strat, second_strat, num_sims)
 
 def play(num):
   ''' Play a game'''
@@ -45,39 +62,39 @@ def play(num):
 
   if (num == 0): #Play 2 humans
     #print str(state)
-    playTurn(state, 0)
+    playTurn(state, 0, 1)
   
     while(winner == -1):
       roll = die.rollDie()
       state.updateRoll(roll)
       state.turn.switchTurn()
       
-      playTurn(state, 0)
+      playTurn(state, 0, 1)
 
       winner = state.testGameOver()
       
   if (num == 1): #Play human v. comp
     if (state.turn.turn == 0):
-      playTurn(state, 0)
+      playTurn(state, 0, 1)
     else:
-      playTurn(state, 2)
+      playTurn(state, 2, 1)
 
     while (winner == -1):
       roll = die.rollDie()
       state.updateRoll(roll)
       state.turn.switchTurn()
       if (state.turn.turn == 0):
-        playTurn(state, 0)
+        playTurn(state, 0, 1)
       else:
-        playTurn(state, 2)
+        playTurn(state, 2, 1)
 
       winner = state.testGameOver()
 
   if (num == 2): #Play comp v. comp
     if (state.turn.turn == 0):
-      playTurn(state, 2)
+      playTurn(state, 2, 1) #White == Strat
     else:
-      playTurn(state, 1)
+      playTurn(state, 1, 1) #Black == Random
 
     while (winner == -1):
       raw_input("wait")
@@ -85,9 +102,9 @@ def play(num):
       state.updateRoll(roll)
       state.turn.switchTurn()
       if (state.turn.turn == 0):
-        playTurn(state, 2)
+        playTurn(state, 2, 1)
       else:
-        playTurn(state, 1)
+        playTurn(state, 1, 1)
 
       winner = state.testGameOver() 
   
@@ -113,7 +130,61 @@ def play(num):
   
   return again
 
-def playTurn(state, num_flag):
+def simulateSession(first_strat, second_strat, number_games):
+  die = dice.oneDie(6)
+  
+  white_score = 0
+  black_score = 0
+
+  for x in range(0, int(number_games)):
+    winner = simulateGame(int(first_strat), int(second_strat), die)
+    
+    if (winner == 0):
+      white_score += 1
+    elif(winner == 1):
+      black_score += 1
+
+    print "Game " + str(x + 1) + " completed"
+ 
+  if (white_score > black_score):
+    print "White wins"
+  else:
+    print "Black wins"
+ 
+  print "White's score for this round was: " + str(white_score) + \
+  " while playing " + str(first_strat)
+  print "Black's score for this round was: " + str(black_score) + \
+  " while playing " + str(second_strat)
+
+
+def simulateGame(first_strat, second_strat, die):
+  '''Simulate a game'''
+
+  state = createInitialState(die)
+  
+  winner = -1
+
+  if (state.turn.turn == 0):
+    playTurn(state, first_strat, 0) #White == Strat
+  else:
+    playTurn(state, second_strat, 0) #Black == Random
+
+  while (winner == -1):
+    roll = die.rollDie()
+    state.updateRoll(roll)
+    state.turn.switchTurn()
+    if (state.turn.turn == 0):
+      playTurn(state, first_strat, 0)
+    else:
+      playTurn(state, second_strat, 0)
+
+    winner = state.testGameOver()
+
+  return winner
+
+
+
+def playTurn(state, num_flag, print_mode):
   '''Plays one turn'''
   stateList.append(copy.deepcopy(state))
   if (num_flag == 0 or num_flag == 1):
@@ -121,13 +192,15 @@ def playTurn(state, num_flag):
 
     if (val_moves == False):
       #stateList.append(copy.deepcopy(state))
-      print "No valid moves"
-      state.printState()
+      if (print_mode):
+        print "No valid moves"
+        state.printState()
 
 
     while (val_moves == True):
       #stateList.append(copy.deepcopy(state))
-      state.printState()
+      if (print_mode):
+        state.printState()
 
       valid_move = False
 
@@ -142,7 +215,8 @@ def playTurn(state, num_flag):
         
         if (valid_move != True and state.turn.turn == 0):
           # If invalid, print relevant error
-          state.printError(space_to_valid[3])
+          if (print_mode):
+            state.printError(space_to_valid[3])
 
         
       #assign valid move values to actual move varialbes
@@ -178,22 +252,27 @@ def playTurn(state, num_flag):
       val_moves = state.existValidMoves()
       #print val_moves
 
-    state.printState()
+    if (print_mode):
+      state.printState()
 
     #stateList.append(copy.deepcopy(state))
     
   else:
-    state.printState()
+    if (print_mode):
+      state.printState()
+
     new_state = playStrategicCompTurn(state)
-    new_state.printState()
-    print new_state.lastOccupiedSpace()
+    
+    if (print_mode):
+      new_state.printState()
+
     #stateList.append(new_state)
     state.updateFromState(new_state)
 
 def genAllPossMoves(posStates):
   '''Recursively generate all possible moves given a game-state'''
   if (len(posStates) > 1000):
-    print "Recursive depth reached - game exited"
+    print "Runaway recursion :( - game exited"
     exit(1)
   state = posStates[0]
 
@@ -202,7 +281,7 @@ def genAllPossMoves(posStates):
 
   else:
     if (state.pieceInJail() == True):
-      print "piece in jail"
+      #print "piece in jail"
       
       for x in range(0, len(state.roll)):
         cpy_state = copy.deepcopy(state)
@@ -330,7 +409,7 @@ def evalMoves(posStates):
   for x in range(0, len(posStates)):
 
     temp = calcMoveValue(posStates[x])
-    print temp
+    #print temp
 
     if (temp > cur_max):
       # If temp move better than current best, remove current best and store temp
@@ -342,7 +421,7 @@ def evalMoves(posStates):
       # If temp is equal to current best, store both moves and decide which one later
       best_move.append(posStates[x])
 
-  print "Best Move Value: " + str(cur_max)
+  #print "Best Move Value: " + str(cur_max)
   
   if (len(best_move) == 1):
     best = best_move[0]
@@ -368,11 +447,11 @@ def calcMoveValue(state):
   # Only count once
   if (state.turn.turn == 0):
       # Points for opp pieces in jail
-      opp_jail_score = 5*(len(state.board.spaceList[27]))
+      opp_jail_score = 8*(len(state.board.spaceList[27]))
       # Points for scoring pieces
       points_scored = 3*len(state.board.spaceList[25])
   else:
-    opp_jail_score = 5*(len(state.board.spaceList[26]))
+    opp_jail_score = 8*(len(state.board.spaceList[26]))
     points_scored = 3*len(state.board.spaceList[0])
 
 
@@ -387,6 +466,7 @@ def calcMoveValue(state):
     else:
       # Points for uncovered pieces
       if (len(cur_space) == 1):
+        blot_points = 0
         blocade_count = 0
         if (state.turn.turn == 0): #White
           if (cur_space > last_black_space): 
@@ -404,7 +484,12 @@ def calcMoveValue(state):
         if (blocade_count > 1):
           blocade_score += blocade_count*2
 
-  move_value = points_scored + opp_jail_score + blocade_score - uncovered_score
+  
+
+  #print "points scored: " + str(points_scored) + " opponent jail score: " + str(opp_jail_score) \
+  #+ " blocade score: " + str(blocade_score) + \
+  #" covered score: " + str(covered_score) + " Uncovered score: -" + str(uncovered_score)
+  move_value = points_scored + opp_jail_score + blocade_score + covered_score - uncovered_score
   return move_value
   
 def playStrategicCompTurn(state):
