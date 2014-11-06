@@ -443,7 +443,6 @@ def calcMoveValue(state):
   last_white_space = temp[0]
   last_black_space = temp[1]
 
-
   # Only count once
   if (state.turn.turn == 0):
       # Points for opp pieces in jail
@@ -457,7 +456,6 @@ def calcMoveValue(state):
 
   for x in range(0, 25):
     cur_space = state.board.spaceList[x]
-
     
     if (cur_space.getColor() != state.turn.turn):
       blocade_count = 0
@@ -483,8 +481,6 @@ def calcMoveValue(state):
         blocade_count += 1
         if (blocade_count > 1):
           blocade_score += blocade_count*2
-
-  
 
   #print "points scored: " + str(points_scored) + " opponent jail score: " + str(opp_jail_score) \
   #+ " blocade score: " + str(blocade_score) + \

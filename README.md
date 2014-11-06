@@ -8,7 +8,13 @@ with error checking of illegal moves.
 Currently, the AI has 2 settings - a random player and a player guided by logic (written by me 
 but inspired by http://www.bkgm.com/articles/Berliner/BKG-AProgramThatPlaysBackgammon/). To 
 change the type of computer player, can modify the second argument in any of the play turn 
-functions in play() in backgammon.py.
+functions in play() in backgammon.py. I have also implemented a simulation mode to test 
+strategies against each other. At this point, I only have the two above strategies but intend
+to implement more.
+
+Success vs. Random:
+My algorithm - 999/1000 wins vs. random computer
+
 
 Features:
 Every before every move (and then after the end of the game to capture the last state), 
@@ -20,9 +26,10 @@ state register will allow the game to be reset to the state of the game one move
 
 
 Current Issues:
-Need to fix move evaluating algorithm
+Need to improve move evaluating algorithm
 Possible bug in computer not taking final dice move if it will cause it to move off the board
-and the previous move was the first to move all pieces into the final quadrant
+and the previous move was the first to move all pieces into the final quadrant - seems fixed
+but want to be aware in case it pops up again
 
 Completed Issues:
 Need to fix move generator that calculates all possible moves for the computer
