@@ -13,7 +13,7 @@ strategies against each other. At this point, I only have the two above strategi
 to implement more.
 
 Success vs. Random:
-My algorithm - 999/1000 wins vs. random computer
+My algorithm - 980/1000 wins vs. random computer
 
 
 Features:
