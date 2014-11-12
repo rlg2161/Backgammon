@@ -144,7 +144,11 @@ def simulateSession(first_strat, second_strat, number_games):
     elif(winner == 1):
       black_score += 1
 
-    print "Game " + str(x + 1) + " completed"
+    print "Game " + str(x + 1) + " completed - ",
+    if (winner == 0):
+      print "White won"
+    else:
+      print "Black won"
  
   if (white_score > black_score):
     print "White wins"
@@ -442,16 +446,17 @@ def calcMoveValue(state):
   temp = state.lastOccupiedSpace()
   last_white_space = temp[0]
   last_black_space = temp[1]
+  
 
   # Only count once
   if (state.turn.turn == 0):
       # Points for opp pieces in jail
       opp_jail_score = 8*(len(state.board.spaceList[27]))
       # Points for scoring pieces
-      points_scored = 3*len(state.board.spaceList[25])
+      points_scored = 4*len(state.board.spaceList[25])
   else:
     opp_jail_score = 8*(len(state.board.spaceList[26]))
-    points_scored = 3*len(state.board.spaceList[0])
+    points_scored = 4*len(state.board.spaceList[0])
 
 
   for x in range(0, 25):
@@ -467,10 +472,10 @@ def calcMoveValue(state):
         blot_points = 0
         blocade_count = 0
         if (state.turn.turn == 0): #White
-          if (cur_space > last_black_space): 
+          if (x > last_black_space): 
             blot_points = 5 * ((25-x)*.125)
         elif (state.turn.turn == 1): #Black
-          if (cur_space < last_white_space):
+          if (x < last_white_space):
             blot_points = 5*((x)*.125)
         
         uncovered_score = uncovered_score + blot_points
@@ -485,6 +490,7 @@ def calcMoveValue(state):
   #print "points scored: " + str(points_scored) + " opponent jail score: " + str(opp_jail_score) \
   #+ " blocade score: " + str(blocade_score) + \
   #" covered score: " + str(covered_score) + " Uncovered score: -" + str(uncovered_score)
+  #state.printState()
   move_value = points_scored + opp_jail_score + blocade_score + covered_score - uncovered_score
   return move_value
   
@@ -492,8 +498,6 @@ def playStrategicCompTurn(state):
   '''Plays a computer turn if a non-random strategy is being played'''
   posStates = [state]
   genAllPossMoves(posStates)
-  #for item in posStates:
-    #print item.printState()
   best = evalMoves(posStates)
   return best
   
@@ -544,7 +548,7 @@ def getCompSpaceFrom(state):
     return space_from
 
 def getCompSpaceTo(state, space_from):
-  ''' Return's the comps select space plus the largest remaining dice roll'''
+  '''Returns the comps selected space plus the largest remaining dice roll'''
   rollcpy = copy.deepcopy(state.roll)
   
   if (random.random() > .5):
@@ -563,12 +567,10 @@ def getCompSpaceTo(state, space_from):
 
     elif (state.allInFinalQuadrant() == False):
       # Comp not in jail && not all in final quadrant
-      #test = rollcpy.pop()
       space_to = space_from + test
     
     else:
       # If all pieces in final quadrant 
-      #test = rollcpy.pop()
       space_to = space_from + test
       if (space_to > 25):
         space_to = 25
@@ -577,19 +579,14 @@ def getCompSpaceTo(state, space_from):
   elif (state.turn.turn == 0):
     if (space_from == 26 + state.turn.turn):
       # If comp is in jail
-      if (random.random() > .5):
-        rollcpy.reverse()
-      #test = rollcpy.pop()
       space_to = 25-test
 
     elif (state.allInFinalQuadrant() == False):
       # Comp not in jail && not all in final quadrant
-      #test = rollcpy.pop()
       space_to = space_from - test
 
     else:
       # If all pieces in final quadrant 
-      #test = rollcpy.pop()
       space_to = space_from - test
       if (space_to < 0):
         space_to = 0
@@ -638,7 +635,6 @@ def getSpaceTo():
       print "That was not a valid input."
   
   return space_to
-
 
 
 def createInitialState(die):
