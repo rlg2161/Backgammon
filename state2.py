@@ -9,9 +9,17 @@ def main():
   state1 = state(1, [1,6])
   state2 = state(1, [1,6])
   state3 = state(1, [2,4])
+  state4 = state(1, [3,2])
+  state5 = state(1, [2,4])
 
-  print state1.compareStates(state2)
-  print state1.compareStates(state3)
+  stateList = [state1, state4, state3]
+  
+  state2.compareStateToList(stateList)
+  state5.compareStateToList(stateList)
+  
+
+   
+
 
 
 class state():
@@ -98,8 +106,6 @@ class state():
           #other_state.printState()
           break
 
-    if (sameState):
-      print "MATCH"
     return sameState
 
   def compareStateToList(self, stateList):
@@ -110,7 +116,6 @@ class state():
       #counter = counter + 1
       #print "counter " +str(counter)
       if (self.compareStates(posState) == True):
-        print "Is this ever happening"
         alreadyInList = True
         break
 
@@ -267,7 +272,6 @@ class state():
 
     return fwd
 
-
   def checkSpaceTo(self, space_from, space_to):
     '''Check if desired space to move to is legal'''
     orig_space_from = space_from
@@ -314,14 +318,14 @@ class state():
        move_dist = -3
        return (valid_move, orig_space_from, space_to, move_dist)       
 
-    if (self.turn == 1 and (self.board[space_from] < 0)): #Black
-      if (self.board[space_to] > 1):
+    if (self.turn == 0 ): #White moving to black space
+      if (self.board[space_to] < -1):
         valid_move = False
         move_dist = -4
         return (valid_move, orig_space_from, space_to, move_dist)
 
-    elif ((self.turn == 0 and self.board[space_from] > 0)): #White
-      if (self.board[space_to] < -1):
+    elif (self.turn == 1): #Black moving to white space
+      if (self.board[space_to] > 1):
         valid_move = False
         move_dist = -4
         return (valid_move, orig_space_from, space_to, move_dist)

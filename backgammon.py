@@ -94,17 +94,17 @@ def play(num):
     if (state.turn == 0):
       playTurn(state, 2, 1) #White == Strat
     else:
-      playTurn(state, 2, 1) #Black == Random
+      playTurn(state, 1, 1) #Black == Random
 
     while (winner == -1):
-      raw_input("wait")
+      #raw_input("wait")
       roll = die.rollDie()
       state.updateRoll(roll)
       state.switchTurn()
       if (state.turn == 0):
-        playTurn(state, 2, 1)
+        playTurn(state, 2, 0)
       else:
-        playTurn(state, 2, 1)
+        playTurn(state, 1, 0)
 
       winner = state.testGameOver() 
   
@@ -138,6 +138,7 @@ def simulateSession(first_strat, second_strat, number_games):
 
   for x in range(0, int(number_games)):
     winner = simulateGame(int(first_strat), int(second_strat), die)
+
     
     if (winner == 0):
       white_score += 1
@@ -169,9 +170,9 @@ def simulateGame(first_strat, second_strat, die):
   winner = -1
 
   if (state.turn == 0):
-    playTurn(state, first_strat, 0) #White == Strat
+    playTurn(state, first_strat, 0) #White
   else:
-    playTurn(state, second_strat, 0) #Black == Random
+    playTurn(state, second_strat, 0) #Black
 
   while (winner == -1):
     roll = die.rollDie()
@@ -279,10 +280,10 @@ def genAllPossMoves(posStates):
   '''Recursively generate all possible moves given a game-state'''
   if (len(posStates) > 10000):
     print "Runaway recursion :( - game exited"
-    posMovesList = open('posMovesList.txt', 'wa')
+    overflowMovesList = open('overflowMovesList.txt', 'wa')
     for item in posStates:
-      posMovesList.write(str(item))
-    posMovesList.close()
+      overflowMovesList.write(str(item))
+    overflowMovesList.close()
     print len(posStates)
     exit(1)
   givenState = posStates[0]
@@ -296,7 +297,7 @@ def genAllPossMoves(posStates):
     # CURRENT PLAYER HAS PIECE IN JAIL
     if ((givenState.turn == 0 and givenState.board[26] > 0 or \
       givenState.turn == 1 and givenState.board[27] < 0)):
-      print "piece in jail"
+      #print "piece in jail"
       
       for x in range(0, len(givenState.roll)):
         cpy_state = state2.state(givenState)
@@ -306,6 +307,7 @@ def genAllPossMoves(posStates):
           space_to_valid = cpy_state.checkSpaceTo(27, cpy_state.roll[x])
         #### IF VALID MOVE, THEN EXECUTE
         if (space_to_valid[0] == True):
+          
           #UPDATE values
           space_from = space_to_valid[1]
           space_to = space_to_valid[2]
@@ -338,11 +340,10 @@ def genAllPossMoves(posStates):
           cpy_state.updatePipCount()
 
           if (cpy_state.compareStateToList(posStates) == False):
+            #print "not getting here?"
             posStates.append(cpy_state)
             
-        else:
-          printError(space_to_valid[3])
-    
+        
     # CURRENT PLAYER HAS NO PIECES IN JAIL
     else:
       for x in range(1, 25):
@@ -394,22 +395,15 @@ def genAllPossMoves(posStates):
               else: #White
                 cpy_state.board[space_to] = cpy_state.board[space_to] + 1
               
+              cpy_state.roll.remove(cpy_state.roll[y])
+              cpy_state.updatePipCount()
+
               if (cpy_state.compareStateToList(posStates) == False):
-                print "happening"
                 posStates.append(cpy_state)
                 #cpy_state.printState()
 
-              cpy_state.roll.remove(cpy_state.roll[y])
-              cpy_state.updatePipCount()
-            
-      #print len(posStates)
-      #posMovesList = open('posMovesList.txt', 'wa')
-      #for item in posStates:
-        #posMovesList.write(str(item))
-      #posMovesList.close()
-      #raw_input("wait")
-      posStates.remove(givenState)
-      genAllPossMoves(posStates)
+    posStates.remove(givenState)
+    genAllPossMoves(posStates)
 
 
 

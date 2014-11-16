@@ -2,7 +2,6 @@
 
 import math
 import random
-import turn
 
 class oneDie():
   '''Represents one die (of variable side number)'''
