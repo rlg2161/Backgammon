@@ -8,6 +8,8 @@ import space
 
 class state(): 
 
+  
+  
   def __init__(self, board, turn, roll):
     self.board = copy.deepcopy(board)
     self.turn = copy.copy(turn)

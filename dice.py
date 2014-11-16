@@ -40,11 +40,11 @@ class oneDie():
       roll2 = int(math.floor(random.random()*(self.num_sides)) + 1)
 
     if (roll1 > roll2):
-      t = turn.turn(0)
+      t = 0
       # i.e. Player 1 (white) goes first
 
     else:
-      t = turn.turn(1)
+      t = 1
       #i.e. Player 2 (black) goes first
   
     totalRoll = [roll1, roll2]
