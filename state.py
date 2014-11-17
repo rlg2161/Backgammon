@@ -5,7 +5,7 @@ import copy
 import math
 
 def main():
-  
+  # Used for testing state constructor and state compare functions
   state1 = state(1, [1,6])
   state2 = state(1, [1,6])
   state3 = state(1, [2,4])
@@ -17,10 +17,6 @@ def main():
   state2.compareStateToList(stateList)
   state5.compareStateToList(stateList)
   
-
-   
-
-
 
 class state():
 
@@ -71,6 +67,7 @@ class state():
     return (w_pips, b_pips)
 
   def updatePipCount(self):
+    '''Update pip count'''
     self.pip_count = self.getPipCount()
 
   def updateFromState(self, other_state):
@@ -81,6 +78,7 @@ class state():
     self.pip_count = other_state.pip_count
 
   def updateRoll(self, roll):
+    '''Update Roll'''
     self.roll = list(roll)
     # Creates copy of roll list
 
@@ -122,6 +120,7 @@ class state():
     return alreadyInList
 
   def switchTurn(self): 
+    '''Switch turn'''
     if (self.turn): #Black --> Black
       self.turn = 0
     else: #White --> Black

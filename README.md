@@ -13,11 +13,11 @@ strategies against each other. At this point, I only have the two above strategi
 to implement more.
 
 Success vs. Random:
-My algorithm - 980/1000 wins vs. random computer
+My algorithm - 979/1000 wins vs. random computer
 
 
 Features:
-Every before every move (and then after the end of the game to capture the last state), 
+Before every move (and then after the end of the game to capture the last state), 
 the current board, turn and roll values are copied to a state value and added to a linked
 list. At the end of the game, the LL is written to lastGameFile.txt so there is a printout
 of all moves in the game. Later, I intend to update the game with an undo feature - this
@@ -33,8 +33,12 @@ but want to be aware in case it pops up again
 
 Completed Issues:
 Need to fix move generator that calculates all possible moves for the computer
+
+
 Need to fix move generator/compGenMoves() to avoid infinite loop on doubles - not an infinite
   loop but a recursion overflow. Fixed by pruning repititve states so that there is not an 
   explosion of recursive calls when evaluating a double.
+
+
 Have to make sure that the "best" move always uses 2 dice if possible in accordance with rules  
   - possibly reasserting itself in above error

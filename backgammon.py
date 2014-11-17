@@ -128,6 +128,7 @@ def play(num):
   return again
 
 def simulateSession(first_strat, second_strat, number_games):
+  '''Simulates a given number of games and keeps track of results'''
   die = dice.oneDie(6)
   
   white_score = 0
@@ -405,6 +406,9 @@ def genAllPossMoves(posStates):
 
 
 def elimInvalidMoves(stateList):
+  '''Eliminates moves from stateList that are not "complete" turns (i.e. not all
+    dice are used) so that they can not be considered and illegally returned by
+    move checking functions'''
   roll_count = 4
 
   for state in stateList:
@@ -500,12 +504,12 @@ def calcMoveValue(state):
         if (blocade_count > 1):
           blocade_score += blocade_count*2
 
-  print "points scored: " + str(points_scored) + " opponent jail score: " + str(opp_jail_score) \
-  + " blocade score: " + str(blocade_score) + \
-  " covered score: " + str(covered_score) + " Uncovered score: -" + str(uncovered_score)
-  print state.board
+  #print "points scored: " + str(points_scored) + " opponent jail score: " + str(opp_jail_score) \
+  #+ " blocade score: " + str(blocade_score) + \
+  #" covered score: " + str(covered_score) + " Uncovered score: -" + str(uncovered_score)
+  #print state.board
   move_value = points_scored + opp_jail_score + blocade_score + covered_score - uncovered_score
-  print "State score: " + str(move_value)
+  #print "State score: " + str(move_value)
   return move_value
   
 def playStrategicCompTurn(state):
@@ -665,8 +669,6 @@ def createInitialState(die):
 
   t = gf[0]
   r = gf[1]
-
-  #print t
 
   st = state.state(t, r)
 
