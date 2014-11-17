@@ -13,10 +13,12 @@ strategies against each other. At this point, I only have the two above strategi
 to implement more.
 
 Success vs. Random:
+
 My algorithm - 979/1000 wins vs. random computer
 
 
 Features:
+
 Before every move (and then after the end of the game to capture the last state), 
 the current board, turn and roll values are copied to a state value and added to a linked
 list. At the end of the game, the LL is written to lastGameFile.txt so there is a printout
@@ -26,12 +28,16 @@ state register will allow the game to be reset to the state of the game one move
 
 
 Current Issues:
+
 Need to improve move evaluating algorithm
+
+
 Possible bug in computer not taking final dice move if it will cause it to move off the board
 and the previous move was the first to move all pieces into the final quadrant - seems fixed
 but want to be aware in case it pops up again
 
 Completed Issues:
+
 Need to fix move generator that calculates all possible moves for the computer
 
 
