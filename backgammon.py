@@ -1,9 +1,6 @@
 
 import dice
-#import space
-#import board
-import state2
-#import turn
+import state
 import copy
 import math
 import random
@@ -97,14 +94,14 @@ def play(num):
       playTurn(state, 1, 1) #Black == Random
 
     while (winner == -1):
-      #raw_input("wait")
+      raw_input("Press enter for next computer move")
       roll = die.rollDie()
       state.updateRoll(roll)
       state.switchTurn()
       if (state.turn == 0):
-        playTurn(state, 2, 0)
+        playTurn(state, 2, 1)
       else:
-        playTurn(state, 1, 0)
+        playTurn(state, 1, 1)
 
       winner = state.testGameOver() 
   
@@ -300,7 +297,7 @@ def genAllPossMoves(posStates):
       #print "piece in jail"
       
       for x in range(0, len(givenState.roll)):
-        cpy_state = state2.state(givenState)
+        cpy_state = state.state(givenState)
         if (cpy_state.turn == 0): #White
           space_to_valid = cpy_state.checkSpaceTo(26, 25 - cpy_state.roll[x])
         else: # Black
@@ -361,7 +358,7 @@ def genAllPossMoves(posStates):
         # Current space a valid space_from
         else: 
           for y in range(0, len(givenState.roll)):
-            cpy_state = state2.state(givenState)
+            cpy_state = state.state(givenState)
             if (cpy_state.turn == 0): #White
               space_to_valid = cpy_state.checkSpaceTo(x, x - cpy_state.roll[y])
             else: #Black
@@ -465,20 +462,20 @@ def calcMoveValue(state):
   
 
   # Only count once
-  if (state.turn == 0):
+  if (state.turn == 0): #White
       # Points for opp pieces in jail
-      opp_jail_score = 8*((state.board[27]))
+      opp_jail_score = 8*((math.fabs(state.board[27])))
       # Points for scoring pieces
-      points_scored = 4*(state.board[25])
-  else:
+      points_scored = 4*(state.board[0])
+  else: #Black
     opp_jail_score = 8*((state.board[26]))
-    points_scored = 4*(state.board[0])
+    points_scored = 4*(state.board[25])
 
 
   for x in range(0, 25):
-    #cur_space = state.board.spaceList[x]
-    
-    if ((state.board[x] >= 0 and state.turn == 1) or (state.board[x] <=0 and state.turn == 0)):
+        
+    if ((state.board[x] >= 0 and state.turn == 1) or \
+      (state.board[x] <=0 and state.turn == 0)):
       blocade_count = 0
       continue
 
@@ -503,11 +500,12 @@ def calcMoveValue(state):
         if (blocade_count > 1):
           blocade_score += blocade_count*2
 
-  #print "points scored: " + str(points_scored) + " opponent jail score: " + str(opp_jail_score) \
-  #+ " blocade score: " + str(blocade_score) + \
-  #" covered score: " + str(covered_score) + " Uncovered score: -" + str(uncovered_score)
-  #state.printState()
+  print "points scored: " + str(points_scored) + " opponent jail score: " + str(opp_jail_score) \
+  + " blocade score: " + str(blocade_score) + \
+  " covered score: " + str(covered_score) + " Uncovered score: -" + str(uncovered_score)
+  print state.board
   move_value = points_scored + opp_jail_score + blocade_score + covered_score - uncovered_score
+  print "State score: " + str(move_value)
   return move_value
   
 def playStrategicCompTurn(state):
@@ -670,7 +668,7 @@ def createInitialState(die):
 
   #print t
 
-  st = state2.state(t, r)
+  st = state.state(t, r)
 
   return st
 
