@@ -4,6 +4,7 @@
 import copy
 import math
 
+
 def main():
   # Used for testing state constructor and state compare functions
   state1 = state(1, [1,6])

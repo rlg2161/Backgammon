@@ -4,6 +4,7 @@ import state
 import copy
 import math
 import random
+import stateTreeNode
 
 stateList = []
 
@@ -273,6 +274,35 @@ def playTurn(state, num_flag, print_mode):
 
     #stateList.append(new_state)
     state.updateFromState(new_state)
+
+
+def simulateTurn(state, root):
+  '''Accurately simulate a turn'''
+   
+  validMoves = state.existValidMoves()
+
+  while (validMoves)
+    
+    if (root == None):
+      stateScore = calcMoveValue(state)
+      root = stateTreeNode(state, stateScore)
+
+
+
+    else: # inputting a roll instead of generating all possible moves
+      childList = [root.state] #NEED TO REWRITE GENALLPOSSMOVES to make this more efficient
+      
+
+      genAllPossMoves(childList)
+
+      for chi in childList:
+        chiVal = calcMoveValue(chi) 
+        child = stateTreeNode(chi, chiVal)
+        root.add
+
+
+
+
 
 def genAllPossMoves(posStates):
   '''Recursively generate all possible moves given a game-state'''
