@@ -2,25 +2,53 @@ class stateTreeNode():
 
   def __init__(self, state, stateValue):
     ''' Construct a state tree node'''
-    #If args is 2, then we can catch an inputted dice roll as a way to flip 
-    #booleans and not generate as many possible game states
-
-    if (len(args) == x):
-      self.nodeState = state #Actual state of the game
-      self.score = stateValue
-      self.childList = []
+  
+    self.nodeState = state #Actual state of the game
+    self.score = stateValue
+    self.child = None
+    self.firstSibling = None
 
       
-  def addChild(stateTreeNode):
-    self.childList.append(stateTreeNode)
+  def addChild(self, stateTreeNode):
+    self.child = stateTreeNode
 
-  def updateScore(stateTreeNode):
-    childScore = 0
-    for item in childList:
-      childScore = childScore + item
+  def addSibling(self, stateTreeNode):
+    self.firstSibling = stateTreeNode
 
-    self.score = self.score + childScore
+  #def updateScore(self):
+    #maxChildScore = -100000
+    #for item in self.childList:
+      #if (item.score > maxChildScore):
+        #maxChildScore = item.score
 
+    #self.score = self.score + maxChildScore
+
+  
+ 
+  def __str__(self):
+    return_string = "Score of state: " + str(self.score) + "\n"
+    return_string = return_string + str(self.nodeState)
+
+    return return_string
+
+  def __len__(self):
+    #FIX THIS
+    
+    if (self == None):
+      return 0
+
+    elif (self.child == None and self.firstSibling == None):
+      return 1
+
+    else:
+      counter = 1
+      if (self.child != None):
+        counter = counter + len(self.child)
+      if (self.firstSibling != None):
+        counter = counter + len(self.firstSibling)
+      
+      return counter
 
 
     
+

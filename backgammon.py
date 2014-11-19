@@ -10,42 +10,51 @@ stateList = []
 
 def main():
   
-  print "Would you like to play against another person or the computer?"
-  print ""
-  print "0: two people to play each other"
-  print "1: human vs. computer"
-  print "2: comp vs. comp (strategy testing and simulation)"
-  print "3: simulation"
-  computer = raw_input("Please make your selection:   ")
-  
-  good_input = False
+  num = int(raw_input("0 for game, anything else for other"))
 
-  while (good_input != True):
-    try:
-      if (int(computer) == 1 or int(computer) == 0 or int(computer) == 2 or int(computer) == 3):
-        good_input = True
-        continue
-      else:
+  if (num == 0):
+
+    print "Would you like to play against another person or the computer?"
+    print ""
+    print "0: two people to play each other"
+    print "1: human vs. computer"
+    print "2: comp vs. comp (strategy testing and simulation)"
+    print "3: simulation"
+    computer = raw_input("Please make your selection:   ")
+    
+    good_input = False
+
+    while (good_input != True):
+      try:
+        if (int(computer) == 1 or int(computer) == 0 or int(computer) == 2 or int(computer) == 3):
+          good_input = True
+          continue
+        else:
+          computer = raw_input("Please enter 0 to play against a person or 1 for computer or 2 for 2 computers against eachother:  ")
+      except:
         computer = raw_input("Please enter 0 to play against a person or 1 for computer or 2 for 2 computers against eachother:  ")
-    except:
-      computer = raw_input("Please enter 0 to play against a person or 1 for computer or 2 for 2 computers against eachother:  ")
-  
-  if (int(computer) < 3):
-    again = play(int(computer))
-
-    while(again):
+    
+    if (int(computer) < 3):
       again = play(int(computer))
 
-  else: 
-    num_sims = raw_input("How many games would you like to simulate? ")
-    print "What strategies would you like the computer to use? They are, currently: "
-    print "1: Random computer player"
-    print "2: My own, custom algorithm"
-    print "... More to come ..."
-    first_strat = raw_input("Choice for comp 1: ")
-    second_strat = raw_input("Choice for comp 2: ")
+      while(again):
+        again = play(int(computer))
 
-    simulateSession(first_strat, second_strat, num_sims)
+    else: 
+      num_sims = raw_input("How many games would you like to simulate? ")
+      print "What strategies would you like the computer to use? They are, currently: "
+      print "1: Random computer player"
+      print "2: My own, custom algorithm"
+      print "... More to come ..."
+      first_strat = raw_input("Choice for comp 1: ")
+      second_strat = raw_input("Choice for comp 2: ")
+
+      simulateSession(first_strat, second_strat, num_sims)
+
+  else:
+    die = dice.oneDie(6)
+    state = createInitialState(die)
+    generateMoveTree(state)
 
 def play(num):
   ''' Play a game'''
@@ -278,29 +287,183 @@ def playTurn(state, num_flag, print_mode):
 
 def simulateTurn(state, root):
   '''Accurately simulate a turn'''
-   
-  validMoves = state.existValidMoves()
+  return 
+  
 
-  while (validMoves)
+
+def generateMoveTree(st):
+  '''Generate all possible game states two moves out and put it in a tree'''
+  listOfRolls = [ [1,1,1,1], [1,2], [1,3], [1,4], [1,5], [1,6], [2,2,2,2], [2,3],\
+  [2,4], [2,5], [2,6], [3,3,3,3], [3,4], [3,5], [3,6], [4,4,4,4], [4,5], [4,6],\
+  [5,5,5,5], [5,6], [6,6,6,6] ]
+
+  stateTreeFile = open('stateTreeFile.txt', 'wa')
+
+  stateScore = calcMoveValue(st, st.turn)
+  root = stateTreeNode.stateTreeNode(st, stateScore)
+  #print str(root)
+  #genMoveTree(root, root.nodeState.turn) #Here we have a list of x states that are possible given
+                    #the initial configuration of the state
+  print len(root)
+  # #For each child, generate all possible children of that child
+
+  #w = 0
+  #x = 0
+  #y = 0
+  #z = 0
+
+  #stateTreeFile.write("Total size of tree: " + str(len(root)) + "\n")
+  #stateTreeFile.write(str(root))
+
+  queue = [root]
+  #print queue
+  counter = 0
+
+  while (len(queue) > 0):
+    #print "top of the loop"
+    counter = counter + 1
+    print "Loop Counter: " + str(counter)
+    print "Len queue: " + str(len(queue))
+    node = queue.pop(0)
     
-    if (root == None):
-      stateScore = calcMoveValue(state)
-      root = stateTreeNode(state, stateScore)
-
-
-
-    else: # inputting a roll instead of generating all possible moves
-      childList = [root.state] #NEED TO REWRITE GENALLPOSSMOVES to make this more efficient
+    #print type(node)
+    #print type(node.child)
+    #print "Len Queue: " + str(len(queue))
+    if (node == None):
+      #print "continue"
+      continue
+    else:
+      #print "else block"
+      #print node
+      #print "node.child: " + str(node.child)
+      genMoveTree(node, root.nodeState.turn)
+      stateTreeFile.write(str(node))
+      #print "else block"
+      #print "node.child type " + str((node.child))
+      if (node.child != None):
+        #print "append child"
+        queue.append(node.child)
       
+        if (node.child.firstSibling != None):
+          nodeSib = node.child.firstSibling
+          #print "nodeSib: " + str(nodeSib)
+          while (nodeSib != None):
+            #print "append sib"
+            queue.append(nodeSib)
+            nodeSib = nodeSib.firstSibling
+          #print queue
 
-      genAllPossMoves(childList)
+      #raw_input("wait")
+      #print "Queue after one iteration: " + str(len(queue))
+      
+      #stateTreeFile.write(str(node))
+      
+      #print "Len Queue: " + str(len(queue))
 
-      for chi in childList:
-        chiVal = calcMoveValue(chi) 
-        child = stateTreeNode(chi, chiVal)
-        root.add
+  
+  print len(root)
+  stateTreeFile.close()
+  #for item in root.childList:
+    #w = w + 1
+    #x = 0
+    ##print "Child # from root: " + str(w)
+    #stateTreeFile.write("Child # from root: " + str(w) + "\n" + str(item))
+    #for roll in listOfRolls:
+      #x = x + 1
+      #y = 0
+      ##print "Child with roll #: " + str(x) 
+      #chi_cpy = state.state(item.nodeState)
+      #chi_cpy.switchTurn()
+      #chi_cpy.updateRoll(roll)
 
+      #chi_cpy_Score = calcMoveValue(chi_cpy, st.turn)
+      #child = stateTreeNode.stateTreeNode(chi_cpy, chi_cpy_Score)
+      #stateTreeFile.write("Child of # from root: " + str(w) + "\nChild with roll #: " + str(x) + "\n" + str(item))
+      #genMoveTree(child, st.turn)
+      
+      #for item2 in child.childList:
+        #y = y + 1
+        #z = 0
+        ##print "Second children # from child: " + str(y)
+        ##stateTreeFile.write("Second child #: " + str(y) + " from parent: " + str(x) + "\n" + str(item2))
 
+        #for roll in listOfRolls:
+          #z = z + 1
+          ##print "Second child with roll #: " + str(z)
+          #second_chi_cpy = state.state(child.nodeState)
+          #second_chi_cpy.switchTurn()
+          #second_chi_cpy.updateRoll(roll)
+
+          #second_chi_cpy_Score = calcMoveValue(second_chi_cpy, st.turn)
+          #second_child = stateTreeNode.stateTreeNode(chi_cpy, chi_cpy_Score)
+          #genMoveTree(second_child, st.turn)
+          #for child in second_child.childList:
+            #stateTreeFile.write("\nSecond Child with roll #" + str(y) + "\n" + str(child))
+    
+    #stateTreeFile.write("Child # from root: " + str(w) + "\n" + str(item))
+    #for child in item.childList:
+      #stateTreeFile.write("\n\n\n" + str(child))
+     # for snd_child in child.childList:
+        #stateTreeFile.write("\n + ........ + \n" + str(snd_child))
+    #stateTreeFile.close()
+    #raw_input("wait")
+
+def genMoveTree(root, turn):
+  listOfRolls = [ [1,1,1,1], [1,2], [1,3], [1,4], [1,5], [1,6], [2,2,2,2], [2,3],\
+  [2,4], [2,5], [2,6], [3,3,3,3], [3,4], [3,5], [3,6], [4,4,4,4], [4,5], [4,6],\
+  [5,5,5,5], [5,6], [6,6,6,6] ]
+
+  #print "genMoveTree()"
+  rState = root.nodeState
+  stateList = [rState]
+
+  if (rState.existValidMoves() == False):
+    #print "no valid moves"
+    # elim extra generation when no moves exist 
+    return
+
+  else:
+    #print "getting here"
+    genAllPossMoves(stateList)
+    for x in range (0, len(stateList)):
+      #print x
+      diceFreeState = stateList.pop()
+      for roll in listOfRolls:
+        diceState = state.state(diceFreeState)
+        diceState.switchTurn()
+        diceState.updateRoll(roll)
+        stateList.append(diceState)
+
+    for item in stateList:
+      nextNodeScore = calcMoveValue(item, turn)
+      nextNode = stateTreeNode.stateTreeNode(item, nextNodeScore)
+      if (root.child == None):
+        #print "adding child"
+        root.addChild(nextNode)
+      else:
+        #print "adding sibling"
+        sib = root.child.firstSibling
+        if (sib == None):
+          root.child.addSibling(nextNode)
+        else:
+          while (sib.firstSibling != None):
+            sib = sib.firstSibling
+          sib.addSibling(nextNode)
+
+     # for roll in listOfRolls:
+       # chi_cpy = state.state(item)
+       # chi_cpy.switchTurn()
+       # chi_cpy.updateRoll(roll)
+
+       # chi_cpy_Score = calcMoveValue(item)
+       # child = stateTreeNode.stateTreeNode(chi_cpy, chi_cpy_Score)
+      
+       # root.addChild(child)
+ 
+    #root.updateScore()
+    return
+
+#def genProbibalisticMoveTree(root)
 
 
 
@@ -459,7 +622,7 @@ def evalMoves(posStates):
 
   for x in range(0, len(posStates)):
 
-    temp = calcMoveValue(posStates[x])
+    temp = calcMoveValue(posStates[x], posStates[x].turn)
     #print temp
 
     if (temp > cur_max):
@@ -482,10 +645,11 @@ def evalMoves(posStates):
 
   return best
 
-def calcMoveValue(state):
+def calcMoveValue(state, turn):
   '''Calculate the value of a move for a strategy-based computer to determine best move'''
   uncovered_score = 0
   opp_jail_score = 0
+  own_jail_score = 0
   blocade_score = 0
   blocade_count = 0
   covered_score = 0
@@ -496,20 +660,24 @@ def calcMoveValue(state):
   
 
   # Only count once
-  if (state.turn == 0): #White
+  if (turn == 0): #White
       # Points for opp pieces in jail
       opp_jail_score = 8*((math.fabs(state.board[27])))
       # Points for scoring pieces
       points_scored = 4*(state.board[0])
+      # Points for own pieces in jail
+      own_jail_score = 8*(math.fabs(state.board[26]))
+
   else: #Black
     opp_jail_score = 8*((state.board[26]))
     points_scored = 4*(state.board[25])
+    own_jail_score = 8*(math.fabs(state.board[27]))
 
 
   for x in range(0, 25):
         
-    if ((state.board[x] >= 0 and state.turn == 1) or \
-      (state.board[x] <=0 and state.turn == 0)):
+    if ((state.board[x] >= 0 and turn == 1) or \
+      (state.board[x] <=0 and turn == 0)):
       blocade_count = 0
       continue
 
@@ -535,10 +703,10 @@ def calcMoveValue(state):
           blocade_score += blocade_count*2
 
   #print "points scored: " + str(points_scored) + " opponent jail score: " + str(opp_jail_score) \
-  #+ " blocade score: " + str(blocade_score) + \
+  #+ " blocade score: " + str(blocade_score) + " own jail score: " + str(own_jail_score) +\
   #" covered score: " + str(covered_score) + " Uncovered score: -" + str(uncovered_score)
   #print state.board
-  move_value = points_scored + opp_jail_score + blocade_score + covered_score - uncovered_score
+  move_value = points_scored + opp_jail_score + blocade_score + covered_score - own_jail_score - uncovered_score
   #print "State score: " + str(move_value)
   return move_value
   
