@@ -5,16 +5,21 @@ This repository is a backgammon game I wrote from scratch in Python for practice
 As of now, the game is only playable from the terminal. Plays like a normal game of backgammon 
 with error checking of illegal moves. 
 
-Currently, the AI has 2 settings - a random player and a player guided by logic (written by me 
-but inspired by http://www.bkgm.com/articles/Berliner/BKG-AProgramThatPlaysBackgammon/). To 
-change the type of computer player, can modify the second argument in any of the play turn 
+Currently, the AI has 3 settings - a random player, and a player guided by logic (written by me 
+but inspired by http://www.bkgm.com/articles/Berliner/BKG-AProgramThatPlaysBackgammon/), and
+a player that looks forward and tries to pick a move based on what will probibalistically 
+create the worst situation for its opponet. At this time, strats 1 and 2 are vialbe, and 
+athough 3 works in concept, the actual algorithm being used is not effective. It is also quite
+slow - since it projects every possible response by the other player to every possible move,
+it takes a while to crunch the numbers and return the optimal move. 
+
+To change the type of computer player, can modify the second argument in any of the play turn 
 functions in play() in backgammon.py. I have also implemented a simulation mode to test 
-strategies against each other. At this point, I only have the two above strategies but intend
-to implement more.
+strategies against each other. 
 
 Success vs. Random:
 
-My algorithm - 979/1000 wins vs. random computer
+My algorithm (strat 2) - 979/1000 wins vs. random computer
 
 
 Features:
