@@ -54,7 +54,8 @@ def main():
   else:
     die = dice.oneDie(6)
     state = createInitialState(die)
-    generateMoveTree(state)
+    root = generateMoveTree(state)
+    print len(root)
 
 def play(num):
   ''' Play a game'''
@@ -301,112 +302,50 @@ def generateMoveTree(st):
 
   stateScore = calcMoveValue(st, st.turn)
   root = stateTreeNode.stateTreeNode(st, stateScore)
-  #print str(root)
-  #genMoveTree(root, root.nodeState.turn) #Here we have a list of x states that are possible given
-                    #the initial configuration of the state
-  print len(root)
-  # #For each child, generate all possible children of that child
-
-  #w = 0
-  #x = 0
-  #y = 0
-  #z = 0
-
-  #stateTreeFile.write("Total size of tree: " + str(len(root)) + "\n")
-  #stateTreeFile.write(str(root))
+  
+ 
+  
 
   queue = [root]
-  #print queue
+  
   counter = 0
 
-  while (len(queue) > 0):
+  #while (len(queue) > 0):
     #print "top of the loop"
-    counter = counter + 1
-    print "Loop Counter: " + str(counter)
-    print "Len queue: " + str(len(queue))
-    node = queue.pop(0)
+    #counter = counter + 1
+  
+  node = queue.pop(0)
+
+  if (node == None):
+    #print "continue"
+    return
+  else:
+    genMoveTree(node, root.nodeState.turn)
+    #stateTreeFile.write(str(node))
     
-    #print type(node)
-    #print type(node.child)
-    #print "Len Queue: " + str(len(queue))
-    if (node == None):
-      #print "continue"
-      continue
-    else:
-      #print "else block"
-      #print node
-      #print "node.child: " + str(node.child)
-      genMoveTree(node, root.nodeState.turn)
-      stateTreeFile.write(str(node))
-      #print "else block"
-      #print "node.child type " + str((node.child))
-      if (node.child != None):
-        #print "append child"
-        queue.append(node.child)
-      
-        if (node.child.firstSibling != None):
-          nodeSib = node.child.firstSibling
-          #print "nodeSib: " + str(nodeSib)
-          while (nodeSib != None):
-            #print "append sib"
-            queue.append(nodeSib)
-            nodeSib = nodeSib.firstSibling
+    if (node.child != None):
+      #print "append child"
+      queue.append(node.child)
+    
+      if (node.child.firstSibling != None):
+        nodeSib = node.child.firstSibling
+        #print "nodeSib: " + str(nodeSib)
+        while (nodeSib != None):
+          #print "append sib"
+          queue.append(nodeSib)
+          nodeSib = nodeSib.firstSibling
           #print queue
 
-      #raw_input("wait")
-      #print "Queue after one iteration: " + str(len(queue))
-      
-      #stateTreeFile.write(str(node))
-      
-      #print "Len Queue: " + str(len(queue))
-
-  
-  print len(root)
-  stateTreeFile.close()
-  #for item in root.childList:
-    #w = w + 1
-    #x = 0
-    ##print "Child # from root: " + str(w)
-    #stateTreeFile.write("Child # from root: " + str(w) + "\n" + str(item))
-    #for roll in listOfRolls:
-      #x = x + 1
-      #y = 0
-      ##print "Child with roll #: " + str(x) 
-      #chi_cpy = state.state(item.nodeState)
-      #chi_cpy.switchTurn()
-      #chi_cpy.updateRoll(roll)
-
-      #chi_cpy_Score = calcMoveValue(chi_cpy, st.turn)
-      #child = stateTreeNode.stateTreeNode(chi_cpy, chi_cpy_Score)
-      #stateTreeFile.write("Child of # from root: " + str(w) + "\nChild with roll #: " + str(x) + "\n" + str(item))
-      #genMoveTree(child, st.turn)
-      
-      #for item2 in child.childList:
-        #y = y + 1
-        #z = 0
-        ##print "Second children # from child: " + str(y)
-        ##stateTreeFile.write("Second child #: " + str(y) + " from parent: " + str(x) + "\n" + str(item2))
-
-        #for roll in listOfRolls:
-          #z = z + 1
-          ##print "Second child with roll #: " + str(z)
-          #second_chi_cpy = state.state(child.nodeState)
-          #second_chi_cpy.switchTurn()
-          #second_chi_cpy.updateRoll(roll)
-
-          #second_chi_cpy_Score = calcMoveValue(second_chi_cpy, st.turn)
-          #second_child = stateTreeNode.stateTreeNode(chi_cpy, chi_cpy_Score)
-          #genMoveTree(second_child, st.turn)
-          #for child in second_child.childList:
-            #stateTreeFile.write("\nSecond Child with roll #" + str(y) + "\n" + str(child))
-    
-    #stateTreeFile.write("Child # from root: " + str(w) + "\n" + str(item))
-    #for child in item.childList:
-      #stateTreeFile.write("\n\n\n" + str(child))
-     # for snd_child in child.childList:
-        #stateTreeFile.write("\n + ........ + \n" + str(snd_child))
-    #stateTreeFile.close()
+    #print len(queue)
     #raw_input("wait")
+    
+  stateTreeFile.write(str(root))
+  for x in range(0, len(queue)):
+    stateTreeFile.write(str(queue.pop(0)))
+  stateTreeFile.close()
+
+  return root
+  
 
 def genMoveTree(root, turn):
   listOfRolls = [ [1,1,1,1], [1,2], [1,3], [1,4], [1,5], [1,6], [2,2,2,2], [2,3],\
@@ -415,6 +354,7 @@ def genMoveTree(root, turn):
 
   #print "genMoveTree()"
   rState = root.nodeState
+  print rState
   stateList = [rState]
 
   if (rState.existValidMoves() == False):
@@ -423,25 +363,84 @@ def genMoveTree(root, turn):
     return
 
   else:
+    
     #print "getting here"
     genAllPossMoves(stateList)
-    for x in range (0, len(stateList)):
-      #print x
-      diceFreeState = stateList.pop()
-      for roll in listOfRolls:
-        diceState = state.state(diceFreeState)
-        diceState.switchTurn()
-        diceState.updateRoll(roll)
-        stateList.append(diceState)
+    #for st in stateList:
+      #cumeScore = 0
+      #for roll in listOfRolls:
+        #cpy_state = state.state(st)
+        #cpy_state.updateRoll(roll)
+        #cpy_state.switchTurn()
+        #oppStateList = [cpy_state]
+        #genAllPossMoves(oppStateList)
+        #for x in range(0, len(oppStateList)):
+          #print str(oppStateList[x])
+          #raw_input("wait")
+        
+          #mv_val = calcMoveValue(oppStateList[x], cpy_state.turn)
+          #if (roll == listOfRolls[0] or roll == listOfRolls[6] or roll == listOfRolls[11]\
+            #or roll == listOfRolls[15] or roll == listOfRolls[18] or roll == listOfRolls[20]):
+            #mv_val = mv_val/2 #acct for fact that these rolls are half as likely as other rolls
+          #print mv_val
+          #raw_input("wait")
+          #cumeScore = cumeScore + mv_val
+      #print cumeScore
+      #st.updateScore
+      #print str(st)
+      #raw_input("wait")
+    #for x in range (0, len(stateList)):
+      #cumeScore = 0
+      ##print x
+      #diceFreeState = stateList.pop(0)
+      ##if (diceFreeState.turn == rState.turn):
+      #diceFreeState.switchTurn()
+      #for roll in listOfRolls:
+        ##print roll
+        #diceState = state.state(diceFreeState)
+        ##diceState.switchTurn()
+        #diceState.updateRoll(roll)
+        #print str(diceState)
+        #diceStateList = [diceState]
+        #genAllPossMoves(diceStateList)
+        #for item in diceStateList:
+          #node_score = calcMoveValue(item, )
+        #stateList.append(diceStateList)
 
+    counter = 0
     for item in stateList:
-      nextNodeScore = calcMoveValue(item, turn)
+      counter = counter + 1
+      print "counter: " + str(counter)
+      nextNodeScore = 0
       nextNode = stateTreeNode.stateTreeNode(item, nextNodeScore)
+      
+      cumeScore = 0
+      for roll in listOfRolls:
+        cpy_state = state.state(item)
+        cpy_state.updateRoll(roll)
+        cpy_state.switchTurn()
+        oppStateList = [cpy_state]
+        genAllPossMoves(oppStateList)
+        for x in range(0, len(oppStateList)):
+          #print str(oppStateList[x])
+          #raw_input("wait")
+        
+          mv_val = calcMoveValue(oppStateList[x], cpy_state.turn)
+          if (roll == listOfRolls[0] or roll == listOfRolls[6] or roll == listOfRolls[11]\
+            or roll == listOfRolls[15] or roll == listOfRolls[18] or roll == listOfRolls[20]):
+            mv_val = mv_val/2 #acct for fact that these rolls are half as likely as other rolls
+          #print mv_val
+          #raw_input("wait")
+          cumeScore = cumeScore + mv_val
+      #print cumeScore
+      nextNode.updateScore(cumeScore)
+
+
       if (root.child == None):
-        #print "adding child"
+        print "adding child"
         root.addChild(nextNode)
       else:
-        #print "adding sibling"
+        print "adding sibling"
         sib = root.child.firstSibling
         if (sib == None):
           root.child.addSibling(nextNode)
@@ -649,7 +648,7 @@ def calcMoveValue(state, turn):
   '''Calculate the value of a move for a strategy-based computer to determine best move'''
   uncovered_score = 0
   opp_jail_score = 0
-  own_jail_score = 0
+  #own_jail_score = 0
   blocade_score = 0
   blocade_count = 0
   covered_score = 0
@@ -666,12 +665,12 @@ def calcMoveValue(state, turn):
       # Points for scoring pieces
       points_scored = 4*(state.board[0])
       # Points for own pieces in jail
-      own_jail_score = 8*(math.fabs(state.board[26]))
+      #own_jail_score = 8*(math.fabs(state.board[26]))
 
   else: #Black
     opp_jail_score = 8*((state.board[26]))
     points_scored = 4*(state.board[25])
-    own_jail_score = 8*(math.fabs(state.board[27]))
+    #own_jail_score = 8*(math.fabs(state.board[27]))
 
 
   for x in range(0, 25):
@@ -706,7 +705,7 @@ def calcMoveValue(state, turn):
   #+ " blocade score: " + str(blocade_score) + " own jail score: " + str(own_jail_score) +\
   #" covered score: " + str(covered_score) + " Uncovered score: -" + str(uncovered_score)
   #print state.board
-  move_value = points_scored + opp_jail_score + blocade_score + covered_score - own_jail_score - uncovered_score
+  move_value = points_scored + opp_jail_score + blocade_score + covered_score - uncovered_score #-own_jail_score 
   #print "State score: " + str(move_value)
   return move_value
   

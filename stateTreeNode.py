@@ -15,13 +15,8 @@ class stateTreeNode():
   def addSibling(self, stateTreeNode):
     self.firstSibling = stateTreeNode
 
-  #def updateScore(self):
-    #maxChildScore = -100000
-    #for item in self.childList:
-      #if (item.score > maxChildScore):
-        #maxChildScore = item.score
-
-    #self.score = self.score + maxChildScore
+  def updateScore(self, num):
+    self.score = num
 
   
  
