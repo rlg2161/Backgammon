@@ -45,5 +45,3 @@ class stateTreeNode():
       return counter
 
 
-    
-
