@@ -199,8 +199,6 @@ def simulateGame(first_strat, second_strat, die):
 
   return winner
 
-
-
 def playTurn(state, num_flag, print_mode):
   '''Plays one turn'''
   stateList.append(copy.deepcopy(state))
@@ -300,7 +298,7 @@ def playTurn(state, num_flag, print_mode):
     state.updateFromState(new_state)
 
 def moveWithStateTree(state):
-  '''Move for computer when using state tree based strategy'''
+  '''Move for computer when using state tree based strategy for forecasting'''
   root = generateMoveTree(state)
   best_move = calcMoveFromStateTree(root)
   if (best_move != None):
@@ -327,7 +325,7 @@ def generateMoveTree(st):
   [2,4], [2,5], [2,6], [3,3,3,3], [3,4], [3,5], [3,6], [4,4,4,4], [4,5], [4,6],\
   [5,5,5,5], [5,6], [6,6,6,6] ]
 
-  stateTreeFile = open('stateTreeFile.txt', 'wa')
+  #stateTreeFile = open('stateTreeFile.txt', 'wa')
 
   stateScore = calcMoveValue1(st, st.turn)
   root = stateTreeNode.stateTreeNode(st, stateScore)
@@ -337,13 +335,7 @@ def generateMoveTree(st):
     return root
   else:
     genMoveTree(root, root.nodeState.turn)
-    #stateTreeFile.write(str(node))
-        
-  #stateTreeFile.write(str(root))
-  #for x in range(0, len(queue)):
-    #stateTreeFile.write(str(queue.pop(0)))
-  #stateTreeFile.close()
-
+    
     return root
   
 
@@ -367,50 +359,106 @@ def genMoveTree(root, turn):
 
   else:
     genAllPossMoves(stateList)
+    threeBestMoves(stateList)
 
     #counter = 0
-    for item in stateList:
-      #counter = counter + 1
-      #print "counter: " + str(counter)
-      nextNodeScore = 0
-      nextNode = stateTreeNode.stateTreeNode(item, nextNodeScore)
-      
-      cumeScore = 0
-      for roll in listOfRolls:
-        cpy_state = state.state(item)
-        cpy_state.updateRoll(roll)
-        cpy_state.switchTurn()
-        oppStateList = [cpy_state]
-        genAllPossMoves(oppStateList)
-        elimInvalidMoves(oppStateList)
-        for x in range(0, len(oppStateList)):
-                
-          mv_val = calcMoveValue2(oppStateList[x], cpy_state.turn)
-          if (roll == listOfRolls[0] or roll == listOfRolls[6] or roll == listOfRolls[11]\
-            or roll == listOfRolls[15] or roll == listOfRolls[18] or roll == listOfRolls[20]):
-            mv_val = mv_val/2 #acct for fact that these rolls are half as likely as other rolls
-          #print mv_val
-          #raw_input("wait")
-          cumeScore = cumeScore + mv_val
-      cumeScore = cumeScore/len(oppStateList)  
-      #print cumeScore
-      nextNode.updateScore(cumeScore)
+    if (len(stateList) > 1):
+      print "comparing similar moves"
+      for item in stateList:
+        #counter = counter + 1
+        #print "counter: " + str(counter)
+        nextNodeScore = 0
+        nextNode = stateTreeNode.stateTreeNode(item, nextNodeScore)
+        
+        cumeScore = 0
+        for roll in listOfRolls:
+          cpy_state = state.state(item)
+          cpy_state.updateRoll(roll)
+          cpy_state.switchTurn()
+          oppStateList = [cpy_state]
+          genAllPossMoves(oppStateList)
+          elimInvalidMoves(oppStateList)
+          for x in range(0, len(oppStateList)):
+                  
+            mv_val = calcMoveValue2(oppStateList[x], cpy_state.turn)
+            if (roll == listOfRolls[0] or roll == listOfRolls[6] or roll == listOfRolls[11]\
+              or roll == listOfRolls[15] or roll == listOfRolls[18] or roll == listOfRolls[20]):
+              mv_val = mv_val/2 #acct for fact that these rolls are half as likely as other rolls
+            #print mv_val
+            #raw_input("wait")
+            cumeScore = cumeScore + mv_val
+        cumeScore = cumeScore/len(oppStateList)  
+        #print cumeScore
+        nextNode.updateScore(cumeScore)
 
 
-      if (root.child == None):
-        #print "adding child"
-        root.addChild(nextNode)
-      else:
-        #print "adding sibling"
-        sib = root.child.firstSibling
-        if (sib == None):
-          root.child.addSibling(nextNode)
+        if (root.child == None):
+          #print "adding child"
+          root.addChild(nextNode)
         else:
-          while (sib.firstSibling != None):
-            sib = sib.firstSibling
-          sib.addSibling(nextNode)
+          #print "adding sibling"
+          sib = root.child.firstSibling
+          if (sib == None):
+            root.child.addSibling(nextNode)
+          else:
+            while (sib.firstSibling != None):
+              sib = sib.firstSibling
+            sib.addSibling(nextNode)
 
     return
+
+def threeBestMoves(stateList):
+  '''Identify and return list of up to 3 best possible moves for player given all poss states'''
+  best = -10000
+  bestState = None
+  best2 = -10000
+  best2State = None
+  best3 = -10000
+  best3State = None
+
+  for st in stateList:
+    move_val = calcMoveValue1(st, st.turn)
+    if (move_val > best):
+      temp1 = best
+      temp1State = bestState
+      temp2 = best2
+      temp2State = best2State
+
+      best = move_val
+      bestState = st 
+      best2 = temp1
+      best2State = temp1State
+      best3 = temp2
+      best3State = temp2State
+      
+      continue
+       
+    elif (move_val > best2):
+      temp2 = best2
+      temp2State = best2State
+
+      best2 = move_val
+      best2State = st
+      best3 = temp2
+      best3State = temp2State
+
+      continue
+
+    elif (move_val > best3):
+      best3 = move_val
+      best3State = st 
+
+      continue
+
+  bestList = [bestState]
+  if (best2State != None):
+    if (math.fabs(best2 - best) < 1):
+      bestList.append(best2State)
+  if (best3State != None):
+    if (math.fabs(best3 - best) < 1):
+      bestList.append(best2State)
+
+  return bestList
 
 
 def genAllPossMoves(posStates):
