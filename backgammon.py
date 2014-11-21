@@ -103,19 +103,19 @@ def play(num):
 
   if (num == 2): #Play comp v. comp
     if (state.turn == 0):
-      playTurn(state, 2, 1) #White == Strat
+      playTurn(state, 1, 1) #White 
     else:
-      playTurn(state, 1, 1) #Black == Random
+      playTurn(state, 3, 1) #Black  
 
     while (winner == -1):
-      #raw_input("Press enter for next computer move")
+      raw_input("Press enter for next computer move")
       roll = die.rollDie()
       state.updateRoll(roll)
       state.switchTurn()
       if (state.turn == 0):
         playTurn(state, 1, 1)
       else:
-        playTurn(state, 1, 1)
+        playTurn(state, 3, 1)
 
       winner = state.testGameOver() 
   
@@ -310,7 +310,7 @@ def calcMoveFromStateTree(root):
   posMove = root.child
   best_move = posMove
   move_val = -100000
-
+  
   while (posMove != None):
     if (posMove.score > move_val):
       best_move = posMove
@@ -335,6 +335,7 @@ def generateMoveTree(st):
     return root
   else:
     genMoveTree(root, root.nodeState.turn)
+    #print "Len root after genMoveTree(): " + str(len(root))
     
     return root
   
@@ -359,11 +360,22 @@ def genMoveTree(root, turn):
 
   else:
     genAllPossMoves(stateList)
-    threeBestMoves(stateList)
+    stateList = threeBestMoves(stateList)
+    #print "len(stateList): " + str(len(stateList))
 
     #counter = 0
-    if (len(stateList) > 1):
-      print "comparing similar moves"
+    if (len(stateList) == 1):
+      if (stateList[0].turn == 0):
+        nextNodeScore = calcMoveValue2(stateList[0], 1)
+      else:
+        nextNodeScore = calcMoveValue2(stateList[0], 0)
+      nextNode = stateTreeNode.stateTreeNode(stateList[0], nextNodeScore)
+      root.addChild(nextNode)
+      return 
+
+
+    if (len(stateList) >= 1):
+      #print "comparing similar moves"
       for item in stateList:
         #counter = counter + 1
         #print "counter: " + str(counter)
@@ -405,7 +417,7 @@ def genMoveTree(root, turn):
               sib = sib.firstSibling
             sib.addSibling(nextNode)
 
-    return
+      return
 
 def threeBestMoves(stateList):
   '''Identify and return list of up to 3 best possible moves for player given all poss states'''
@@ -430,7 +442,7 @@ def threeBestMoves(stateList):
       best2State = temp1State
       best3 = temp2
       best3State = temp2State
-      
+      #print "best"
       continue
        
     elif (move_val > best2):
@@ -441,13 +453,13 @@ def threeBestMoves(stateList):
       best2State = st
       best3 = temp2
       best3State = temp2State
-
+      #print "second best"
       continue
 
     elif (move_val > best3):
       best3 = move_val
       best3State = st 
-
+      #print "third best"
       continue
 
   bestList = [bestState]
@@ -457,6 +469,9 @@ def threeBestMoves(stateList):
   if (best3State != None):
     if (math.fabs(best3 - best) < 1):
       bestList.append(best2State)
+  
+  #for item in bestList:
+    #print str(item)
 
   return bestList
 

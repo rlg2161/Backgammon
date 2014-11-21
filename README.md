@@ -20,6 +20,8 @@ strategies against each other.
 Success vs. Random:
 
 My algorithm (strat 2) - 979/1000 wins vs. random computer
+My algo with forecasting (strat 3) - 96/100 wins vs. random computer
+Strat 2 vs. Strat 3 - 
 
 
 Features:
@@ -35,6 +37,8 @@ state register will allow the game to be reset to the state of the game one move
 Current Issues:
 
 Need to improve move evaluating algorithm
+
+Need to improve forecasting opponent position value algorithm
 
 
 Possible bug in computer not taking final dice move if it will cause it to move off the board
