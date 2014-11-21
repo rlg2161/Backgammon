@@ -227,10 +227,8 @@ class backgammonGUI():
       if (len(self.state.roll) > 0):
         if (self.moveFrom == -1):
           self.moveFrom = number
-          print (self.moveFrom, self.moveTo)
         else:
           self.moveTo = number
-          print (self.moveFrom, self.moveTo)
           space_to_valid = self.state.checkSpaceTo(self.moveFrom, self.moveTo)
           if (space_to_valid[0]):
             #play
@@ -434,8 +432,6 @@ class backgammonGUI():
 
     #pack the frames
 
-    #self.roll_frame.pack(side = 'left')
-    #self.button_frame.pack(side = 'right')
     self.control_frame.pack(side = 'top')
     self.top_button_frame.pack()
     self.board_frame.pack()
@@ -496,11 +492,14 @@ class backgammonGUI():
       self.turn.set(turn_message)
 
       if (self.state.existValidMoves() == False):
-        self.turn.set("No valid moves")
-        time.sleep(2)
+        #self.turn.set("No valid moves")
+        print "no valid moves"
+        #time.sleep(2)
         r = self.die.rollDie()
         self.state.updateRoll(r)
         self.state.switchTurn()
+        
+        self.state.printState()
 
         self.state = bg.playStrategicCompTurn(self.state)
         self.redraw(self.state)

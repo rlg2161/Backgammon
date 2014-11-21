@@ -2,8 +2,9 @@ Backgammon
 
 This repository is a backgammon game I wrote from scratch in Python for practice.
 
-As of now, the game is only playable from the terminal. Plays like a normal game of backgammon 
-with error checking of illegal moves. 
+As of now, the game is playable in the terminal with all features accessible or in a GUI
+which is permanently in mode 1 - Human is White Player and Computer is Black Player playing
+strategy 2.
 
 Currently, the AI has 3 settings - a random player, and a player guided by logic (written by me 
 but inspired by http://www.bkgm.com/articles/Berliner/BKG-AProgramThatPlaysBackgammon/), and
@@ -21,7 +22,6 @@ Success vs. Random:
 
 My algorithm (strat 2) - 979/1000 wins vs. random computer
 My algo with forecasting (strat 3) - 96/100 wins vs. random computer
-Strat 2 vs. Strat 3 - 
 
 
 Features:
