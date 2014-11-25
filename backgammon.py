@@ -60,7 +60,7 @@ def main():
 def play(num):
   ''' Play a game'''
   
-  lastGameFile = open('lastgame.txt', 'wa')
+  lastGameFile = open('lastgame.txt', 'w')
 
   die = dice.oneDie(6)
 
@@ -269,7 +269,7 @@ def playStratCompTurn(state, factors_list):
 
   posStates = [state]
   genAllPossMoves(posStates)
-  #posMovesList = open('posMovesList.txt', 'wa')
+  #posMovesList = open('posMovesList.txt', 'w')
   #for item in posStates:
     #posMovesList.write(str(item))
   #posMovesList.close()
@@ -557,7 +557,7 @@ def generateMoveTree(st):
   [2,4], [2,5], [2,6], [3,3,3,3], [3,4], [3,5], [3,6], [4,4,4,4], [4,5], [4,6],\
   [5,5,5,5], [5,6], [6,6,6,6] ]
 
-  #stateTreeFile = open('stateTreeFile.txt', 'wa')
+  #stateTreeFile = open('stateTreeFile.txt', 'w')
 
   stateScore = calcMoveValue1(st, st.turn)
   root = stateTreeNode.stateTreeNode(st, stateScore)
@@ -712,7 +712,7 @@ def genAllPossMoves(posStates):
   '''Recursively generate all possible moves given a game-state'''
   if (len(posStates) > 10000):
     print "Runaway recursion :( - game exited"
-    overflowMovesList = open('overflowMovesList.txt', 'wa')
+    overflowMovesList = open('overflowMovesList.txt', 'w')
     for item in posStates:
       overflowMovesList.write(str(item))
     overflowMovesList.close()
@@ -992,7 +992,7 @@ def playStrategicCompTurn(state):
   '''Plays a computer turn if a non-random strategy is being played'''
   posStates = [state]
   genAllPossMoves(posStates)
-  posMovesList = open('posMovesList.txt', 'wa')
+  posMovesList = open('posMovesList.txt', 'w')
   for item in posStates:
     posMovesList.write(str(item))
   posMovesList.close()
