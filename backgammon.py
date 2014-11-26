@@ -54,7 +54,7 @@ def main():
     simulateSession(first_strat, second_strat, num_sims)
 
   else: #for testing
-    generateSimulations(35000, 21, 10, 5)
+    generateSimulations(100, 21, 10, 5)
     
 
 def play(num):
@@ -82,10 +82,16 @@ def play(num):
       winner = state.testGameOver()
       
   if (num == 1): #Play human v. comp
+    #factors_list = genFactorsList(21, 10)
+    factors_list = [0.120619259028, 0.120619259028, 0.120619259028, 0.120619259028, 0.120619259028, 0.120619259028, 0.120619259028, 0.120619259028, 0.120619259028, 0.120619259028, 0.120619259028, 0.120619259028, 0.120619259028, 0.120619259028, 0.120619259028, 0.120619259028, 0.120619259028, 0.120619259028, 0.120619259028, 0.120619259028, 0.120619259028]
+    print factors_list
     if (state.turn == 0):
       playTurn(state, 0, 1)
+	  
     else:
-      playTurn(state, 3, 1)
+      print "Comp first"
+      playStratCompTurn(state, factors_list)
+      calcStratMove(state, factors_list, 1)
 
     while (winner == -1):
       roll = die.rollDie()
@@ -94,15 +100,29 @@ def play(num):
       if (state.turn == 0):
         playTurn(state, 0, 1)
       else:
-        playTurn(state, 3, 1)
+        playStratCompTurn(state, factors_list)
+        calcStratMove(state, factors_list, 1)
 
       winner = state.testGameOver()
 
   if (num == 2): #Play comp v. comp
+    # Currently set up to set a certain factor list to make sure the other sim methods
+	# are working
+    factors_list = [0.120619259028, 0.120619259028, 0.120619259028, 0.120619259028, 0.120619259028, 0.120619259028, 0.120619259028, 0.120619259028, 0.120619259028, 0.120619259028, 0.120619259028, 0.120619259028, 0.120619259028, 0.120619259028, 0.120619259028, 0.120619259028, 0.120619259028, 0.120619259028, 0.120619259028, 0.120619259028, 0.120619259028]
+    print factors_list
+	
     if (state.turn == 0):
+<<<<<<< HEAD
+      playTurn(state, 1, 0) #White == Random
+    else:
+	  #playTurn(state, 2, 1)
+      playStratCompTurn(state, factors_list) #Black == factors_list strat
+      calcStratMove(state, factors_list, 1)
+=======
       playTurn(state, 1, 1) #White 
     else:
       playTurn(state, 3, 1) #Black  
+>>>>>>> GUI
 
     while (winner == -1):
       raw_input("Press enter for next computer move")
@@ -110,9 +130,15 @@ def play(num):
       state.updateRoll(roll)
       state.switchTurn()
       if (state.turn == 0):
-        playTurn(state, 1, 1)
+        playTurn(state, 1, 0)
       else:
+<<<<<<< HEAD
+	    #playTurn(state, 2, 1)
+        playStratCompTurn(state, factors_list)
+        calcStratMove(state, factors_list, 1)
+=======
         playTurn(state, 3, 1)
+>>>>>>> GUI
 
       winner = state.testGameOver() 
   
@@ -170,13 +196,28 @@ def simulateSession(first_strat, second_strat, number_games):
   print "Black's score for this round was: " + str(black_score) + \
   " while playing " + str(second_strat)
 
+def genFactorsList(fia, factor):
+  factors_list = []
+  for x in range(0, 13):
+    strat_val = factor*random.random()
+    factors_list.append(strat_val)
+     
+  for x in range(13, fia):
+    strat_val = factor/10*random.random()
+    if (x == 16 or x == 20):
+      factors_list.append(strat_val*10)
+    else:
+      factors_list.append(strat_val)
+  
+  return factors_list  
+  
 def generateSimulations(num_sims, fia, factor, gps):
   #fia == factors_in_algo
   #gps == games_per_strat
   
-  good_strats_file = open("someSuccess.txt", "wa")
+  good_strats_file = open("someSuccess.txt", "w")
 
-  factors_file = open("factors_file.txt", "wa")
+  factors_file = open("factors_file.txt", "w")
   die = dice.oneDie()
 
   for x in range(0, num_sims):
@@ -197,7 +238,7 @@ def generateSimulations(num_sims, fia, factor, gps):
       else:
         factors_list.append(strat_val)
 
-      in_string = str(strat_val) + ", "
+      in_string = str(strat_val) + " "
       factors_file.write(in_string)
       factors_file.write("\n")
 
@@ -219,10 +260,10 @@ def generateSimulations(num_sims, fia, factor, gps):
       print "Random points: " + str(black_points)
       for item in factors_list:
         print str(item) + ", "
-        good_strats_file.write(str(strat_val) + ", ")
+        good_strats_file.write(str(strat_val) + " ")
       good_strats_file.write(str("\n"))
       good_strats_file.write("White Points: " + str(white_points))
-      good_strats_file.write("Black Points: " + str(black_points))
+      good_strats_file.write(" Black Points: " + str(black_points))
       good_strats_file.write("\n\n\n")
 
 
@@ -232,10 +273,6 @@ def generateSimulations(num_sims, fia, factor, gps):
 
   factors_file.close()
   good_strats_file.close()
-
-
-
-
 
 
 def simGameWithStrat(factors_list, die):
@@ -265,6 +302,7 @@ def simGameWithStrat(factors_list, die):
   return winner
 
 
+  
 def playStratCompTurn(state, factors_list):
 
   posStates = [state]
@@ -278,7 +316,11 @@ def playStratCompTurn(state, factors_list):
   if (best == None):
     print "crashed in playStratCompTurn by returning Null"
     exit()
-  return best
+ 
+  #calcStratMove(best, factors_list, 1)
+  #best.printState()
+  state.updateFromState(best)
+  
 
 def evalStratMove(factors_list, posStates):
   
@@ -290,18 +332,18 @@ def evalStratMove(factors_list, posStates):
 
   for x in range(0, len(posStates)):
 
-    temp = calcStratMove(posStates[x], factors_list)
+    temp = calcStratMove(posStates[x], factors_list, 0)
     #print temp
 
     if (temp > cur_max):
       # If temp move better than current best, remove current best and store temp
       cur_max = temp
-      best_move_state = cur_max
+      best_move_state = posStates[x]
       
 
   return best_move_state
 
-def calcStratMove(state, fl):
+def calcStratMove(state, fl, print_flag):
   
   move_value = 0
 
@@ -336,69 +378,68 @@ def calcStratMove(state, fl):
   white_blot_points = 0
   black_blot_points = 0            #12
 
+  
   for x in range(0, 25): #White points 
-    if (state.board[x] <= 0 and turn == 0):
+    if (state.board[x] <= 1):
       if (white_blocade_count > white_highest_blocade_count):
         white_highest_blocade_count = white_blocade_count
       white_blocade_count = 0
-      continue
-    else: 
-     
-      # Points for uncovered pieces
-      if (state.board[x] == 1):
-        if (white_blocade_count > white_highest_blocade_count):
-          white_highest_blocade_count = white_blocade_count
-        white_blocade_count = 0
-        if (x > last_black_space): 
-          white_blot_points = fl[13] * ((25-x)*fl[14])
-        
-
-        white_uncovered_score = white_uncovered_score + white_blot_points
-
-      # Points for blocades
-      if (int(math.fabs(state.board[x])) >= 2):
-        white_covered_score += 1*fl[15]
-        white_blocade_count += 1
-        if (white_blocade_count > 1):
-          white_blocade_score += white_blocade_count*fl[16]
-
-  for x in range(0, 25): #Black points 
-    if (state.board[x] >= 0 and turn == 1):
+      
+    if (state.board[x] >= -1): #Non-black space on black's turn
       if (black_blocade_count > black_highest_blocade_count):
         black_highest_blocade_count = black_blocade_count
       black_blocade_count = 0
-      continue
-     
-    else:
-      if (state.board[x] == -1):
-        if (black_blocade_count > black_highest_blocade_count):
-          black_highest_blocade_count = black_blocade_count
-        black_blocade_count = 0
-        if (x < last_white_space):
-            blot_points = fl[17]*((x)*fl[18])
-        
-    
-        black_uncovered_score = black_uncovered_score + black_blot_points
+      
+    # Points for uncovered pieces
+    if (state.board[x] == 1):
+      if(white_blocade_count > white_highest_blocade_count):
+        white_highest_blocade_count = white_blocade_count
+      white_blocade_count = 0
+      if (x > last_black_space): 
+        white_blot_points = fl[13] * ((25-x)*fl[14])
+      white_uncovered_score = white_uncovered_score + white_blot_points
+	
+    if (state.board[x] == -1):
+      if(black_blocade_count > black_highest_blocade_count):
+        black_highest_blocade_count = black_blocade_count
+      black_blocade_count = 0
+      if (x < last_white_space): 
+        black_blot_points = fl[13] * ((x)*fl[14])
+      black_uncovered_score = black_uncovered_score + black_blot_points
+      #print str(x) + " " + str(black_uncovered_score)
 
-      # Points for blocades
-      if (int(math.fabs(state.board[x])) >= 2):
-        black_covered_score += 1*fl[19]
-        black_blocade_count += 1
-        if (black_blocade_count > 1):
-          black_blocade_score += black_blocade_count*fl[20]
-   
-  score_tuple = (-1*white_uncovered_score,
-    black_uncovered_score,
-    white_blocade_score,
-    -1*black_blocade_score,          
-    white_covered_score,          
-    -1*black_covered_score,
-    white_highest_blocade_count,
-    -1*black_highest_blocade_count)
+    # Points for blocades
+    if ((state.board[x]) >= 2):
+      white_covered_score += 1#*fl[15]
+      white_blocade_count += 1
+      if (white_blocade_count > 1):
+        white_blocade_score += white_blocade_count#*fl[16]
+        #print str(x) + " " + str(white_blocade_count)
+    
+    if ((state.board[x]) <= -2):
+      black_covered_score += 1#*fl[19]
+      black_blocade_count += 1
+      if (black_blocade_count > 1):
+        black_blocade_score += black_blocade_count#*fl[20]
+        #print str(x) + " " + str(white_blocade_count)
+      
+  score_tuple = (white_uncovered_score,
+    -1*black_uncovered_score,
+    -1*white_blocade_score,
+    black_blocade_score,          
+    -1*white_covered_score,          
+    black_covered_score,
+    -1*white_highest_blocade_count,
+    black_highest_blocade_count)
 
   for x in range(0, len(score_tuple)):
     move_value = move_value + score_tuple[x]*fl[x]
 
+  if (print_flag):
+    print "move value: " + str(move_value),
+    print "   score_tuple: " + str(score_tuple)
+	
+	
   return move_value
 
 
@@ -557,7 +598,15 @@ def generateMoveTree(st):
   [2,4], [2,5], [2,6], [3,3,3,3], [3,4], [3,5], [3,6], [4,4,4,4], [4,5], [4,6],\
   [5,5,5,5], [5,6], [6,6,6,6] ]
 
+<<<<<<< HEAD
   #stateTreeFile = open('stateTreeFile.txt', 'w')
+=======
+<<<<<<< HEAD
+  stateTreeFile = open('stateTreeFile.txt', 'w')
+=======
+  #stateTreeFile = open('stateTreeFile.txt', 'wa')
+>>>>>>> GUI
+>>>>>>> strat
 
   stateScore = calcMoveValue1(st, st.turn)
   root = stateTreeNode.stateTreeNode(st, stateScore)
@@ -1051,6 +1100,7 @@ def getCompSpaceFrom(state):
 def getCompSpaceTo(state, space_from):
   '''Returns the comps selected space plus the largest remaining dice roll'''
   rollcpy = copy.deepcopy(state.roll)
+  
   
   if (random.random() > .5):
     # Check the higher or lower value 50% of time - allows both high and low rolls to be
