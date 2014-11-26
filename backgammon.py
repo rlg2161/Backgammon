@@ -128,7 +128,7 @@ def play(num):
       else:
 	    #playTurn(state, 2, 1)
         playStratCompTurn(state, factors_list)
-        #calcStratMove(state, factors_list, 1)
+        calcStratMove(state, factors_list, 1)
 
       winner = state.testGameOver() 
   
@@ -307,8 +307,8 @@ def playStratCompTurn(state, factors_list):
     print "crashed in playStratCompTurn by returning Null"
     exit()
  
-  calcStratMove(best, factors_list, 1)
-  best.printState()
+  #calcStratMove(best, factors_list, 1)
+  #best.printState()
   state.updateFromState(best)
   
 
@@ -428,6 +428,7 @@ def calcStratMove(state, fl, print_flag):
   if (print_flag):
     print "move value: " + str(move_value),
     print "   score_tuple: " + str(score_tuple)
+    state.printState()
 	
 	
   return move_value
