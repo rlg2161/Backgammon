@@ -54,7 +54,7 @@ def main():
     simulateSession(first_strat, second_strat, num_sims)
 
   else: #for testing
-    generateSimulations(100, 21, 10, 5)
+    generateSimulations(10, 21, 10, 5)
     
 
 def play(num):
@@ -108,7 +108,7 @@ def play(num):
   if (num == 2): #Play comp v. comp
     # Currently set up to set a certain factor list to make sure the other sim methods
 	# are working
-    factors_list = [0.120619259028, 0.120619259028, 0.120619259028, 0.120619259028, 0.120619259028, 0.120619259028, 0.120619259028, 0.120619259028, 0.120619259028, 0.120619259028, 0.120619259028, 0.120619259028, 0.120619259028, 0.120619259028, 0.120619259028, 0.120619259028, 0.120619259028, 0.120619259028, 0.120619259028, 0.120619259028, 0.120619259028]
+    factors_list = [7.47716610732, 2.44558146959, 1.5901601086, 2.04606702991, 9.02275230417, 5.29302425011, 9.34020221359, 1.97485650419, 4.7133024279, 5.65423126216, 4.54429405071, 7.53198387199, 3.23994232217, 0.64351955299, 0.864579043813, 0.0182731562407, 1.1321061362, 0.405103962206, 0.462086420808, 0.940122991592, 9.3886349712]
     print factors_list
 	
     if (state.turn == 0):
@@ -250,7 +250,7 @@ def generateSimulations(num_sims, fia, factor, gps):
       print "Random points: " + str(black_points)
       for item in factors_list:
         print str(item) + ", "
-        good_strats_file.write(str(strat_val) + " ")
+        good_strats_file.write(str(item) + " ")
       good_strats_file.write(str("\n"))
       good_strats_file.write("White Points: " + str(white_points))
       good_strats_file.write(" Black Points: " + str(black_points))
