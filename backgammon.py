@@ -112,33 +112,23 @@ def play(num):
     print factors_list
 	
     if (state.turn == 0):
-<<<<<<< HEAD
-      playTurn(state, 1, 0) #White == Random
+      playStratCompTurn(state, factors_list) #White == factors_list strat
     else:
 	  #playTurn(state, 2, 1)
-      playStratCompTurn(state, factors_list) #Black == factors_list strat
-      calcStratMove(state, factors_list, 1)
-=======
-      playTurn(state, 1, 1) #White 
-    else:
-      playTurn(state, 3, 1) #Black  
->>>>>>> GUI
-
+      playTurn(state, 1, 1) #Black == random
+      #calcStratMove(state, factors_list, 1)
+	  
     while (winner == -1):
       raw_input("Press enter for next computer move")
       roll = die.rollDie()
       state.updateRoll(roll)
       state.switchTurn()
       if (state.turn == 0):
-        playTurn(state, 1, 0)
+        playTurn(state, 1, 1)
       else:
-<<<<<<< HEAD
 	    #playTurn(state, 2, 1)
         playStratCompTurn(state, factors_list)
-        calcStratMove(state, factors_list, 1)
-=======
-        playTurn(state, 3, 1)
->>>>>>> GUI
+        #calcStratMove(state, factors_list, 1)
 
       winner = state.testGameOver() 
   
@@ -317,8 +307,8 @@ def playStratCompTurn(state, factors_list):
     print "crashed in playStratCompTurn by returning Null"
     exit()
  
-  #calcStratMove(best, factors_list, 1)
-  #best.printState()
+  calcStratMove(best, factors_list, 1)
+  best.printState()
   state.updateFromState(best)
   
 
@@ -598,16 +588,7 @@ def generateMoveTree(st):
   [2,4], [2,5], [2,6], [3,3,3,3], [3,4], [3,5], [3,6], [4,4,4,4], [4,5], [4,6],\
   [5,5,5,5], [5,6], [6,6,6,6] ]
 
-<<<<<<< HEAD
-  #stateTreeFile = open('stateTreeFile.txt', 'w')
-=======
-<<<<<<< HEAD
   stateTreeFile = open('stateTreeFile.txt', 'w')
-=======
-  #stateTreeFile = open('stateTreeFile.txt', 'wa')
->>>>>>> GUI
->>>>>>> strat
-
   stateScore = calcMoveValue1(st, st.turn)
   root = stateTreeNode.stateTreeNode(st, stateScore)
     
