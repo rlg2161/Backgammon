@@ -275,7 +275,7 @@ def generateSimulations(num_sims, fia, factor, gps):
     print "Strategy " +str(x+1) + " of " + str(num_sims) 
     #For each simulation num_sim random strategies will be created
     factors_list = []
-    for i in range(0, 5):
+    for i in range(0, 3):
       for x in range(0, 13):
         strat_val = factor*random.random()
         factors_list.append(strat_val)
@@ -302,16 +302,23 @@ def generateSimulations(num_sims, fia, factor, gps):
     white_rand_points = 0
     white_points = 0
     black_points = 0
+    
+    print factors_list
+    print len(factors_list)
 
     for x in range(0, gps):
+      #print "getting here"
 
       winnerRand = simGameWithStrat(1, factors_list, die)
+      print winnerRand
                
       if (winnerRand == 0):
         black_rand_points = black_rand_points + 1
       else:
         white_rand_points = white_rand_points + 1
 
+
+    print "what about here"
     print "vs. random: " + str((white_rand_points, black_rand_points))
     #if (white_rand_points >= 40):
       #print "at least getting here"
@@ -325,7 +332,7 @@ def generateSimulations(num_sims, fia, factor, gps):
       else:
         white_points = white_points + 1
 
-      #print (white_points, black_points)
+      print (white_points, black_points)
   
     print "vs. strat: " + str((white_points, black_points))
 
@@ -353,6 +360,7 @@ def generateSimulations(num_sims, fia, factor, gps):
 
 def simGameWithStrat(strat, factors_list, die):
   "sim games using randomly generated strategies"
+  print "new game"
 
   state = createInitialState(die)
 
@@ -433,7 +441,12 @@ def calcStratMove(state, fl, print_flag):
 
   pip_count = state.getPipCount()
 
-  strat = pip_count[0]/5 
+  if (pip_count[0]+pip_count[1] > 250):
+    strat = 1
+  elif(state.allInFinalQuadrant() == True):
+    strat = 2
+  else:
+    strat = 3 
 
   # Scores
   white_uncovered_score = 0        #1

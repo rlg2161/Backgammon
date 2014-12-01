@@ -194,6 +194,7 @@ class backgammonGUI():
     # Button Methods
     
     def newGameButton():
+      print "\n\n\n"
       self.state = bg.createInitialState(self.die)
       cur_roll = self.state.roll
 
@@ -445,6 +446,7 @@ class backgammonGUI():
 
     # Play comp first turn if it goes first
     if (self.state.turn == 1):
+      print self.state.roll
       self.state = bg.playStrategicCompTurn(self.state)
       
       self.redraw(self.state)
@@ -504,7 +506,7 @@ class backgammonGUI():
         #time.sleep(2)
         bg.playStratCompTurn(self.state, self.factors_list)
         self.redraw(self.state)
-        
+
         r = self.die.rollDie()
         self.state.updateRoll(r)
         self.state.switchTurn()
