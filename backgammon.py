@@ -48,6 +48,7 @@ def main():
     print "1: Random computer player"
     print "2: My own, custom algorithm"
     print "3: My own algo but customized to minimize opponent move values"
+    print "4: Learned algo (make sure to run learning.py first)"
     print "... More to come ..."
     first_strat = raw_input("Choice for comp 1: ")
     second_strat = raw_input("Choice for comp 2: ")
@@ -205,6 +206,46 @@ def simulateSession(first_strat, second_strat, number_games):
   print "Black's score for this round was: " + str(black_score) + \
   " while playing " + str(second_strat)
 
+def simulateGame(first_strat, second_strat, die):
+  '''Simulate a game'''
+
+  if (first_strat != 4):
+    state = createInitialState(die)
+    
+    winner = -1
+
+    if (state.turn == 0):
+      playTurn(state, first_strat, 0) #White
+    else:
+      playTurn(state, second_strat, 0) #Black
+
+    while (winner == -1):
+      roll = die.rollDie()
+      state.updateRoll(roll)
+      state.switchTurn()
+      if (state.turn == 0):
+        playTurn(state, first_strat, 0)
+      else:
+        playTurn(state, second_strat, 0)
+
+      winner = state.testGameOver()
+
+    return winner
+  
+  else: 
+    try_strat_file = open('tryStratFile.txt', 'r')
+    factors_list = []
+    
+    line = try_strat_file.readline()
+    splitLine = line.split()
+
+    for item in splitLine:
+      factors_list.append(float(item))
+
+    winner = simGameWithStrat(second_strat, factors_list, die)
+    return winner
+
+
 def genFactorsList(fia, factor):
   factors_list = []
   for x in range(0, 13):
@@ -326,9 +367,10 @@ def simGameWithStrat(strat, factors_list, die):
     state.updateRoll(roll)
     state.switchTurn()
     if (state.turn == 0):
-      playTurn(state, strat, 0)
-    else:
       playStratCompTurn(state, factors_list)
+      
+    else:
+      playTurn(state, strat, 0)
 
     winner = state.testGameOver()
 
@@ -482,34 +524,7 @@ def calcStratMove(state, fl, print_flag):
   return move_value
 
 
-  
 
-
-
-def simulateGame(first_strat, second_strat, die):
-  '''Simulate a game'''
-
-  state = createInitialState(die)
-  
-  winner = -1
-
-  if (state.turn == 0):
-    playTurn(state, first_strat, 0) #White
-  else:
-    playTurn(state, second_strat, 0) #Black
-
-  while (winner == -1):
-    roll = die.rollDie()
-    state.updateRoll(roll)
-    state.switchTurn()
-    if (state.turn == 0):
-      playTurn(state, first_strat, 0)
-    else:
-      playTurn(state, second_strat, 0)
-
-    winner = state.testGameOver()
-
-  return winner
 
 def playTurn(state, num_flag, print_mode):
   '''Plays one turn'''
@@ -608,6 +623,15 @@ def playTurn(state, num_flag, print_mode):
     
     #stateList.append(new_state)
     state.updateFromState(new_state)
+
+  elif (num_flag == 4):
+    if (print_mode):
+      state.printState()
+
+    playStratCompTurn(state)
+
+
+
 
 def moveWithStateTree(state):
   '''Move for computer when using state tree based strategy for forecasting'''
