@@ -181,9 +181,22 @@ def simulateSession(first_strat, second_strat, number_games):
   white_score = 0
   black_score = 0
 
-  for x in range(0, int(number_games)):
-    winner = simulateGame(int(first_strat), int(second_strat), die)
+  try_strat_file = open('tryStratFile.txt', 'r')
+  factors_list = []
+  
+  line = try_strat_file.readline()
+  splitLine = line.split()
 
+  for item in splitLine:
+    factors_list.append(float(item))
+
+  for x in range(0, int(number_games)):
+    if (int(first_strat) != 4):
+      winner = simulateGame(int(first_strat), int(second_strat), die)
+    
+    else:
+      winner = simGameWithStrat(second_strat, factors_list, die)
+    
     
     if (winner == 0):
       white_score += 1
@@ -209,41 +222,29 @@ def simulateSession(first_strat, second_strat, number_games):
 def simulateGame(first_strat, second_strat, die):
   '''Simulate a game'''
 
-  if (first_strat != 4):
-    state = createInitialState(die)
-    
-    winner = -1
-
-    if (state.turn == 0):
-      playTurn(state, first_strat, 0) #White
-    else:
-      playTurn(state, second_strat, 0) #Black
-
-    while (winner == -1):
-      roll = die.rollDie()
-      state.updateRoll(roll)
-      state.switchTurn()
-      if (state.turn == 0):
-        playTurn(state, first_strat, 0)
-      else:
-        playTurn(state, second_strat, 0)
-
-      winner = state.testGameOver()
-
-    return winner
+  state = createInitialState(die)
   
-  else: 
-    try_strat_file = open('tryStratFile.txt', 'r')
-    factors_list = []
-    
-    line = try_strat_file.readline()
-    splitLine = line.split()
+  winner = -1
 
-    for item in splitLine:
-      factors_list.append(float(item))
+  if (state.turn == 0):
+    playTurn(state, first_strat, 0) #White
+  else:
+    playTurn(state, second_strat, 0) #Black
 
-    winner = simGameWithStrat(second_strat, factors_list, die)
-    return winner
+  while (winner == -1):
+    roll = die.rollDie()
+    state.updateRoll(roll)
+    state.switchTurn()
+    if (state.turn == 0):
+      playTurn(state, first_strat, 0)
+    else:
+      playTurn(state, second_strat, 0)
+
+    winner = state.testGameOver()
+
+  return winner
+  
+  
 
 
 def genFactorsList(fia, factor):

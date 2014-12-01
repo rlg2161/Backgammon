@@ -14,6 +14,7 @@ canvasHeight = 260
 
 
 class backgammonGUI():
+  
 
   
   # Functions and Methods
@@ -151,8 +152,10 @@ class backgammonGUI():
       coords = 231, 133 + 20*x, 251, 153 + 20*x
       self.board.create_oval(coords, fill = '#A37547')
 
-  def __init__(self):
+  def __init__(self, factors_list):
 
+    self.factors_list = factors_list
+    print self.factors_list
     self.moveFrom = -1
     self.moveTo = -1
 
@@ -205,7 +208,9 @@ class backgammonGUI():
       self.redraw(self.state)
 
       if (self.state.turn == 1):
-        self.state = bg.playStrategicCompTurn(self.state)
+        print roll_message
+        #self.state = bg.playStrategicCompTurn(self.state)
+        bg.playStratCompTurn(self.state, self.factors_list)
       
         self.redraw(self.state)
 
@@ -282,120 +287,120 @@ class backgammonGUI():
     #for x in range(0, 6):
       
     # Top Left
-    here_button = Tkinter.Button(self.top_button_frame, text = u'\u2193', width = 4, command=lambda: hereButton(12))
+    here_button = Tkinter.Button(self.top_button_frame, text = u'\u2193', width = 1, command=lambda: hereButton(12))
     here_button.grid(row = 0, column = 0, columnspan = 1)
     #here_button.bind('<Button-1>', self.play(12))
 
     # Bottom Left
-    here_button = Tkinter.Button(self.bottom_button_frame, text = u'\u2191', width = 4, command=lambda: hereButton(13))
+    here_button = Tkinter.Button(self.bottom_button_frame, text = u'\u2191', width = 1, command=lambda: hereButton(13))
     here_button.grid(row = 0, column = 0, columnspan = 1)
 
     # Top Left
-    here_button = Tkinter.Button(self.top_button_frame, text = u'\u2193', width = 4, command=lambda: hereButton(11))
+    here_button = Tkinter.Button(self.top_button_frame, text = u'\u2193', width = 1, command=lambda: hereButton(11))
     here_button.grid(row = 0, column = 1, columnspan = 1)
 
     # Bottom Left
-    here_button = Tkinter.Button(self.bottom_button_frame, text = u'\u2191', width = 4, command=lambda: hereButton(14))
+    here_button = Tkinter.Button(self.bottom_button_frame, text = u'\u2191', width = 1, command=lambda: hereButton(14))
     here_button.grid(row = 0, column = 1, columnspan = 1)
 
     # Top Left
-    here_button = Tkinter.Button(self.top_button_frame, text = u'\u2193', width = 4, command=lambda: hereButton(10))
+    here_button = Tkinter.Button(self.top_button_frame, text = u'\u2193', width = 1, command=lambda: hereButton(10))
     here_button.grid(row = 0, column = 2, columnspan = 1)
 
     # Bottom Left
-    here_button = Tkinter.Button(self.bottom_button_frame, text = u'\u2191', width = 4, command=lambda: hereButton(15))
+    here_button = Tkinter.Button(self.bottom_button_frame, text = u'\u2191', width = 1, command=lambda: hereButton(15))
     here_button.grid(row = 0, column = 2, columnspan = 1)
 
     # Top Left
-    here_button = Tkinter.Button(self.top_button_frame, text = u'\u2193', width = 4, command=lambda: hereButton(9))
+    here_button = Tkinter.Button(self.top_button_frame, text = u'\u2193', width = 1, command=lambda: hereButton(9))
     here_button.grid(row = 0, column = 3, columnspan = 1)
 
     # Bottom Left
-    here_button = Tkinter.Button(self.bottom_button_frame, text = u'\u2191', width = 4, command=lambda: hereButton(16))
+    here_button = Tkinter.Button(self.bottom_button_frame, text = u'\u2191', width = 1, command=lambda: hereButton(16))
     here_button.grid(row = 0, column = 3, columnspan = 1)
 
     # Top Left
-    here_button = Tkinter.Button(self.top_button_frame, text = u'\u2193', width = 4, command=lambda: hereButton(8))
+    here_button = Tkinter.Button(self.top_button_frame, text = u'\u2193', width = 1, command=lambda: hereButton(8))
     here_button.grid(row = 0, column = 4, columnspan = 1)
 
     # Bottom Left
-    here_button = Tkinter.Button(self.bottom_button_frame, text = u'\u2191', width = 4, command=lambda: hereButton(17))
+    here_button = Tkinter.Button(self.bottom_button_frame, text = u'\u2191', width = 1, command=lambda: hereButton(17))
     here_button.grid(row = 0, column = 4, columnspan = 1)
 
     # Top Left
-    here_button = Tkinter.Button(self.top_button_frame, text = u'\u2193', width = 4, command=lambda: hereButton(7))
+    here_button = Tkinter.Button(self.top_button_frame, text = u'\u2193', width = 1, command=lambda: hereButton(7))
     here_button.grid(row = 0, column = 5, columnspan = 1)
 
     # Bottom Left
-    here_button = Tkinter.Button(self.bottom_button_frame, text = u'\u2191', width = 4, command=lambda: hereButton(18))
+    here_button = Tkinter.Button(self.bottom_button_frame, text = u'\u2191', width = 1, command=lambda: hereButton(18))
     here_button.grid(row = 0, column = 5, columnspan = 1)
 
 
 
 
     #Placeholder buttons
-    here_button = Tkinter.Button(self.top_button_frame, text = '', width = 3, command=lambda: placeholderButton(27))
+    here_button = Tkinter.Button(self.top_button_frame, text = '', width = 1, command=lambda: placeholderButton(27))
     here_button.grid(row = 0, column = 6, columnspan = 1)
 
-    here_button = Tkinter.Button(self.bottom_button_frame, text = '', width = 3, command=lambda: placeholderButton(26))
+    here_button = Tkinter.Button(self.bottom_button_frame, text = '', width = 1, command=lambda: placeholderButton(26))
     here_button.grid(row = 0, column = 6, columnspan = 1)
 
     #for x in range(7, 14):
 
     #Top Right
-    here_button = Tkinter.Button(self.top_button_frame, text = u'\u2193', width = 4, command=lambda: hereButton(6))
+    here_button = Tkinter.Button(self.top_button_frame, text = u'\u2193', width = 1, command=lambda: hereButton(6))
     here_button.grid(row = 0, column = 7, columnspan = 1)
 
     #Bottom Right
-    here_button = Tkinter.Button(self.bottom_button_frame, text = u'\u2191', width = 4, command=lambda: hereButton(19))
+    here_button = Tkinter.Button(self.bottom_button_frame, text = u'\u2191', width = 1, command=lambda: hereButton(19))
     here_button.grid(row = 0, column = 7, columnspan = 1)
 
     #Top Right
-    here_button = Tkinter.Button(self.top_button_frame, text = u'\u2193', width = 4, command=lambda: hereButton(5))
+    here_button = Tkinter.Button(self.top_button_frame, text = u'\u2193', width = 1, command=lambda: hereButton(5))
     here_button.grid(row = 0, column = 8, columnspan = 1)
 
     #Bottom Right
-    here_button = Tkinter.Button(self.bottom_button_frame, text = u'\u2191', width = 4, command=lambda: hereButton(20))
+    here_button = Tkinter.Button(self.bottom_button_frame, text = u'\u2191', width = 1, command=lambda: hereButton(20))
     here_button.grid(row = 0, column = 8, columnspan = 1)
 
     #Top Right
-    here_button = Tkinter.Button(self.top_button_frame, text = u'\u2193', width = 4, command=lambda: hereButton(4))
+    here_button = Tkinter.Button(self.top_button_frame, text = u'\u2193', width = 1, command=lambda: hereButton(4))
     here_button.grid(row = 0, column = 9, columnspan = 1)
 
     #Bottom Right
-    here_button = Tkinter.Button(self.bottom_button_frame, text = u'\u2191', width = 4, command=lambda: hereButton(21))
+    here_button = Tkinter.Button(self.bottom_button_frame, text = u'\u2191', width = 1, command=lambda: hereButton(21))
     here_button.grid(row = 0, column = 9, columnspan = 1)
 
     #Top Right
-    here_button = Tkinter.Button(self.top_button_frame, text = u'\u2193', width = 4, command=lambda: hereButton(3))
+    here_button = Tkinter.Button(self.top_button_frame, text = u'\u2193', width = 1, command=lambda: hereButton(3))
     here_button.grid(row = 0, column = 10, columnspan = 1)
 
     #Bottom Right
-    here_button = Tkinter.Button(self.bottom_button_frame, text = u'\u2191', width = 4, command=lambda: hereButton(22))
+    here_button = Tkinter.Button(self.bottom_button_frame, text = u'\u2191', width = 1, command=lambda: hereButton(22))
     here_button.grid(row = 0, column = 10, columnspan = 1)
 
     #Top Right
-    here_button = Tkinter.Button(self.top_button_frame, text = u'\u2193', width = 4, command=lambda: hereButton(2))
+    here_button = Tkinter.Button(self.top_button_frame, text = u'\u2193', width = 1, command=lambda: hereButton(2))
     here_button.grid(row = 0, column = 11, columnspan = 1)
 
     #Bottom Right
-    here_button = Tkinter.Button(self.bottom_button_frame, text = u'\u2191', width = 4, command=lambda: hereButton(23))
+    here_button = Tkinter.Button(self.bottom_button_frame, text = u'\u2191', width = 1, command=lambda: hereButton(23))
     here_button.grid(row = 0, column = 11, columnspan = 1)
 
     #Top Right
-    here_button = Tkinter.Button(self.top_button_frame, text = u'\u2193', width = 4, command=lambda: hereButton(1))
+    here_button = Tkinter.Button(self.top_button_frame, text = u'\u2193', width = 1, command=lambda: hereButton(1))
     here_button.grid(row = 0, column = 12, columnspan = 1)
 
     #Bottom Right
-    here_button = Tkinter.Button(self.bottom_button_frame, text = u'\u2191', width = 4, command=lambda: hereButton(24))
+    here_button = Tkinter.Button(self.bottom_button_frame, text = u'\u2191', width = 1, command=lambda: hereButton(24))
     here_button.grid(row = 0, column = 12, columnspan = 1)
 
     #Top Right
-    here_button = Tkinter.Button(self.top_button_frame, text = u'\u2193', width = 4, command=lambda: hereButton(0))
+    here_button = Tkinter.Button(self.top_button_frame, text = u'\u2193', width = 1, command=lambda: hereButton(0))
     here_button.grid(row = 0, column = 13, columnspan = 1)
 
     #Bottom Right
-    here_button = Tkinter.Button(self.bottom_button_frame, text = u'\u2191', width = 4, command=lambda: hereButton(25))
+    here_button = Tkinter.Button(self.bottom_button_frame, text = u'\u2191', width = 1, command=lambda: hereButton(25))
     here_button.grid(row = 0, column = 13, columnspan = 1)
 
 
@@ -475,10 +480,12 @@ class backgammonGUI():
     
  
     if (self.state.turn == 1): #Black
+      print roll_message
       
 
       # Calculate and play turn
-      self.state = bg.playStrategicCompTurn(self.state)
+      #self.state = bg.playStrategicCompTurn(self.state)
+      bg.playStratCompTurn(self.state, self.factors_list)
       self.redraw(self.state)
       
       # Update and return move to other player
@@ -495,13 +502,18 @@ class backgammonGUI():
         #self.turn.set("No valid moves")
         print "no valid moves"
         #time.sleep(2)
+        bg.playStratCompTurn(self.state, self.factors_list)
+        self.redraw(self.state)
+        
         r = self.die.rollDie()
         self.state.updateRoll(r)
         self.state.switchTurn()
         
         self.state.printState()
+        print roll_message
 
-        self.state = bg.playStrategicCompTurn(self.state)
+        #self.state = bg.playStrategicCompTurn(self.state)
+        bg.playStratCompTurn(self.state, self.factors_list)
         self.redraw(self.state)
 
         roll_message = 'Roll: ' + str(self.state.roll)

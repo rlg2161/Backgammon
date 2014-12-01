@@ -6,10 +6,19 @@ import dice
 
 def main():
 
-  die = dice.oneDie(6)
+  #die = dice.oneDie(6)
+
+  try_strat_file = open('tryStratFile.txt', 'r')
+  factors_list = []
+  
+  line = try_strat_file.readline()
+  splitLine = line.split()
+
+  for item in splitLine:
+    factors_list.append(float(item))
   
 
-  gui = bgGUI.backgammonGUI()
+  gui = bgGUI.backgammonGUI(factors_list)
   
 
 
