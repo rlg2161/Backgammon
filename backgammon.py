@@ -5,6 +5,7 @@ import copy
 import math
 import random
 import stateTreeNode
+import datetime
 
 stateList = []
 
@@ -54,7 +55,7 @@ def main():
     simulateSession(first_strat, second_strat, num_sims)
 
   else: #for testing
-    generateSimulations(10, 21, 10, 5)
+    generateSimulations(1500, 21, 10, 50)
     
 
 def play(num):
@@ -83,8 +84,17 @@ def play(num):
       
   if (num == 1): #Play human v. comp
     #factors_list = genFactorsList(21, 10)
-    factors_list = [0.120619259028, 0.120619259028, 0.120619259028, 0.120619259028, 0.120619259028, 0.120619259028, 0.120619259028, 0.120619259028, 0.120619259028, 0.120619259028, 0.120619259028, 0.120619259028, 0.120619259028, 0.120619259028, 0.120619259028, 0.120619259028, 0.120619259028, 0.120619259028, 0.120619259028, 0.120619259028, 0.120619259028]
+    try_strat_file = open('tryStratFile.txt', 'r')
+    factors_list = []
+    
+    line = try_strat_file.readline()
+    splitLine = line.split()
+
+    for item in splitLine:
+      factors_list.append(float(item))
+    #factors_list = [0.120619259028, 0.120619259028, 0.120619259028, 0.120619259028, 0.120619259028, 0.120619259028, 0.120619259028, 0.120619259028, 0.120619259028, 0.120619259028, 0.120619259028, 0.120619259028, 0.120619259028, 0.120619259028, 0.120619259028, 0.120619259028, 0.120619259028, 0.120619259028, 0.120619259028, 0.120619259028, 0.120619259028]
     print factors_list
+    
     if (state.turn == 0):
       playTurn(state, 0, 1)
 	  
@@ -108,14 +118,23 @@ def play(num):
   if (num == 2): #Play comp v. comp
     # Currently set up to set a certain factor list to make sure the other sim methods
 	# are working
-    factors_list = [7.47716610732, 2.44558146959, 1.5901601086, 2.04606702991, 9.02275230417, 5.29302425011, 9.34020221359, 1.97485650419, 4.7133024279, 5.65423126216, 4.54429405071, 7.53198387199, 3.23994232217, 0.64351955299, 0.864579043813, 0.0182731562407, 1.1321061362, 0.405103962206, 0.462086420808, 0.940122991592, 9.3886349712]
+    try_strat_file = open('tryStratFile.txt', 'r')
+    factors_list = []
+    
+    line = try_strat_file.readline()
+    splitLine = line.split()
+
+    for item in splitLine:
+      factors_list.append(float(item))
+
+    #factors_list = [7.47716610732, 2.44558146959, 1.5901601086, 2.04606702991, 9.02275230417, 5.29302425011, 9.34020221359, 1.97485650419, 4.7133024279, 5.65423126216, 4.54429405071, 7.53198387199, 3.23994232217, 0.64351955299, 0.864579043813, 0.0182731562407, 1.1321061362, 0.405103962206, 0.462086420808, 0.940122991592, 9.3886349712]
     print factors_list
 	
     if (state.turn == 0):
       playStratCompTurn(state, factors_list) #White == factors_list strat
     else:
 	  #playTurn(state, 2, 1)
-      playTurn(state, 1, 1) #Black == random
+      playTurn(state, 2, 1) #Black == random
       #calcStratMove(state, factors_list, 1)
 	  
     while (winner == -1):
@@ -211,50 +230,75 @@ def generateSimulations(num_sims, fia, factor, gps):
   die = dice.oneDie()
 
   for x in range(0, num_sims):
-    print "Strategy " +str(x) + " of " + str(num_sims) 
+    print "Strategy " +str(x+1) + " of " + str(num_sims) 
     #For each simulation num_sim random strategies will be created
     factors_list = []
-    for x in range(0, 13):
-      strat_val = factor*random.random()
-      factors_list.append(strat_val)
-      in_string = str(strat_val) + ", "
-      factors_file.write(in_string)
-      factors_file.write("\n")
-    
-    for x in range(13, fia):
-      strat_val = factor/10*random.random()
-      if (x == 16 or x == 20):
-        factors_list.append(strat_val*10)
-      else:
+    for i in range(0, 5):
+      for x in range(0, 13):
+        strat_val = factor*random.random()
         factors_list.append(strat_val)
+        in_string = str(strat_val) + " "
+        #factors_file.write(in_string)
+        #factors_file.write("\n")
+      
+      for x in range(13, fia):
+        strat_val = factor/10*random.random()
+        if (x == 16 or x == 20):
+          factors_list.append(strat_val*10)
+        else:
+          factors_list.append(strat_val)
 
-      in_string = str(strat_val) + " "
+        in_string = str(strat_val) + " "
+        #factors_file.write(in_string)
+        #factors_file.write("\n")
+
       factors_file.write(in_string)
       factors_file.write("\n")
 
 
-    black_points = 0
+    black_rand_points = 0
+    white_rand_points = 0
     white_points = 0
+    black_points = 0
 
     for x in range(0, gps):
 
-      winner = simGameWithStrat(factors_list, die)
+      winnerRand = simGameWithStrat(1, factors_list, die)
                
+      if (winnerRand == 0):
+        black_rand_points = black_rand_points + 1
+      else:
+        white_rand_points = white_rand_points + 1
+
+    print "vs. random: " + str((white_rand_points, black_rand_points))
+    #if (white_rand_points >= 40):
+      #print "at least getting here"
+      
+
+    for x in range(0, gps):
+      winner = simGameWithStrat(2, factors_list, die)
+
       if (winner == 0):
         black_points = black_points + 1
       else:
         white_points = white_points + 1
 
-    if (white_points > 1):
-      print "Strat points: " + str(white_points)
-      print "Random points: " + str(black_points)
-      for item in factors_list:
-        print str(item) + ", "
-        good_strats_file.write(str(item) + " ")
-      good_strats_file.write(str("\n"))
-      good_strats_file.write("White Points: " + str(white_points))
-      good_strats_file.write(" Black Points: " + str(black_points))
-      good_strats_file.write("\n\n\n")
+      #print (white_points, black_points)
+  
+    print "vs. strat: " + str((white_points, black_points))
+
+    #if (white_points >= 40):
+    good_strats_file.write("Points vs. Random: " + str(white_rand_points) + " " + str(black_rand_points) + "\n")
+    good_strats_file.write("Points vs. Strat: " + str(white_points) + " "+ str(black_points) + "\n")
+
+    print "Points vs. Random: " + str(white_rand_points) + " " + str(black_rand_points)
+    print "Points vs. Strat: " + str(white_points) + " "+ str(black_points)
+
+    for item in factors_list:
+      #print str(item) + ", "
+      good_strats_file.write(str(item) + " ")
+          
+    good_strats_file.write("\n\n\n")
 
 
     factors_file.write("White Points: " + str(white_points))
@@ -265,7 +309,7 @@ def generateSimulations(num_sims, fia, factor, gps):
   good_strats_file.close()
 
 
-def simGameWithStrat(factors_list, die):
+def simGameWithStrat(strat, factors_list, die):
   "sim games using randomly generated strategies"
 
   state = createInitialState(die)
@@ -275,14 +319,14 @@ def simGameWithStrat(factors_list, die):
   if (state.turn == 0):
     playStratCompTurn(state, factors_list) #White
   else:
-    playTurn(state, 1, 0) #Black
+    playTurn(state, strat, 0) #Black
 
   while (winner == -1):
     roll = die.rollDie()
     state.updateRoll(roll)
     state.switchTurn()
     if (state.turn == 0):
-      playTurn(state, 1, 0)
+      playTurn(state, strat, 0)
     else:
       playStratCompTurn(state, factors_list)
 
@@ -344,6 +388,10 @@ def calcStratMove(state, fl, print_flag):
   last_white_space = temp[0]
   last_black_space = temp[1]
 
+  pip_count = state.getPipCount()
+
+  strat = pip_count[0]/5 
+
   # Scores
   white_uncovered_score = 0        #1
   black_uncovered_score = 0
@@ -386,7 +434,7 @@ def calcStratMove(state, fl, print_flag):
         white_highest_blocade_count = white_blocade_count
       white_blocade_count = 0
       if (x > last_black_space): 
-        white_blot_points = fl[13] * ((25-x)*fl[14])
+        white_blot_points = fl[13]*strat * ((25-x)*fl[14]*strat)
       white_uncovered_score = white_uncovered_score + white_blot_points
 	
     if (state.board[x] == -1):
@@ -394,33 +442,33 @@ def calcStratMove(state, fl, print_flag):
         black_highest_blocade_count = black_blocade_count
       black_blocade_count = 0
       if (x < last_white_space): 
-        black_blot_points = fl[13] * ((x)*fl[14])
+        black_blot_points = fl[13]*strat * ((x)*fl[14]*strat)
       black_uncovered_score = black_uncovered_score + black_blot_points
       #print str(x) + " " + str(black_uncovered_score)
 
     # Points for blocades
     if ((state.board[x]) >= 2):
-      white_covered_score += 1#*fl[15]
+      white_covered_score += 1*fl[15]*strat
       white_blocade_count += 1
       if (white_blocade_count > 1):
-        white_blocade_score += white_blocade_count#*fl[16]
+        white_blocade_score += white_blocade_count*fl[16]*strat
         #print str(x) + " " + str(white_blocade_count)
     
     if ((state.board[x]) <= -2):
-      black_covered_score += 1#*fl[19]
+      black_covered_score += 1*fl[19]*strat
       black_blocade_count += 1
       if (black_blocade_count > 1):
-        black_blocade_score += black_blocade_count#*fl[20]
+        black_blocade_score += black_blocade_count*fl[20]*strat
         #print str(x) + " " + str(white_blocade_count)
-      
+    
   score_tuple = (white_uncovered_score,
-    -1*black_uncovered_score,
-    -1*white_blocade_score,
-    black_blocade_score,          
-    -1*white_covered_score,          
-    black_covered_score,
-    -1*white_highest_blocade_count,
-    black_highest_blocade_count)
+  -1*black_uncovered_score,
+  -1*white_blocade_score,
+  black_blocade_score,          
+  -1*white_covered_score,          
+  black_covered_score,
+  -1*white_highest_blocade_count,
+  black_highest_blocade_count) 
 
   for x in range(0, len(score_tuple)):
     move_value = move_value + score_tuple[x]*fl[x]
