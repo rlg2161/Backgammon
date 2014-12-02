@@ -211,7 +211,7 @@ class backgammonGUI():
       if (self.state.turn == 1):
         print roll_message
         #self.state = bg.playStrategicCompTurn(self.state)
-        bg.playStratCompTurn(self.state, self.factors_list)
+        bg.playCompTurn(self.state, 4, False self.factors_list)
       
         self.redraw(self.state)
 
@@ -447,7 +447,7 @@ class backgammonGUI():
     # Play comp first turn if it goes first
     if (self.state.turn == 1):
       print self.state.roll
-      self.state = bg.playStrategicCompTurn(self.state)
+      self.state = bg.playCompTurn(self.state, 4, False self.factors_list)
       
       self.redraw(self.state)
 
@@ -487,7 +487,7 @@ class backgammonGUI():
 
       # Calculate and play turn
       #self.state = bg.playStrategicCompTurn(self.state)
-      bg.playStratCompTurn(self.state, self.factors_list)
+      self.state = bg.playCompTurn(self.state, 4, False self.factors_list)
       self.redraw(self.state)
       
       # Update and return move to other player
@@ -503,25 +503,36 @@ class backgammonGUI():
       if (self.state.existValidMoves() == False):
         #self.turn.set("No valid moves")
         print "no valid moves"
-        #time.sleep(2)
-        bg.playStratCompTurn(self.state, self.factors_list)
-        self.redraw(self.state)
+        print "press next turn"
 
-        r = self.die.rollDie()
-        self.state.updateRoll(r)
-        self.state.switchTurn()
+        #r = self.die.rollDie()
+        #self.state.updateRoll(r)
+        #self.state.switchTurn()
         
-        self.state.printState()
-        print roll_message
+        #self.state = bg.playCompTurn(self.state, 4, False self.factors_list)
+        #self.redraw(self.state)
+    
+        #r = self.die.rollDie()
+        #self.state.updateRoll(r)
+        #self.state.switchTurn()
 
-        #self.state = bg.playStrategicCompTurn(self.state)
-        bg.playStratCompTurn(self.state, self.factors_list)
-        self.redraw(self.state)
+        ##self.state = bg.playStrategicCompTurn(self.state)
+        #if (self.state.existValidMoves() == False):
+          #r = self.die.rollDie()
+          #self.state.updateRoll(r)
+          #self.state.switchTurn()
+          
+          #self.state = bg.playCompTurn(self.state, 4, False self.factors_list)
+          #self.redraw(self.state)
+      
+          #r = self.die.rollDie()
+          #self.state.updateRoll(r)
+          #self.state.switchTurn()
 
-        roll_message = 'Roll: ' + str(self.state.roll)
-        self.roll.set(roll_message)
-        turn_message = "White's Turn"
-        self.turn.set(turn_message)
+          #roll_message = 'Roll: ' + str(self.state.roll)
+          #self.roll.set(roll_message)
+          #turn_message = "White's Turn"
+          #self.turn.set(turn_message)
 
 
   
