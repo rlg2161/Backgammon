@@ -3,6 +3,7 @@
 
 import copy
 import math
+import numpy as np
 
 
 def main():
@@ -25,9 +26,9 @@ class state():
     '''Constructor for first state object'''
     # args == (turn, roll)
     if (len(args) == 2):
-      self.board = []
-      for x in range(0,28):
-        self.board.append(0)
+      self.board = np.zeros(28)
+      #for x in range(0,28):
+        #self.board.append(0)
       self.board[1] = -2
       self.board[6] = 5
       self.board[8] = 3
@@ -62,7 +63,7 @@ class state():
       else:
         b_pips = b_pips + (int(math.fabs(self.board[x])) * (25-x))
 
-    w_pips = w_pips + self.board[26] * 25
+    w_pips = int(w_pips + self.board[26] * 25)
     b_pips = b_pips + (int(math.fabs(self.board[27])) * 25)
 
     return (w_pips, b_pips)

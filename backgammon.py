@@ -11,9 +11,14 @@ stateList = []
 
 def main():
   
-  #num = int(raw_input("0 for game, anything else for other"))
+  factors_list = []
+  try_strat_file = open('tryStratFile.txt', 'r')
+  line = try_strat_file.readline()
+  splitLine = line.split()
 
-  #if (num == 0):
+  for item in splitLine:
+    factors_list.append(float(item))
+  #print factors_list
 
   print "Would you like to play against another person or the computer?"
   print ""
@@ -21,29 +26,91 @@ def main():
   print "1: human vs. computer"
   print "2: comp vs. comp (strategy testing and simulation)"
   print "3: simulation"
-  print "4+: other shit"
+  print "4: learning"
   computer = raw_input("Please make your selection:   ")
+  #print computer
   
   good_input = False
 
   while (good_input != True):
     try:
-      if (int(computer)):
-        good_input = True
-        continue
-      else:
-        computer = raw_input("Please enter 0 to play against a person or 1 for computer or 2 for 2 computers against eachother:  ")
+      int(computer)
+      #computer = int(computer)
+      good_input = True
+      continue
+      #else:
+        #computer = raw_input("Please enter 0 to play against a person or 1 for computer or 2 for 2 computers against eachother:  ")
     except:
-      computer = raw_input("Please enter 0 to play against a person or 1 for computer or 2 for 2 computers against eachother:  ")
+      computer = raw_input("Please enter the appropriate option: ")
   
-  if (int(computer) < 3):
-    again = play(int(computer))
+  
+  computer = int(computer)
+  if (computer < 3):
+    #Single Game Play
+    
+    if (computer == 0):
+      print_flag = 1
+      first_strat = 0
+      second_strat = 0
+
+    elif (computer == 1):
+      print "What strategies would you like the computer to use? They are, currently: "
+      print "1: Random computer player"
+      print "2: My own, custom algorithm"
+      print "3: My own algo but customized to minimize opponent move values"
+      print "4: Learned algo (make sure to run learning.py first)"
+      print "... More to come ..."
+
+      good_input = False
+      print_flag = 1
+      first_strat = 0
+      second_strat = raw_input("\n" + "Please enter the desired computer strategy: ")
+      while (good_input != True):
+        try:
+          second_strat = int(second_strat)
+          good_input = True
+        except:
+          second_strat = raw_input("\n" + "Please enter the appropriate option: ")
+
+    elif (computer == 2):
+      print "What strategies would you like the computer to use? They are, currently: "
+      print "1: Random computer player"
+      print "2: My own, custom algorithm"
+      print "3: My own algo but customized to minimize opponent move values"
+      print "4: Learned algo (make sure to run learning.py first)"
+      print "... More to come ..."
+
+      good_input = False
+      print_flag = 1
+      first_strat = raw_input("\n" + "Please enter the desired computer strategy: ")
+
+      while (good_input != True):
+        try:
+          first_strat = int(first_strat)
+          good_input = True
+        except:
+          first_strat = raw_input("\n" + "Please enter the appropriate option: ")
+
+      second_strat = raw_input("\n" + "Please enter the desired computer strategy: ")
+      while (good_input != True):
+        try:
+          second_strat = int(second_strat)
+          good_input = True
+        except:
+          second_strat = raw_input("\n" + "Please enter the appropriate option: ")
+
+    again = play(first_strat, second_strat, print_flag, factors_list)
 
     while(again):
-      again = play(int(computer))
+      again = play(first_strat, second_strat, print_flag, factors_list)
 
-  elif (int(computer) == 3): 
+  elif (computer == 3): 
+    #On screen simulation
     num_sims = raw_input("How many games would you like to simulate? ")
+    try:
+      num_sims = int(num_sims)
+    except:
+      num_sims = int(raw_input("Please enter a # of sims: "))
     print "What strategies would you like the computer to use? They are, currently: "
     print "1: Random computer player"
     print "2: My own, custom algorithm"
@@ -53,14 +120,15 @@ def main():
     first_strat = raw_input("Choice for comp 1: ")
     second_strat = raw_input("Choice for comp 2: ")
 
-    simulateSession(first_strat, second_strat, num_sims)
+    simulateSession(first_strat, second_strat, num_sims, factors_list)
 
-  else: #for testing
+  else: 
+    # Random strategy simulation to gather learning data
     generateSimulations(1500, 21, 10, 50)
     
 
-def play(num):
-  ''' Play a game'''
+def play(first_strat, second_strat, print_flag, factors_list):
+  ''' Play a single game'''
   
   lastGameFile = open('lastgame.txt', 'w')
 
@@ -70,90 +138,18 @@ def play(num):
   
   winner = -1
 
-  if (num == 0): #Play 2 humans
-    #print str(state)
-    playTurn(state, 0, 1)
-  
-    while(winner == -1):
-      roll = die.rollDie()
-      state.updateRoll(roll)
-      state.switchTurn()
-      
-      playTurn(state, 0, 1)
-
-      winner = state.testGameOver()
-      
-  if (num == 1): #Play human v. comp
-    #factors_list = genFactorsList(21, 10)
-    try_strat_file = open('tryStratFile.txt', 'r')
-    factors_list = []
-    
-    line = try_strat_file.readline()
-    splitLine = line.split()
-
-    for item in splitLine:
-      factors_list.append(float(item))
-    #factors_list = [0.120619259028, 0.120619259028, 0.120619259028, 0.120619259028, 0.120619259028, 0.120619259028, 0.120619259028, 0.120619259028, 0.120619259028, 0.120619259028, 0.120619259028, 0.120619259028, 0.120619259028, 0.120619259028, 0.120619259028, 0.120619259028, 0.120619259028, 0.120619259028, 0.120619259028, 0.120619259028, 0.120619259028]
-    print factors_list
-    
-    if (state.turn == 0):
-      playTurn(state, 0, 1)
-	  
-    else:
-      print "Comp first"
-      playStratCompTurn(state, factors_list)
-      calcStratMove(state, factors_list, 1)
-
-    while (winner == -1):
-      roll = die.rollDie()
-      state.updateRoll(roll)
-      state.switchTurn()
-      if (state.turn == 0):
-        playTurn(state, 0, 1)
-      else:
-        playStratCompTurn(state, factors_list)
-        calcStratMove(state, factors_list, 1)
-
-      winner = state.testGameOver()
-
-  if (num == 2): #Play comp v. comp
-    # Currently set up to set a certain factor list to make sure the other sim methods
-	# are working
-    try_strat_file = open('tryStratFile.txt', 'r')
-    factors_list = []
-    
-    line = try_strat_file.readline()
-    splitLine = line.split()
-
-    for item in splitLine:
-      factors_list.append(float(item))
-
-    #factors_list = [7.47716610732, 2.44558146959, 1.5901601086, 2.04606702991, 9.02275230417, 5.29302425011, 9.34020221359, 1.97485650419, 4.7133024279, 5.65423126216, 4.54429405071, 7.53198387199, 3.23994232217, 0.64351955299, 0.864579043813, 0.0182731562407, 1.1321061362, 0.405103962206, 0.462086420808, 0.940122991592, 9.3886349712]
-    print factors_list
-	
-    if (state.turn == 0):
-      playStratCompTurn(state, factors_list) #White == factors_list strat
-    else:
-	  #playTurn(state, 2, 1)
-      playTurn(state, 2, 1) #Black == random
-      #calcStratMove(state, factors_list, 1)
-	  
-    while (winner == -1):
-      raw_input("Press enter for next computer move")
-      roll = die.rollDie()
-      state.updateRoll(roll)
-      state.switchTurn()
-      if (state.turn == 0):
-        playTurn(state, 1, 1)
-      else:
-	    #playTurn(state, 2, 1)
-        playStratCompTurn(state, factors_list)
-        calcStratMove(state, factors_list, 1)
-
-      winner = state.testGameOver() 
+  factors_list = None
   
 
-  state.printState()
+  if (first_strat == 0 and second_strat == 0): #Play 2 humans
+    winner = playTwoHumans(first_strat, second_strat, print_flag)
+ 
+  elif (first_strat == 0 and second_strat != 0): #Human vs. comp
+    winner = playHumanVsComp(first_strat, second_strat, print_flag, factors_list)
+
+  elif(first_strat != 0 and second_strat != 0):
+    winner = playCompVsComp(first_strat, second_strat, print_flag, factors_list)
+
   stateList.append(copy.deepcopy(state))
   
   stateList.reverse()
@@ -174,370 +170,115 @@ def play(num):
   
   return again
 
-def simulateSession(first_strat, second_strat, number_games):
-  '''Simulates a given number of games and keeps track of results'''
+def playTwoHumans(first_strat, second_strat, print_flag):
+  '''Function to manage gameplay between 2 humans'''
+
+  #set up initial parameters
   die = dice.oneDie(6)
-  
-  white_score = 0
-  black_score = 0
-
-  try_strat_file = open('tryStratFile.txt', 'r')
-  factors_list = []
-  
-  line = try_strat_file.readline()
-  splitLine = line.split()
-
-  for item in splitLine:
-    factors_list.append(float(item))
-
-  for x in range(0, int(number_games)):
-    if (int(first_strat) != 4):
-      winner = simulateGame(int(first_strat), int(second_strat), die)
-    
-    else:
-      winner = simGameWithStrat(second_strat, factors_list, die)
-    
-    
-    if (winner == 0):
-      white_score += 1
-    elif(winner == 1):
-      black_score += 1
-
-    print "Game " + str(x + 1) + " completed - ",
-    if (winner == 0):
-      print "White won"
-    else:
-      print "Black won"
- 
-  if (white_score > black_score):
-    print "White wins"
-  else:
-    print "Black wins"
- 
-  print "White's score for this round was: " + str(white_score) + \
-  " while playing " + str(first_strat)
-  print "Black's score for this round was: " + str(black_score) + \
-  " while playing " + str(second_strat)
-
-def simulateGame(first_strat, second_strat, die):
-  '''Simulate a game'''
-
   state = createInitialState(die)
+  winner = -1
+
+  playTurn(state, first_strat, print_flag)
   
+  while (winner == -1):
+    roll = die.rollDie()
+    state.updateRoll(roll)
+    state.switchTurn()
+    
+    playTurn(state, second_strat, print_flag)
+
+    winner = state.testGameOver()
+
+  return winner
+
+def playHumanVsComp(first_strat, second_strat, print_flag, factors_list):
+
+  #set up initial parameters
+  die = dice.oneDie(6)
+  state = createInitialState(die)
   winner = -1
 
   if (state.turn == 0):
-    playTurn(state, first_strat, 0) #White
+    # White/Human player goes first
+    playTurn(state, first_strat, print_flag)
+
   else:
-    playTurn(state, second_strat, 0) #Black
+    #Comp first
+    print "Comp first"
+    playCompTurn(state, second_strat, print_flag, factors_list)
 
   while (winner == -1):
     roll = die.rollDie()
     state.updateRoll(roll)
     state.switchTurn()
     if (state.turn == 0):
-      playTurn(state, first_strat, 0)
+      playTurn(state, first_strat, 1)
     else:
-      playTurn(state, second_strat, 0)
+      playCompTurn(state, second_strat, print_flag, factors_list)
 
     winner = state.testGameOver()
 
   return winner
+
+def playCompVsComp(first_strat, second_strat, print_flag, factors_list):
   
-  
-
-
-def genFactorsList(fia, factor):
-  factors_list = []
-  for x in range(0, 13):
-    strat_val = factor*random.random()
-    factors_list.append(strat_val)
-     
-  for x in range(13, fia):
-    strat_val = factor/10*random.random()
-    if (x == 16 or x == 20):
-      factors_list.append(strat_val*10)
-    else:
-      factors_list.append(strat_val)
-  
-  return factors_list  
-  
-def generateSimulations(num_sims, fia, factor, gps):
-  #fia == factors_in_algo
-  #gps == games_per_strat
-  
-  good_strats_file = open("someSuccess.txt", "w")
-
-  factors_file = open("factors_file.txt", "w")
-  die = dice.oneDie()
-
-  for x in range(0, num_sims):
-    print "Strategy " +str(x+1) + " of " + str(num_sims) 
-    #For each simulation num_sim random strategies will be created
-    factors_list = []
-    for i in range(0, 3):
-      for x in range(0, 13):
-        strat_val = factor*random.random()
-        factors_list.append(strat_val)
-        in_string = str(strat_val) + " "
-        #factors_file.write(in_string)
-        #factors_file.write("\n")
-      
-      for x in range(13, fia):
-        strat_val = factor/10*random.random()
-        if (x == 16 or x == 20):
-          factors_list.append(strat_val*10)
-        else:
-          factors_list.append(strat_val)
-
-        in_string = str(strat_val) + " "
-        #factors_file.write(in_string)
-        #factors_file.write("\n")
-
-      factors_file.write(in_string)
-      factors_file.write("\n")
-
-
-    black_rand_points = 0
-    white_rand_points = 0
-    white_points = 0
-    black_points = 0
-    
-    print factors_list
-    print len(factors_list)
-
-    for x in range(0, gps):
-      #print "getting here"
-
-      winnerRand = simGameWithStrat(1, factors_list, die)
-      print winnerRand
-               
-      if (winnerRand == 0):
-        black_rand_points = black_rand_points + 1
-      else:
-        white_rand_points = white_rand_points + 1
-
-
-    print "what about here"
-    print "vs. random: " + str((white_rand_points, black_rand_points))
-    #if (white_rand_points >= 40):
-      #print "at least getting here"
-      
-
-    for x in range(0, gps):
-      winner = simGameWithStrat(2, factors_list, die)
-
-      if (winner == 0):
-        black_points = black_points + 1
-      else:
-        white_points = white_points + 1
-
-      print (white_points, black_points)
-  
-    print "vs. strat: " + str((white_points, black_points))
-
-    #if (white_points >= 40):
-    good_strats_file.write("Points vs. Random: " + str(white_rand_points) + " " + str(black_rand_points) + "\n")
-    good_strats_file.write("Points vs. Strat: " + str(white_points) + " "+ str(black_points) + "\n")
-
-    print "Points vs. Random: " + str(white_rand_points) + " " + str(black_rand_points)
-    print "Points vs. Strat: " + str(white_points) + " "+ str(black_points)
-
-    for item in factors_list:
-      #print str(item) + ", "
-      good_strats_file.write(str(item) + " ")
-          
-    good_strats_file.write("\n\n\n")
-
-
-    factors_file.write("White Points: " + str(white_points))
-    factors_file.write("Black Points: " + str(black_points))
-    factors_file.write("\n\n\n")
-
-  factors_file.close()
-  good_strats_file.close()
-
-
-def simGameWithStrat(strat, factors_list, die):
-  "sim games using randomly generated strategies"
-  print "new game"
-
+  #set up initial parameters
+  die = dice.oneDie(6)
   state = createInitialState(die)
-
   winner = -1
-  
-  if (state.turn == 0):
-    playStratCompTurn(state, factors_list) #White
-  else:
-    playTurn(state, strat, 0) #Black
 
+  if (state.turn == 0):
+    playCompTurn(state, first_strat, print_flag, factors_list)
+  else:
+    playCompTurn(state, second_strat, print_flag, factors_list)
+
+  #raw_input("wait")
   while (winner == -1):
     roll = die.rollDie()
     state.updateRoll(roll)
     state.switchTurn()
     if (state.turn == 0):
-      playStratCompTurn(state, factors_list)
-      
-    else:
-      playTurn(state, strat, 0)
+      playCompTurn(state, first_strat, print_flag, factors_list)
+    elif(state.turn == 1):
+      playCompTurn(state, second_strat, print_flag, factors_list)
 
     winner = state.testGameOver()
-
   
+  #state.printState()
+  #print winner
   return winner
 
 
-  
-def playStratCompTurn(state, factors_list):
-
-  posStates = [state]
-  genAllPossMoves(posStates)
-  #posMovesList = open('posMovesList.txt', 'w')
-  #for item in posStates:
-    #posMovesList.write(str(item))
-  #posMovesList.close()
-  
-  best = evalStratMove(factors_list, posStates)
-  if (best == None):
-    print "crashed in playStratCompTurn by returning Null"
-    exit()
- 
-  #calcStratMove(best, factors_list, 1)
-  #best.printState()
-  state.updateFromState(best)
-  
-
-def evalStratMove(factors_list, posStates):
-  
-  '''Evaluate all moves in a list and return move with the highest score'''
-  cur_max = -1000000
-  best_move_state = None
-
-  elimInvalidMoves(posStates)
-
-  for x in range(0, len(posStates)):
-
-    temp = calcStratMove(posStates[x], factors_list, 0)
-    #print temp
-
-    if (temp > cur_max):
-      # If temp move better than current best, remove current best and store temp
-      cur_max = temp
-      best_move_state = posStates[x]
-      
-
-  return best_move_state
-
-def calcStratMove(state, fl, print_flag):
-  
-  move_value = 0
-
-  turn = state.turn
-  ##fl == factors_list
-  
-  temp = state.lastOccupiedSpace()
-  last_white_space = temp[0]
-  last_black_space = temp[1]
-
-  pip_count = state.getPipCount()
-
-  if (pip_count[0]+pip_count[1] > 250):
-    strat = 1
-  elif(state.allInFinalQuadrant() == True):
-    strat = 2
-  else:
-    strat = 3 
-
-  # Scores
-  white_uncovered_score = 0        #1
-  black_uncovered_score = 0
-  white_blocade_score = 0
-  black_blocade_score = 0          #4
-  
-  white_covered_score = 0          #5
-  black_covered_score = 0
-  white_highest_blocade_count = 0
-  black_highest_blocade_count = 0  #8
-  
-  white_points_scored = state.board[0]
-  white_jail_score = state.board[26]
-  black_points_scored = state.board[25]
-  black_jail_score = state.board[27]
-
-
-  # Factors but not scores
-  white_blocade_count = 0          #9
-  black_blocade_count = 0
-  
-  white_blot_points = 0
-  black_blot_points = 0            #12
-
-  
-  for x in range(0, 25): #White points 
-    if (state.board[x] <= 1):
-      if (white_blocade_count > white_highest_blocade_count):
-        white_highest_blocade_count = white_blocade_count
-      white_blocade_count = 0
-      
-    if (state.board[x] >= -1): #Non-black space on black's turn
-      if (black_blocade_count > black_highest_blocade_count):
-        black_highest_blocade_count = black_blocade_count
-      black_blocade_count = 0
-      
-    # Points for uncovered pieces
-    if (state.board[x] == 1):
-      if(white_blocade_count > white_highest_blocade_count):
-        white_highest_blocade_count = white_blocade_count
-      white_blocade_count = 0
-      if (x > last_black_space): 
-        white_blot_points = fl[13]*strat * ((25-x)*fl[14]*strat)
-      white_uncovered_score = white_uncovered_score + white_blot_points
-	
-    if (state.board[x] == -1):
-      if(black_blocade_count > black_highest_blocade_count):
-        black_highest_blocade_count = black_blocade_count
-      black_blocade_count = 0
-      if (x < last_white_space): 
-        black_blot_points = fl[13]*strat * ((x)*fl[14]*strat)
-      black_uncovered_score = black_uncovered_score + black_blot_points
-      #print str(x) + " " + str(black_uncovered_score)
-
-    # Points for blocades
-    if ((state.board[x]) >= 2):
-      white_covered_score += 1*fl[15]*strat
-      white_blocade_count += 1
-      if (white_blocade_count > 1):
-        white_blocade_score += white_blocade_count*fl[16]*strat
-        #print str(x) + " " + str(white_blocade_count)
+def playCompTurn(state, strat, print_flag, factors_list):
+  if(int(strat) == 4):
+    #Use factors list to play a 'random' strat
+    new_state = playStratCompTurn(state, factors_list)
+    state.updateFromState(new_state)
     
-    if ((state.board[x]) <= -2):
-      black_covered_score += 1*fl[19]*strat
-      black_blocade_count += 1
-      if (black_blocade_count > 1):
-        black_blocade_score += black_blocade_count*fl[20]*strat
-        #print str(x) + " " + str(white_blocade_count)
+    if (print_flag):
+      state.printState()
+  
+  elif (int(strat) == 3):
+    #Move with state tree
+    new_state = moveWithStateTree(state)
+    state.updateFromState(new_state)
     
-  score_tuple = (white_uncovered_score,
-  -1*black_uncovered_score,
-  -1*white_blocade_score,
-  black_blocade_score,          
-  -1*white_covered_score,          
-  black_covered_score,
-  -1*white_highest_blocade_count,
-  black_highest_blocade_count) 
+    if (print_flag):
+      state.printState()
 
-  for x in range(0, len(score_tuple)):
-    move_value = move_value + score_tuple[x]*fl[x]
+  elif(int(strat) == 2):
+    #Play my human-like algo
+    
+    new_state = playStrategicCompTurn(state)
+    state.updateFromState(new_state)
 
-  if (print_flag):
-    print "move value: " + str(move_value),
-    print "   score_tuple: " + str(score_tuple)
-    state.printState()
-	
-	
-  return move_value
+    if (print_flag):
+      state.printState()
 
-
+  elif (int(strat) == 1):
+    playTurn(state, int(strat), False)
+    if (print_flag):
+      state.printState()
 
 
 def playTurn(state, num_flag, print_mode):
@@ -608,43 +349,297 @@ def playTurn(state, num_flag, print_mode):
       state.updatePipCount()
 
       val_moves = state.existValidMoves()
+      
+
       #print val_moves
 
     if (print_mode):
       state.printState()
 
-    #stateList.append(copy.deepcopy(state))
+
+def simulateSession(first_strat, second_strat, number_games, factors_list):
+  '''Simulates a given number of games and keeps track of results'''
+  
+  white_score = 0
+  black_score = 0
+
+  for x in range(0, number_games):
+    winner = playCompVsComp(first_strat, second_strat, False, factors_list)
+          
+    if (winner == 0):
+      white_score += 1
+    elif(winner == 1):
+      black_score += 1
+
+    print "Game " + str(x + 1) + " completed - ",
+    if (winner == 0):
+      print "White won"
+    else:
+      print "Black won"
+ 
+  if (white_score > black_score):
+    print "White wins"
+  else:
+    print "Black wins"
+ 
+  print "White's score for this round was: " + str(white_score) + \
+  " while playing " + str(first_strat)
+  print "Black's score for this round was: " + str(black_score) + \
+  " while playing " + str(second_strat)
+
+
+def generateSimulations(num_sims, fia, factor, gps):
+  #fia == factors_in_algo
+  #gps == games_per_strat
+  
+  good_strats_file = open("someSuccess.txt", "w")
+
+  #factors_file = open("factors_file.txt", "w")
+  die = dice.oneDie()
+
+  for x in range(0, num_sims):
+    print "Strategy " +str(x+1) + " of " + str(num_sims) 
+    #For each simulation num_sim random strategies will be created
+    factors_list = []
+    for i in range(0, 2):
+      fl = genFactorsList(fia, factor)
+      for item in fl:
+        factors_list.append(item)
+
+    #factors_file.write(in_string)
+    #factors_file.write("\n")
+
+
+    black_rand_points = 0
+    white_rand_points = 0
+    white_points = 0
+    black_points = 0
     
-  elif (num_flag == 2):
-    if (print_mode):
-      state.printState()
 
-    new_state = playStrategicCompTurn(state)
+    for x in range(0, gps):
+
+      winnerRand = playCompVsComp(4, 1, False, factors_list)
+      
+               
+      if (winnerRand == 1):
+        black_rand_points = black_rand_points + 1
+      else:
+        white_rand_points = white_rand_points + 1
+
+
+    print "vs. random: " + str((white_rand_points, black_rand_points))
+    #if (white_rand_points >= 40):
+      
+
+    for x in range(0, gps):
+      winner = playCompVsComp(4, 2, False, factors_list)
+
+      if (winner == 1):
+        black_points = black_points + 1
+      else:
+        white_points = white_points + 1
+
+  
+    print "vs. strat: " + str((white_points, black_points))
+
+    good_strats_string = ""
+    good_strats_string = good_strats_string + "Points vs. Random: " + str(white_rand_points) + " " + str(black_rand_points) + "\n"
+    good_strats_string = good_strats_string + "Points vs. Strat: " + str(white_points) + " "+ str(black_points) + "\n"
+
+    #good_strats_file.write("Points vs. Random: " + str(white_rand_points) + " " + str(black_rand_points) + "\n")
+    #good_strats_file.write("Points vs. Strat: " + str(white_points) + " "+ str(black_points) + "\n")
+
+    print "Points vs. Random: " + str(white_rand_points) + " " + str(black_rand_points)
+    print "Points vs. Strat: " + str(white_points) + " "+ str(black_points)
+
+    for item in factors_list:
+      #print str(item) + ", "
+      good_strats_string = good_strats_string + str(item) + " "
+          
+    good_strats_string = good_strats_string + "\n\n\n"
+
+    print good_strats_string
+
+    good_strats_file.write(good_strats_string)
+    good_strats_file.flush()
+
+  good_strats_file.close()  
+
+def genFactorsList(fia, factor):
+  factors_list = []
+  for x in range(0, 13):
+    strat_val = factor*random.random()
+    factors_list.append(strat_val)
+     
+  for x in range(13, fia):
+    strat_val = factor/10*random.random()
+    if (x == 16 or x == 20):
+      factors_list.append(strat_val*10)
+    else:
+      factors_list.append(strat_val)
+  
+  return factors_list  
+  
+
+  
+def playStratCompTurn(state, factors_list):
+
+  posStates = [state]
+  genAllPossMoves(posStates)
     
-    #if (print_mode):
-      #new_state.printState()
+  best = evalStratMove(factors_list, posStates)
+  if (best == None):
+    print "crashed in playStratCompTurn by returning Null"
+    exit()
+ 
+  return best
+  
 
-    #stateList.append(new_state)
-    state.updateFromState(new_state)
+def evalStratMove(factors_list, posStates):
+  
+  '''Evaluate all moves in a list and return move with the highest score'''
+  cur_max = -1000000
+  best_move_state = None
 
-  elif (num_flag == 3):
-    if (print_mode):
-      state.printState()
+  elimInvalidMoves(posStates)
 
-    new_state = moveWithStateTree(state)
-    #if (print_mode):
-      #new_state.printState()
+  for x in range(0, len(posStates)):
+
+    temp = calcStratMove(posStates[x], factors_list, 0)
+    #print temp
+
+    if (temp > cur_max):
+      # If temp move better than current best, remove current best and store temp
+      cur_max = temp
+      best_move_state = posStates[x]
+      
+
+  return best_move_state
+
+def calcStratMove(state, fl, print_flag):
+  
+  move_value = 0
+
+  turn = state.turn
+  ##fl == factors_list
+  
+  temp = state.lastOccupiedSpace()
+  last_white_space = temp[0]
+  last_black_space = temp[1]
+
+  pip_count = state.getPipCount()
+
+  if (state.turn == 0): #white
+    if(state.allInFinalQuadrant() == True and last_black_space > last_white_space):
+      strat = 2
+    else:
+      strat = 1
+  elif(state.turn == 1): #black
+    if(state.allInFinalQuadrant() == True and last_black_space < last_white_space):
+      strat = 2
+    else:
+      strat = 1
+   
+
+  # Scores
+  white_uncovered_score = 0        #1
+  black_uncovered_score = 0
+  white_blocade_score = 0
+  black_blocade_score = 0          #4
+  
+  white_covered_score = 0          #5
+  black_covered_score = 0
+  white_highest_blocade_count = 0
+  black_highest_blocade_count = 0  #8
+  
+  white_points_scored = state.board[0]
+  white_jail_score = state.board[26]
+  black_points_scored = state.board[25]
+  black_jail_score = state.board[27]
+
+
+  # Factors but not scores
+  white_blocade_count = 0          #9
+  black_blocade_count = 0
+  
+  white_blot_points = 0
+  black_blot_points = 0            #12
+
+  
+  for x in range(0, 25): #White points 
+    if (state.board[x] <= 1):
+      if (white_blocade_count > white_highest_blocade_count):
+        white_highest_blocade_count = white_blocade_count
+      white_blocade_count = 0
+      
+    if (state.board[x] >= -1): #Non-black space on black's turn
+      if (black_blocade_count > black_highest_blocade_count):
+        black_highest_blocade_count = black_blocade_count
+      black_blocade_count = 0
+      
+    # Points for uncovered pieces
+    if (state.board[x] == 1):
+      if(white_blocade_count > white_highest_blocade_count):
+        white_highest_blocade_count = white_blocade_count
+      white_blocade_count = 0
+      if (x > last_black_space): 
+        white_blot_points = fl[13]*strat * ((25-x)*fl[14]*strat)
+      white_uncovered_score = white_uncovered_score + white_blot_points
+	
+    if (state.board[x] == -1):
+      if(black_blocade_count > black_highest_blocade_count):
+        black_highest_blocade_count = black_blocade_count
+      black_blocade_count = 0
+      if (x < last_white_space): 
+        black_blot_points = fl[13]*strat * ((x)*fl[14]*strat)
+      black_uncovered_score = black_uncovered_score + black_blot_points
+      #print str(x) + " " + str(black_uncovered_score)
+
+    # Points for blocades
+    if ((state.board[x]) >= 2):
+      white_covered_score += 1*fl[15]*strat
+      white_blocade_count += 1
+      if (white_blocade_count > 1):
+        white_blocade_score += white_blocade_count*fl[16]*strat
+        #print str(x) + " " + str(white_blocade_count)
     
-    #stateList.append(new_state)
-    state.updateFromState(new_state)
+    if ((state.board[x]) <= -2):
+      black_covered_score += 1*fl[19]*strat
+      black_blocade_count += 1
+      if (black_blocade_count > 1):
+        black_blocade_score += black_blocade_count*fl[20]*strat
+        #print str(x) + " " + str(white_blocade_count)
+  
+  if (state.turn == 1):  
+    score_tuple = (white_uncovered_score,
+    -1*black_uncovered_score,
+    -1*white_blocade_score,
+    black_blocade_score,          
+    -1*white_covered_score,          
+    black_covered_score,
+    -1*white_highest_blocade_count,
+    black_highest_blocade_count) 
 
-  elif (num_flag == 4):
-    if (print_mode):
-      state.printState()
+  elif (state.turn == 0):
+    score_tuple = (-1*white_uncovered_score,
+    black_uncovered_score,
+    white_blocade_score,
+    -1*black_blocade_score,          
+    white_covered_score,          
+    -1*black_covered_score,
+    white_highest_blocade_count,
+    -1*black_highest_blocade_count)
 
-    playStratCompTurn(state)
+  for x in range(0, len(score_tuple)):
+    move_value = move_value + score_tuple[x]*fl[x]
 
-
+  if (print_flag):
+    print "move value: " + str(move_value),
+    print "   score_tuple: " + str(score_tuple)
+    state.printState()
+	
+	
+  return move_value
 
 
 def moveWithStateTree(state):
@@ -1109,10 +1104,10 @@ def playStrategicCompTurn(state):
   '''Plays a computer turn if a non-random strategy is being played'''
   posStates = [state]
   genAllPossMoves(posStates)
-  posMovesList = open('posMovesList.txt', 'w')
-  for item in posStates:
-    posMovesList.write(str(item))
-  posMovesList.close()
+  #posMovesList = open('posMovesList.txt', 'w')
+  #for item in posStates:
+    #posMovesList.write(str(item))
+  #posMovesList.close()
   
   best = evalMoves(posStates)
   return best
