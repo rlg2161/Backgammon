@@ -2,7 +2,7 @@ import numpy as np
 
 
 def main():
-  data = getData('someSuccess1.txt')
+  data = getData('someSuccess.txt')
   gameMatrix = data[0]
   solutionVector = data[1]
   
@@ -14,7 +14,7 @@ def main():
 
   print "solutionVector: "
   print solutionVector.shape
-  solutionVector.shape = (1500, 1)
+  solutionVector.shape = (55, 1)
   print "solutionVector after col conversion: "
   print solutionVector.shape
   print solutionVector
@@ -69,7 +69,7 @@ def getData(filename):
   in_file = open(filename, 'r')
   test = ''
   
-  for x in range(0, 1500):
+  for x in range(0, 55):
     rand_score = in_file.readline()
     rand_score_split = rand_score.split()
 
@@ -77,7 +77,6 @@ def getData(filename):
     strat_score_split = strat_score.split()
     test = strat_score_split[3]
     test_val = int(test)
-    #raw_input("wait")
 
     strat = in_file.readline()
     strat_split = strat.split()
@@ -91,17 +90,9 @@ def getData(filename):
       #continue
 
     solutionList.append(int(strat_score_split[3]))
-    #print strat_score_split
-    #print int(strat_score_split[3])
-    #raw_input("wait")
-
-    #strat = in_file.readline()
-    #strat_split = strat.split()
+   
     for x in range(0, len(strat_split)):
       strat_split[x] = float(strat_split[x])
-
-    #in_file.readline()
-    #in_file.readline()
     
     #strat_split.insert(0, 1.0)
 

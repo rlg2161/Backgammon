@@ -211,7 +211,7 @@ class backgammonGUI():
       if (self.state.turn == 1):
         print roll_message
         #self.state = bg.playStrategicCompTurn(self.state)
-        bg.playCompTurn(self.state, 4, False self.factors_list)
+        bg.playCompTurn(self.state, 4, False, self.factors_list)
       
         self.redraw(self.state)
 
@@ -230,6 +230,13 @@ class backgammonGUI():
       print "Not implemented yet"
 
     def hereButton(number):
+      if (self.state.existValidMoves() == False):
+        
+        turn_message = "No Moves for White"
+        self.turn.set(turn_message)
+        roll_message = "press next turn"
+        self.roll.set(roll_message)
+
       if (len(self.state.roll) > 0):
         if (self.moveFrom == -1):
           self.moveFrom = number
@@ -447,8 +454,8 @@ class backgammonGUI():
     # Play comp first turn if it goes first
     if (self.state.turn == 1):
       print self.state.roll
-      self.state = bg.playCompTurn(self.state, 4, False self.factors_list)
-      
+      bg.playCompTurn(self.state, 4, False, self.factors_list)
+
       self.redraw(self.state)
 
       # Update and return move to other player
@@ -487,7 +494,7 @@ class backgammonGUI():
 
       # Calculate and play turn
       #self.state = bg.playStrategicCompTurn(self.state)
-      self.state = bg.playCompTurn(self.state, 4, False self.factors_list)
+      bg.playCompTurn(self.state, 4, False, self.factors_list)
       self.redraw(self.state)
       
       # Update and return move to other player
@@ -501,15 +508,17 @@ class backgammonGUI():
       self.turn.set(turn_message)
 
       if (self.state.existValidMoves() == False):
-        #self.turn.set("No valid moves")
-        print "no valid moves"
-        print "press next turn"
+        
+        turn_message = "No Moves for White"
+        self.turn.set(turn_message)
+        roll_message = "press next turn"
+        self.roll.set(roll_message)
 
         #r = self.die.rollDie()
         #self.state.updateRoll(r)
         #self.state.switchTurn()
         
-        #self.state = bg.playCompTurn(self.state, 4, False self.factors_list)
+        #bg.playCompTurn(self.state, 4, False, self.factors_list)
         #self.redraw(self.state)
     
         #r = self.die.rollDie()
@@ -522,7 +531,7 @@ class backgammonGUI():
           #self.state.updateRoll(r)
           #self.state.switchTurn()
           
-          #self.state = bg.playCompTurn(self.state, 4, False self.factors_list)
+          #bg.playCompTurn(self.state, 4, False, self.factors_list)
           #self.redraw(self.state)
       
           #r = self.die.rollDie()
