@@ -120,11 +120,16 @@ def main():
     first_strat = raw_input("Choice for comp 1: ")
     second_strat = raw_input("Choice for comp 2: ")
 
-    simulateSession(first_strat, second_strat, num_sims, factors_list)
+    #num_sims, fia, factor, gps
+    a = "_" + str(1000) +"_" + str(12) + "_" + str(10) + "_" + str(10) #+ "_" + "greaterThan6"
+    
+    #print "verify a, then re-run program"
+    simulateSession(first_strat, second_strat, num_sims, factors_list, a)
 
   else: 
     # Random strategy simulation to gather learning data
-    generateSimulations(1000, 12, 10, 50)
+    generateSimulations(5000, 12, 10, 50)
+    #print "change generateSimulations numer and restart program"
     
 
 def play(first_strat, second_strat, print_flag, factors_list):
@@ -217,6 +222,9 @@ def playHumanVsComp(first_strat, second_strat, print_flag, factors_list):
       playCompTurn(state, second_strat, print_flag, factors_list)
 
     winner = state.testGameOver()
+
+  if (winner == -1):
+    state.printState()
 
   return winner
 
@@ -358,10 +366,12 @@ def playTurn(state, num_flag, print_mode):
       state.printState()
 
 
-def simulateSession(first_strat, second_strat, number_games, factors_list):
+def simulateSession(first_strat, second_strat, number_games, factors_list, a):
   '''Simulates a given number of games and keeps track of results'''
   
-  sim_session_file = open("simSessionFile.txt", 'a')
+  fname = "simSessionFile" + a + ".txt" 
+
+  sim_session_file = open(fname, 'a')
   num_games = raw_input("How many games are being calculated by learning?: ")
   white_score = 0
   black_score = 0

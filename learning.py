@@ -2,7 +2,7 @@ import numpy as np
 
 
 def main():
-  data = getData('someSuccess1000121010.txt')
+  data = getData('someSuccess_1000_12_10_10.txt')
   A = data[0]
   b = data[1]
   
@@ -18,9 +18,11 @@ def main():
 
   print "x"
   print x
+  #print x[1]
 
   for i in range(0, shape[0]):
-    try_strat_file.write(str(x[i,0]) + " ")
+    #print i
+    try_strat_file.write(str(x[i]) + " ")
   
   try_strat_file.close()
 
@@ -33,7 +35,7 @@ def normalEquation(A, b, print_flag):
     print "b: "
     print b.shape
 
-  b.shape = (355, 1)
+  #b.shape = (4074, 1)
   
   if (print_flag):
     print "b after col conversion: "
@@ -79,21 +81,20 @@ def normalEquation(A, b, print_flag):
 
   return (x, shape)
 
-def getData(filename):
+def getData(filename, length):
   A = None
   vectorList = []
   solutionList = []
   in_file = open(filename, 'r')
   test = ''
   
-  for x in range(0, 355):
+  for x in range(0, length):
     rand_score = in_file.readline()
     rand_score_split = rand_score.split()
 
     strat_score = in_file.readline()
     strat_score_split = strat_score.split()
     test = strat_score_split[3]
-    test_val = int(test)
 
     strat = in_file.readline()
     strat_split = strat.split()
@@ -101,12 +102,11 @@ def getData(filename):
     in_file.readline()
     in_file.readline()
 
-    #if (test_val < 25 ):
-      # so as to only keep track of and use "good" strategies to learn
-      
+    #if (int(test) < 7):
       #continue
 
-    solutionList.append(int(strat_score_split[3]))
+
+    solutionList.append(int(test))
    
     for x in range(0, len(strat_split)):
       strat_split[x] = float(strat_split[x])
