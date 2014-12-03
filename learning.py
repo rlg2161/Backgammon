@@ -8,7 +8,16 @@ def main():
   
   try_strat_file = open("tryStratFile.txt", 'w')
 
-  shape = normalEquation(A, b, True)
+  x_tuple = normalEquation(A, b, True)
+
+  shape = x_tuple[1]
+  x = x_tuple[0]
+
+  print "shape"
+  print shape
+
+  print "x"
+  print x
 
   for i in range(0, shape[0]):
     try_strat_file.write(str(x[i,0]) + " ")
@@ -24,7 +33,7 @@ def normalEquation(A, b, print_flag):
     print "b: "
     print b.shape
 
-  b.shape = (297, 1)
+  b.shape = (355, 1)
   
   if (print_flag):
     print "b after col conversion: "
@@ -68,7 +77,7 @@ def normalEquation(A, b, print_flag):
   
   shape = x.shape
 
-  return x
+  return (x, shape)
 
 def getData(filename):
   A = None
@@ -77,7 +86,7 @@ def getData(filename):
   in_file = open(filename, 'r')
   test = ''
   
-  for x in range(0, 297):
+  for x in range(0, 355):
     rand_score = in_file.readline()
     rand_score_split = rand_score.split()
 

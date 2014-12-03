@@ -254,7 +254,7 @@ def playCompTurn(state, strat, print_flag, factors_list):
     #Use factors list to play a 'random' strat
     if (print_flag):
       state.printState()
-
+    #print "playcompturn" + str(factors_list)
     new_state = playStratCompTurn(state, factors_list)
     state.updateFromState(new_state)
     
@@ -481,14 +481,16 @@ def generateSimulations(num_sims, fia, factor, gps):
 
 def genFactorsList(fia, factor):
   factors_list = []
-  for x in range(0, 8):
+  for x in range(0, 12):
     strat_val = factor*random.random()
     factors_list.append(strat_val)
      
   factors_list[1] = factors_list[1]*.1
   factors_list[3] = factors_list[3]*.1
   
+  
   return factors_list  
+
   
 
   
@@ -514,7 +516,8 @@ def evalStratMove(factors_list, posStates):
   elimInvalidMoves(posStates)
 
   for x in range(0, len(posStates)):
-
+    
+    #print "evalStratMove" + str(factors_list)
     temp = calcStratMove(posStates[x], factors_list, 0)
     #print temp
 
