@@ -124,7 +124,7 @@ def main():
 
   else: 
     # Random strategy simulation to gather learning data
-    generateSimulations(1500, 21, 10, 50)
+    generateSimulations(1000, 12, 10, 50)
     
 
 def play(first_strat, second_strat, print_flag, factors_list):
@@ -361,6 +361,8 @@ def playTurn(state, num_flag, print_mode):
 def simulateSession(first_strat, second_strat, number_games, factors_list):
   '''Simulates a given number of games and keeps track of results'''
   
+  sim_session_file = open("simSessionFile.txt", 'a')
+  num_games = raw_input("How many games are being calculated by learning?: ")
   white_score = 0
   black_score = 0
 
@@ -384,17 +386,27 @@ def simulateSession(first_strat, second_strat, number_games, factors_list):
   else:
     print "Black wins"
  
-  print "White's score for this round was: " + str(white_score) + \
+  fp1 = "White's score for this round was: " + str(white_score) + \
   " while playing " + str(first_strat)
-  print "Black's score for this round was: " + str(black_score) + \
+  fp2 = "Black's score for this round was: " + str(black_score) + \
   " while playing " + str(second_strat)
+
+  print fp1
+  print fp2
+
+  sim_session_file.write("learning w/ " + num_games + "\n")
+  #The strategy being used is based on learning in commit ad03b14369 (aka when I fixed the linear algebra
+
+  sim_session_file.write(fp1 + "\n" + fp2 + "\n")
 
 
 def generateSimulations(num_sims, fia, factor, gps):
   #fia == factors_in_algo
   #gps == games_per_strat
-  
-  good_strats_file = open("someSuccess.txt", "w")
+
+  a = "_" + str(num_sims) +"_" + str(fia) + "_" + str(factor) + "_" + str(gps)
+  fname = "someSuccess" + a + ".txt" 
+  good_strats_file = open(fname, "w")
 
   #factors_file = open("factors_file.txt", "w")
   die = dice.oneDie()
@@ -539,7 +551,7 @@ def calcStratMove(state, fl, print_flag):
       strat = 1
    
 
-  # Scores
+  # Score Resets
   white_uncovered_score = 0        #1
   black_uncovered_score = 0
   white_blocade_score = 0
@@ -550,10 +562,7 @@ def calcStratMove(state, fl, print_flag):
   white_highest_blocade_count = 0
   black_highest_blocade_count = 0  #8
   
-  white_points_scored = state.board[0]
-  white_jail_score = state.board[26]
-  black_points_scored = state.board[25]
-  black_jail_score = state.board[27]
+  
 
 
   # Factors but not scores
@@ -608,8 +617,18 @@ def calcStratMove(state, fl, print_flag):
         black_blocade_score += black_blocade_count*fl[7]*strat
         #print str(x) + " " + str(white_blocade_count)
   
+  white_points_scored = state.board[0]*strat*fl[8]
+  white_jail_score = state.board[26]*strat*fl[9]
+  black_points_scored = state.board[25]*strat*fl[10]
+  black_jail_score = state.board[27]*strat*fl[11]
+
+
   if (state.turn == 1):  
-    score_tuple = (white_uncovered_score,
+    score_tuple = (-1*white_points_scored,
+    black_points_scored,
+    -1*white_jail_score,
+    black_jail_score,
+    white_uncovered_score,
     -1*black_uncovered_score,
     -1*white_blocade_score,
     black_blocade_score,          
@@ -619,7 +638,11 @@ def calcStratMove(state, fl, print_flag):
     black_highest_blocade_count) 
 
   elif (state.turn == 0):
-    score_tuple = (-1*white_uncovered_score,
+    score_tuple = (white_points_scored,
+    -1*black_points_scored,
+    white_jail_score,
+    -1*black_jail_score,
+    -1*white_uncovered_score,
     black_uncovered_score,
     white_blocade_score,
     -1*black_blocade_score,          

@@ -2,66 +2,73 @@ import numpy as np
 
 
 def main():
-  data = getData('someSuccess.txt')
+  data = getData('someSuccess1000121010.txt')
   A = data[0]
   b = data[1]
   
   try_strat_file = open("tryStratFile.txt", 'w')
 
-  print "A: "
-  print A.shape
-  print A
-
-  print "b: "
-  print b.shape
-  b.shape = (158, 1)
-  print "b after col conversion: "
-  print b.shape
-  print b
-
-  # Generate Optimal Move Weighting Array 
-
-  ATranspose = A.transpose()
-  print "ATranspose: "
-  print ATranspose
-  print "ATranspose shape: ",
-  print ATranspose.shape
-
-  #nextMatrix = np.dot(ATranspose, A)
-  #print nextMatrix
-  #print "nextMatrix shape: ",
-  #print nextMatrix.shape
-  
-  AT_A = np.dot(ATranspose, A)
-
-  AT_Ainv = np.linalg.inv(AT_A)
-  print AT_Ainv
-  print "inv shape: ",
-  print AT_Ainv.shape
-
-
-  AT_Ainv_AT = np.dot(AT_Ainv, ATranspose)
-
-  print "AT_Ainv_AT shape: ",
-  print AT_Ainv_AT.shape
-  print AT_Ainv_AT
-  
-
-  print b
-  print b.shape
-
-  x = np.dot(AT_Ainv_AT, b)
-
-  print "Final Weights: "
-  print x
-  shape = x.shape
-  print shape
+  shape = normalEquation(A, b, True)
 
   for i in range(0, shape[0]):
     try_strat_file.write(str(x[i,0]) + " ")
   
   try_strat_file.close()
 
+def normalEquation(A, b, print_flag):
+  if (print_flag):
+    print "A: "
+    print A.shape
+    print A
+
+    print "b: "
+    print b.shape
+
+  b.shape = (297, 1)
+  
+  if (print_flag):
+    print "b after col conversion: "
+    print b.shape
+    print b
+
+  # Generate Optimal Move Weighting Array 
+
+  ATranspose = A.transpose()
+  if (print_flag):
+    print "ATranspose: "
+    print ATranspose
+    print "ATranspose shape: ",
+    print ATranspose.shape
+
+    
+  AT_A = np.dot(ATranspose, A)
+
+  AT_Ainv = np.linalg.inv(AT_A)
+  if (print_flag):
+    print AT_Ainv
+    print "inv shape: ",
+    print AT_Ainv.shape
+
+
+  AT_Ainv_AT = np.dot(AT_Ainv, ATranspose)
+  if (print_flag):
+    print "AT_Ainv_AT shape: ",
+    print AT_Ainv_AT.shape
+    print AT_Ainv_AT
+  
+
+    print b
+    print b.shape
+
+  x = np.dot(AT_Ainv_AT, b)
+
+  if (print_flag):
+    print "Final Weights: "
+    print x
+  
+  shape = x.shape
+
+  return x
 
 def getData(filename):
   A = None
@@ -70,7 +77,7 @@ def getData(filename):
   in_file = open(filename, 'r')
   test = ''
   
-  for x in range(0, 158):
+  for x in range(0, 297):
     rand_score = in_file.readline()
     rand_score_split = rand_score.split()
 
