@@ -138,7 +138,7 @@ def play(first_strat, second_strat, print_flag, factors_list):
   
   winner = -1
 
-  factors_list = None
+  #factors_list = None
   
 
   if (first_strat == 0 and second_strat == 0): #Play 2 humans
@@ -252,33 +252,34 @@ def playCompVsComp(first_strat, second_strat, print_flag, factors_list):
 def playCompTurn(state, strat, print_flag, factors_list):
   if(int(strat) == 4):
     #Use factors list to play a 'random' strat
+    if (print_flag):
+      state.printState()
+
     new_state = playStratCompTurn(state, factors_list)
     state.updateFromState(new_state)
     
-    if (print_flag):
-      state.printState()
-  
   elif (int(strat) == 3):
     #Move with state tree
+    if (print_flag):
+      state.printState()
+
     new_state = moveWithStateTree(state)
     state.updateFromState(new_state)
     
-    if (print_flag):
-      state.printState()
-
   elif(int(strat) == 2):
     #Play my human-like algo
     
+    if (print_flag):
+      state.printState()
+
     new_state = playStrategicCompTurn(state)
     state.updateFromState(new_state)
 
-    if (print_flag):
-      state.printState()
-
   elif (int(strat) == 1):
-    playTurn(state, int(strat), False)
     if (print_flag):
       state.printState()
+    playTurn(state, int(strat), False)
+    
 
 
 def playTurn(state, num_flag, print_mode):
@@ -372,6 +373,7 @@ def simulateSession(first_strat, second_strat, number_games, factors_list):
       black_score += 1
 
     print "Game " + str(x + 1) + " completed - ",
+    #print winner
     if (winner == 0):
       print "White won"
     else:
@@ -467,16 +469,12 @@ def generateSimulations(num_sims, fia, factor, gps):
 
 def genFactorsList(fia, factor):
   factors_list = []
-  for x in range(0, 13):
+  for x in range(0, 8):
     strat_val = factor*random.random()
     factors_list.append(strat_val)
      
-  for x in range(13, fia):
-    strat_val = factor/10*random.random()
-    if (x == 16 or x == 20):
-      factors_list.append(strat_val*10)
-    else:
-      factors_list.append(strat_val)
+  factors_list[1] = factors_list[1]*.1
+  factors_list[3] = factors_list[3]*.1
   
   return factors_list  
   
@@ -583,7 +581,7 @@ def calcStratMove(state, fl, print_flag):
         white_highest_blocade_count = white_blocade_count
       white_blocade_count = 0
       if (x > last_black_space): 
-        white_blot_points = fl[13]*strat * ((25-x)*fl[14]*strat)
+        white_blot_points = fl[0]*strat * ((25-x)*fl[1]*strat)
       white_uncovered_score = white_uncovered_score + white_blot_points
 	
     if (state.board[x] == -1):
@@ -591,23 +589,23 @@ def calcStratMove(state, fl, print_flag):
         black_highest_blocade_count = black_blocade_count
       black_blocade_count = 0
       if (x < last_white_space): 
-        black_blot_points = fl[13]*strat * ((x)*fl[14]*strat)
+        black_blot_points = fl[2]*strat * ((x)*fl[3]*strat)
       black_uncovered_score = black_uncovered_score + black_blot_points
       #print str(x) + " " + str(black_uncovered_score)
 
     # Points for blocades
     if ((state.board[x]) >= 2):
-      white_covered_score += 1*fl[15]*strat
+      white_covered_score += 1*fl[4]*strat
       white_blocade_count += 1
       if (white_blocade_count > 1):
-        white_blocade_score += white_blocade_count*fl[16]*strat
+        white_blocade_score += white_blocade_count*fl[5]*strat
         #print str(x) + " " + str(white_blocade_count)
     
     if ((state.board[x]) <= -2):
-      black_covered_score += 1*fl[19]*strat
+      black_covered_score += 1*fl[6]*strat
       black_blocade_count += 1
       if (black_blocade_count > 1):
-        black_blocade_score += black_blocade_count*fl[20]*strat
+        black_blocade_score += black_blocade_count*fl[7]*strat
         #print str(x) + " " + str(white_blocade_count)
   
   if (state.turn == 1):  
