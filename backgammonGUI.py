@@ -37,11 +37,11 @@ class backgammonGUI():
       coordBottom = (space_width*x), 260, space_width + (space_width*x), 260, \
       (((space_width*x)) + (space_width + space_width*x))/2, canvasHeight - space_height
       if (x % 2 == 0):
-        color = '#522900'
-        opp_color = '#FFFFCC'
-      else:
         color = '#FFFFCC'
         opp_color = '#522900'
+      else:
+        color = '#522900'
+        opp_color = '#FFFFCC'
 
       self.board.create_polygon(coordTop, outline = color, fill = color)
       self.board.create_polygon(coordBottom, outline = opp_color, fill = opp_color)
@@ -54,11 +54,11 @@ class backgammonGUI():
       coordBottom = 255 + (space_width*x), 260, 255 + space_width + (space_width*x), 260, \
       ((255 + (space_width*x)) + (255 + space_width + space_width*x))/2, canvasHeight - space_height 
       if (x % 2 == 0):
-        color = '#522900'
-        opp_color = '#FFFFCC'
-      else:
         color = '#FFFFCC'
         opp_color = '#522900'
+      else:
+        color = '#522900'
+        opp_color = '#FFFFCC'
 
       self.board.create_polygon(coordTop, outline = color, fill = color)
       self.board.create_polygon(coordBottom, outline = opp_color, fill = opp_color)

@@ -2,9 +2,11 @@ import numpy as np
 
 
 def main():
-  data = getData('someSuccess_1000_12_10_10.txt')
-  A = data[0]
-  b = data[1]
+  data = getData('someSuccess_3941_12_10_10.txt', 2035)
+  genFactors = data[0:4]
+  print genFactors
+  A = data[4]
+  b = data[5]
   
   try_strat_file = open("tryStratFile.txt", 'w')
 
@@ -19,7 +21,10 @@ def main():
   print "x"
   print x
   #print x[1]
-
+ 
+  for h in range(0, 4):
+    try_strat_file.write(str(data[h]))
+  
   for i in range(0, shape[0]):
     #print i
     try_strat_file.write(str(x[i]) + " ")
@@ -88,16 +93,30 @@ def getData(filename, length):
   in_file = open(filename, 'r')
   test = ''
   
+  num_games = in_file.readline()
+  fia = in_file.readline()
+  factor = in_file.readline()
+  gps = in_file.readline()
+
+  #print "num_games"
+  #print str(num_games)
+  #print str(fia)
+  #print str(factor)
+  #print str(gps)
+  
   for x in range(0, length):
     rand_score = in_file.readline()
     rand_score_split = rand_score.split()
+    #print rand_score
 
     strat_score = in_file.readline()
     strat_score_split = strat_score.split()
     test = strat_score_split[3]
+    #print test
 
     strat = in_file.readline()
     strat_split = strat.split()
+    #print strat_split
 
     in_file.readline()
     in_file.readline()
@@ -118,7 +137,7 @@ def getData(filename, length):
   b = np.array(solutionList)
   A = np.array(vectorList)
 
-  return (A, b)
+  return (num_games, fia, factor, gps, A, b)
 
 
 if __name__ == '__main__':

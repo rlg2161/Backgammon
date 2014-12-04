@@ -5,31 +5,48 @@ from scipy import ndimage
 import learning
 
 def main():
-  a = "someSuccess_10000_12_10_10.txt"
-  list_of_filenames = [a, a, a, a, a, a, a]#, a, a, a]
-  file_lengths = [100, 200, 300, 400, 500, 600, 700]#, 800, 900, 1000]
+  a = "someSuccess_3941_12_10_10.txt"
+  list_of_filenames = [a, a, a, a, a, a, a, a, a]#, a]
+  file_lengths = [400, 800, 1200, 1600, 2000, 2400, 2800, 3200, 3600]#, 4000]
   fl = getData(list_of_filenames, file_lengths)
 
   use_colors = {0: "red", 1: "blue", 2: "green", 3: "black", 4: "pink", 5: "orange", 6: "purple", \
   7: "cyan", 8: "magenta", 9: "white" }
   
+  fig = plt.figure()
+  ax = plt.subplot(111)
+
+  # Add plot points
   for x in range (0, len(fl)):
-    plt.plot(fl[x], 'ro', c = use_colors[x])
+    ax.plot(fl[x], 'ro', c = use_colors[x], label=str((x+1)*100))
   
+  #Resize plot
+  box = ax.get_position()
+  ax.set_position([box.x0, box.y0, box.width*.8, box.height])
+
+
+  # Add legend
+  temp = " trials"
+  legend_list = []
+
+  for x in range(0, len(fl)):
+    
+    legend_list.append((str((x+1)*400) + temp))
+
+  ax.legend(legend_list, bbox_to_anchor=(1.4, 1))
+  
+  # Labels
   plt.ylabel('score')
   plt.xlabel('factor')
-  plt.xlim(-1, 24)
 
   
-
+  # Axes
+  plt.xlim(-1, 25)
   minorLocator = MultipleLocator(1)
-
   plt.axes().xaxis.set_minor_locator(minorLocator)
-
 
   plt.show()
   
-  #print fl[0]
 
 
 def getData(list_of_filenames, file_lengths):
@@ -39,8 +56,8 @@ def getData(list_of_filenames, file_lengths):
 
   for x in range(0, len(lof)):
     data = learning.getData(lof[x], fl[x])
-    A = data[0]
-    b = data[1]
+    A = data[4]
+    b = data[5]
 
     x_tuple = learning.normalEquation(A, b, False)
     

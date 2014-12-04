@@ -13,6 +13,17 @@ def main():
   
   factors_list = []
   try_strat_file = open('tryStratFile.txt', 'r')
+  
+  num_games = try_strat_file.readline()
+  num_games = num_games.rstrip("\n")
+  fia = try_strat_file.readline()
+  fia =fia.rstrip("\n")
+  factor = try_strat_file.readline()
+  factor = factor.rstrip("\n")
+  gps = try_strat_file.readline()
+  gps = gps.rstrip("\n")
+  
+
   line = try_strat_file.readline()
   splitLine = line.split()
 
@@ -121,8 +132,10 @@ def main():
     second_strat = raw_input("Choice for comp 2: ")
 
     #num_sims, fia, factor, gps
-    a = "_" + str(1000) +"_" + str(12) + "_" + str(10) + "_" + str(10) #+ "_" + "greaterThan6"
+    a = "_" + str(num_games) +"_" + str(fia) + "_" + str(factor) + "_" + str(gps) #+ "_" + "greaterThan6"
     
+
+    #raw_input("wait")
     #print "verify a, then re-run program"
     simulateSession(first_strat, second_strat, num_sims, factors_list, a)
 
