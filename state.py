@@ -3,22 +3,37 @@
 
 import copy
 import math
+import backgammon
 import numpy as np
 
 
 def main():
   # Used for testing state constructor and state compare functions
-  state1 = state(1, [1,6])
-  state2 = state(1, [1,6])
-  state3 = state(1, [2,4])
-  state4 = state(1, [3,2])
-  state5 = state(1, [2,4])
 
-  stateList = [state1, state4, state3]
+  factors_list1 = []
+  try_strat_file = open('tryStratFile104.txt', 'r')
   
-  state2.compareStateToList(stateList)
-  state5.compareStateToList(stateList)
+  num_games = try_strat_file.readline()
+  num_games = num_games.rstrip("\n")
+  fia = try_strat_file.readline()
+  fia =fia.rstrip("\n")
+  factor = try_strat_file.readline()
+  factor = factor.rstrip("\n")
+  gps = try_strat_file.readline()
+  gps = gps.rstrip("\n")
   
+
+  line = try_strat_file.readline()
+  splitLine = line.split()
+
+  for item in splitLine:
+    factors_list1.append(float(item))
+
+  state1 = state()
+  stateList = [state1]
+  state1.printState()
+  
+  backgammon.calcStratMove(state1, factors_list1, True)
 
 class state():
 
@@ -47,8 +62,43 @@ class state():
       self.turn = args[0].turn
       self.roll = list(args[0].roll)
     
-    self.pip_count = self.getPipCount()
+    
 
+    if (len(args) == 0): #make custom state
+      self.board = np.zeros(28)
+      self.board[0] = 0
+      self.board[1] = -2
+      self.board[2] = 0
+      self.board[3] = 0 
+      self.board[4] = 1
+      self.board[5] =0
+      self.board[6] = 5
+      self.board[7] = 0
+      self.board[8] = 7
+      self.board[9] = 0
+      self.board[10] = 2
+      self.board[11] = 0
+      self.board[12] = -5
+      self.board[13] = 0
+      self.board[14] = 0
+      self.board[15] = 0
+      self.board[16] = 0
+      self.board[17] = -1
+      self.board[18] = 0
+      self.board[19] = -1
+      self.board[20] = 0
+      self.board[21] = 0
+      self.board[22] = -1
+      self.board[23] = 0
+      self.board[24] = -5
+      self.board[25] = 0
+      self.board[26] = 0
+      self.board[27] = 0
+      
+      self.turn = 1
+      self.roll = []
+
+    self.pip_count = self.getPipCount()
   
   def getPipCount(self):
     '''Calculate pip count'''

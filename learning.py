@@ -2,13 +2,13 @@ import numpy as np
 
 
 def main():
-  data = getData('someSuccess_3941_12_10_10.txt', 2035)
+  data = getData("someSuccess_104_12_10_10.txt", 1091)
   genFactors = data[0:4]
   print genFactors
   A = data[4]
   b = data[5]
   
-  try_strat_file = open("tryStratFile.txt", 'w')
+  try_strat_file = open("tryStratFile1091.txt", 'w')
 
   x_tuple = normalEquation(A, b, True)
 
@@ -105,9 +105,11 @@ def getData(filename, length):
   #print str(gps)
   
   for x in range(0, length):
+    #print x
     rand_score = in_file.readline()
     rand_score_split = rand_score.split()
     #print rand_score
+
 
     strat_score = in_file.readline()
     strat_score_split = strat_score.split()

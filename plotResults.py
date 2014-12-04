@@ -5,9 +5,14 @@ from scipy import ndimage
 import learning
 
 def main():
-  a = "someSuccess_3941_12_10_10.txt"
-  list_of_filenames = [a, a, a, a, a, a, a, a, a]#, a]
-  file_lengths = [400, 800, 1200, 1600, 2000, 2400, 2800, 3200, 3600]#, 4000]
+  a = "someSuccess_10000_12_10_10.txt"
+  factor = 1000
+  list_of_filenames = [a, a, a, a, a, a, a, a, a, a]
+    
+  file_lengths = []
+  for x in range(1, 11, 1):
+    file_lengths.append(x*factor)
+
   fl = getData(list_of_filenames, file_lengths)
 
   use_colors = {0: "red", 1: "blue", 2: "green", 3: "black", 4: "pink", 5: "orange", 6: "purple", \
@@ -18,7 +23,7 @@ def main():
 
   # Add plot points
   for x in range (0, len(fl)):
-    ax.plot(fl[x], 'ro', c = use_colors[x], label=str((x+1)*100))
+    ax.plot(fl[x], 'ro', c = use_colors[x], label=str((x+1)*factor))
   
   #Resize plot
   box = ax.get_position()
@@ -31,7 +36,7 @@ def main():
 
   for x in range(0, len(fl)):
     
-    legend_list.append((str((x+1)*400) + temp))
+    legend_list.append((str((x+1)*factor) + temp))
 
   ax.legend(legend_list, bbox_to_anchor=(1.4, 1))
   
