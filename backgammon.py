@@ -508,8 +508,8 @@ def genFactorsList(fia, factor):
     strat_val = factor*random.random()
     factors_list.append(strat_val)
      
-  factors_list[1] = factors_list[1]*.1
-  factors_list[3] = factors_list[3]*.1
+  factors_list[1] = factors_list[1]
+  factors_list[3] = factors_list[3]
   
   
   return factors_list  
