@@ -2,13 +2,13 @@ import numpy as np
 
 
 def main():
-  data = getData("someSuccess_104_12_10_10.txt", 1091)
+  data = getData("someSuccess_2001_12_10_10.txt", 2001)
   genFactors = data[0:4]
   print genFactors
   A = data[4]
   b = data[5]
   
-  try_strat_file = open("tryStratFile1091.txt", 'w')
+  try_strat_file = open("tryStratFile2001.txt", 'w')
 
   x_tuple = normalEquation(A, b, True)
 

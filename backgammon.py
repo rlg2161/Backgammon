@@ -12,7 +12,7 @@ stateList = []
 def main():
   
   factors_list1 = []
-  try_strat_file = open('tryStratFile104.txt', 'r')
+  try_strat_file = open('tryStratFile2001.txt', 'r')
   
   num_games = try_strat_file.readline()
   num_games = num_games.rstrip("\n")

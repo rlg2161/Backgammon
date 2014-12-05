@@ -5,8 +5,8 @@ from scipy import ndimage
 import learning
 
 def main():
-  a = "someSuccess_10000_12_10_10.txt"
-  factor = 1000
+  a = "someSuccess_2001_12_10_10.txt"
+  factor = 200
   list_of_filenames = [a, a, a, a, a, a, a, a, a, a]
     
   file_lengths = []
