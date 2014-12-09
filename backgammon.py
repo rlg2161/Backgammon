@@ -221,12 +221,12 @@ def main():
 
     while (good_input != True):
       try:
-        f = int(factor)%10
+        f = int(factor)
         good_input = True
       except:
         factor = raw_input("What factor would you like to use? ")
 
-    plotResults.plotResults(inFile, factor)
+    plotResults.plotResults(inFile, f)
 
 
   else:

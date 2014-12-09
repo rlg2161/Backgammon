@@ -64,8 +64,8 @@ def getData(list_of_filenames, file_lengths):
 
   for x in range(0, len(lof)):
     data = learning.getData(lof[x], fl[x])
-    A = data[4]
-    b = data[5]
+    A = data[5]
+    b = data[6]
 
     x_tuple = learning.normalEquation(A, b, False)
     

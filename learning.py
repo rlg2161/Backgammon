@@ -6,11 +6,11 @@ def main():
 
 def learningFxn(inFileName, sizeInput, outFileName, print_flag):
   data = getData(inFileName, sizeInput)
-  genFactors = data[0:4]
+  genFactors = data[0:5]
   if (print_flag):
     print genFactors
-  A = data[4]
-  b = data[5]
+  A = data[5]
+  b = data[6]
   
   try_strat_file = open(outFileName, 'w')
 
@@ -27,7 +27,7 @@ def learningFxn(inFileName, sizeInput, outFileName, print_flag):
     print x
     #print x[1]
  
-  for h in range(0, 4):
+  for h in range(0, 5):
     try_strat_file.write(str(data[h]))
   
   for i in range(0, shape[0]):
@@ -104,11 +104,11 @@ def getData(filename, length):
   mps = in_file.readline()
   ppm = in_file.readline()
 
-  #print "num_games"
   #print str(num_games)
   #print str(fia)
   #print str(factor)
-  #print str(gps)
+  #print str(mps)
+  #print str(ppm)
   
   for x in range(0, length):
     #print x
@@ -119,6 +119,7 @@ def getData(filename, length):
 
     strat_score = in_file.readline()
     strat_score_split = strat_score.split()
+    #print strat_score_split
     test = strat_score_split[4]
     #print test
 
@@ -145,7 +146,7 @@ def getData(filename, length):
   b = np.array(solutionList)
   A = np.array(vectorList)
 
-  return (num_games, fia, factor, gps, A, b)
+  return (num_games, fia, factor, mps, ppm, A, b)
 
 
 if __name__ == '__main__':
