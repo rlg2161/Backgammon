@@ -5,8 +5,11 @@ from scipy import ndimage
 import learning
 
 def main():
-  a = "someSuccess_2001_12_10_10.txt"
-  factor = 200
+  plotResults("someSuccess_2001_12_10_10", 200)
+
+def plotResults(inFileName, f):
+  a = inFileName
+  factor = f
   list_of_filenames = [a, a, a, a, a, a, a, a, a, a]
     
   file_lengths = []

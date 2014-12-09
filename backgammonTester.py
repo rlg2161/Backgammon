@@ -6,9 +6,11 @@ import dice
 
 def main():
 
-  #die = dice.oneDie(6)
+  backgammonTester('try_strat_file2001.txt', 'r')
 
-  try_strat_file = open('tryStratFile.txt', 'r')
+
+def backgammonTester(stratFile):
+  try_strat_file = open(stratFile, 'r')
   factors_list = []
   
   for x in range(0,4):

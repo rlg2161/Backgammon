@@ -2,34 +2,39 @@ import numpy as np
 
 
 def main():
-  data = getData("someSuccess_2001_12_10_10.txt", 2001)
+  learningFxn("someSuccess_2001_12_10_10.txt", 2001, "tryStratFile2001.txt", True)
+
+def learningFxn(inFileName, sizeInput, outFileName, print_flag):
+  data = getData(inFileName, sizeInput)
   genFactors = data[0:4]
-  print genFactors
+  if (print_flag):
+    print genFactors
   A = data[4]
   b = data[5]
   
-  try_strat_file = open("tryStratFile2001.txt", 'w')
+  try_strat_file = open(outFileName, 'w')
 
   x_tuple = normalEquation(A, b, True)
 
   shape = x_tuple[1]
   x = x_tuple[0]
 
-  print "shape"
-  print shape
+  if (print_flag):
+    print "shape"
+    print shape
 
-  print "x"
-  print x
-  #print x[1]
+    print "x"
+    print x
+    #print x[1]
  
   for h in range(0, 4):
     try_strat_file.write(str(data[h]))
   
   for i in range(0, shape[0]):
-    #print i
     try_strat_file.write(str(x[i]) + " ")
   
   try_strat_file.close()
+  
 
 def normalEquation(A, b, print_flag):
   if (print_flag):

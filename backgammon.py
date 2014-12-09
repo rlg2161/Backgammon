@@ -6,50 +6,75 @@ import math
 import random
 import stateTreeNode
 import datetime
+import learning
+import plotResults
+import sys
 
 stateList = []
 
 def main():
-  
-  factors_list1 = []
-  try_strat_file = open('tryStratFile2001.txt', 'r')
-  
-  num_games = try_strat_file.readline()
-  num_games = num_games.rstrip("\n")
-  fia = try_strat_file.readline()
-  fia =fia.rstrip("\n")
-  factor = try_strat_file.readline()
-  factor = factor.rstrip("\n")
-  gps = try_strat_file.readline()
-  gps = gps.rstrip("\n")
-  
 
-  line = try_strat_file.readline()
-  splitLine = line.split()
+  if (len(sys.argv) != 2 and len(sys.argv) != 3):
+    print len(sys.argv)
+    print "usage = backgammon.py + <first_strat_file.txt> + <<second_strat_file.txt>>"
+    exit(1)
 
-  for item in splitLine:
-    factors_list1.append(float(item))
-  #print factors_list
-
-  factors_list2 = []
-  try_strat_file = open('tryStratFile2000.txt', 'r')
+  if (len(sys.argv) >= 2):
+    str_arg1 = str(sys.argv[1])
+  if (len(sys.argv) == 3):
+    str_arg2 = str(sys.argv[2])
   
-  num_games = try_strat_file.readline()
-  num_games = num_games.rstrip("\n")
-  fia = try_strat_file.readline()
-  fia =fia.rstrip("\n")
-  factor = try_strat_file.readline()
-  factor = factor.rstrip("\n")
-  gps = try_strat_file.readline()
-  gps = gps.rstrip("\n")
+  try:
+    factors_list1 = []
+    print str_arg1
+
+    try_strat_file = open(str_arg1, 'r')
+
+    num_games1 = try_strat_file.readline()
+    num_games1 = num_games1.rstrip("\n")
+    fia1 = try_strat_file.readline()
+    fia1 =fia1.rstrip("\n")
+    factor1 = try_strat_file.readline()
+    factor1 = factor1.rstrip("\n")
+    gps1 = try_strat_file.readline()
+    gps1 = gps1.rstrip("\n")
+
+
+    line = try_strat_file.readline()
+    splitLine = line.split()
+
+    for item in splitLine:
+      factors_list1.append(float(item))
+    #print factors_list
+
+    factors_list2 = []
+
+    if (len(sys.argv) == 2):
+      factors_list2 = factors_list1
+
+    else:  
+      try_strat_file = open(str_arg2, 'r')
+      
+      num_games2 = try_strat_file.readline()
+      num_games2 = num_games2.rstrip("\n")
+      fia2 = try_strat_file.readline()
+      fia2 = fia2.rstrip("\n")
+      factor2 = try_strat_file.readline()
+      factor2 = factor2.rstrip("\n")
+      gps2 = try_strat_file.readline()
+      gps2 = gps2.rstrip("\n")
+      
+
+      line = try_strat_file.readline()
+      splitLine = line.split()
+
+      for item in splitLine:
+        factors_list2.append(float(item))
+      #print factors_list
   
-
-  line = try_strat_file.readline()
-  splitLine = line.split()
-
-  for item in splitLine:
-    factors_list2.append(float(item))
-  #print factors_list
+  except:
+    print "Files could not be opened - please recheck file names and restart program"
+    exit()
 
   print "Would you like to play against another person or the computer?"
   print ""
@@ -57,7 +82,10 @@ def main():
   print "1: human vs. computer"
   print "2: comp vs. comp (strategy testing and simulation)"
   print "3: simulation"
-  print "4: learning"
+  print "4: sim for learning "
+  print "5: calculate learning values"
+  print "6: plot results "
+  print "7: GUI "
   computer = raw_input("Please make your selection:   ")
   #print computer
   
@@ -135,7 +163,7 @@ def main():
     while(again):
       again = play(first_strat, second_strat, print_flag, factors_list1, factors_list2)
 
-  elif (computer == 3): 
+  elif (computer == 3):
     #On screen simulation
     num_sims = raw_input("How many games would you like to simulate? ")
     try:
@@ -152,17 +180,59 @@ def main():
     second_strat = raw_input("Choice for comp 2: ")
 
     #num_sims, fia, factor, gps
-    a = "_" + str(num_games) +"_" + str(fia) + "_" + str(factor) + "_" + str(gps) #+ "_" + "greaterThan6"
+    a = "_" + str(num_games1) +"_" + str(fia1) + "_" + str(factor1) + "_" + str(gps1) #+ "_" + "greaterThan6"
     
 
     #raw_input("wait")
     #print "verify a, then re-run program"
     simulateSession(first_strat, second_strat, num_sims, factors_list1, factors_list2, a)
+  
 
-  else: 
+  elif (computer == 4):
     # Random strategy simulation to gather learning data
-    generateSimulations(2001, 12, 10, 10)
+    num_games = raw_input("How many rounds would you like to simulate? ")
+    gps = raw_input("How many games per strat/round? ")
+    name = raw_input("What would you like to name the output file? ")
+
+    generateSimulations(int(num_games), 12, 10, int(gps), name)
     #print "change generateSimulations numer and restart program"
+
+  elif (computer == 5): 
+    #learning.py
+    inFile = raw_input("What file would you like to draw learning examples from? ")
+    sizeInput = raw_input("How many learning examples in the file? ")
+    outFile = raw_input("What would you like to call file containing the resulting list of weights? ")
+    print_flag_in = raw_input("Would you like to print intermediate steps and results -y/Y/yes/Yes?")
+    print_flag = False
+    
+    if(print_flat_in == "y" or again_in == "Y" or again_in == "yes" or again_in == "Yes"):
+      print_flag = True
+    
+    learning.learningFxn(inFile, sizeInput, outFile, print_flag)
+
+
+  elif (computer == 6):
+    # plotResults.py
+    inFile = raw_input("What file would you like to plot algorithm values from? ")
+    factor = raw_input("What factor would you like to use? ")
+
+    good_input = False
+
+    while (good_input != True):
+      try:
+        f = int(factor)%10
+        good_input = True
+      except:
+        factor = raw_input("What factor would you like to use? ")
+
+    plotResults.plotResults(inFile, factor)
+
+
+  else:
+    # backgammonTester.py
+    inFile = raw_input("What file contains the correct algorithm weights? ")
+    backgammonTester.backgammonTester(inFile)
+    
     
 
 def play(first_strat, second_strat, print_flag, factors_list1, factors_list2):
@@ -447,12 +517,17 @@ def simulateSession(first_strat, second_strat, number_games, factors_list1, fact
   sim_session_file.write(fp1 + "\n" + fp2 + "\n")
 
 
-def generateSimulations(num_sims, fia, factor, gps):
+def generateSimulations(num_sims, fia, factor, gps, name):
   #fia == factors_in_algo
   #gps == games_per_strat
 
-  a = "_" + str(num_sims) +"_" + str(fia) + "_" + str(factor) + "_" + str(gps)
-  fname = "someSuccess" + a + ".txt" 
+  if (name == ""):
+    a = "_" + str(num_sims) +"_" + str(fia) + "_" + str(factor) + "_" + str(gps)
+    fname = "stratListviaGen" + a + ".txt" 
+  
+  else:
+    fname = name + ".txt"
+
   good_strats_file = open(fname, "w")
 
   good_strats_file.write(str(num_sims) + "\n")
