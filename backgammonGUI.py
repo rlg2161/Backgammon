@@ -7,16 +7,13 @@ import math
 import dice
 import time
 
-# CONFUSED ABOUT OBJECT HIERARCHY
 
 canvasWidth = 520
 canvasHeight = 260
 
 
 class backgammonGUI():
-  
-
-  
+    
   # Functions and Methods
   def redraw(self, state):
     self.drawBoard()
@@ -210,7 +207,6 @@ class backgammonGUI():
 
       if (self.state.turn == 1):
         print roll_message
-        #self.state = bg.playStrategicCompTurn(self.state)
         bg.playCompTurn(self.state, 4, False, self.factors_list)
       
         self.redraw(self.state)
@@ -493,7 +489,6 @@ class backgammonGUI():
       
 
       # Calculate and play turn
-      #self.state = bg.playStrategicCompTurn(self.state)
       bg.playCompTurn(self.state, 4, False, self.factors_list)
       self.redraw(self.state)
       
@@ -514,34 +509,6 @@ class backgammonGUI():
         roll_message = "press next turn"
         self.roll.set(roll_message)
 
-        #r = self.die.rollDie()
-        #self.state.updateRoll(r)
-        #self.state.switchTurn()
-        
-        #bg.playCompTurn(self.state, 4, False, self.factors_list)
-        #self.redraw(self.state)
-    
-        #r = self.die.rollDie()
-        #self.state.updateRoll(r)
-        #self.state.switchTurn()
-
-        ##self.state = bg.playStrategicCompTurn(self.state)
-        #if (self.state.existValidMoves() == False):
-          #r = self.die.rollDie()
-          #self.state.updateRoll(r)
-          #self.state.switchTurn()
-          
-          #bg.playCompTurn(self.state, 4, False, self.factors_list)
-          #self.redraw(self.state)
-      
-          #r = self.die.rollDie()
-          #self.state.updateRoll(r)
-          #self.state.switchTurn()
-
-          #roll_message = 'Roll: ' + str(self.state.roll)
-          #self.roll.set(roll_message)
-          #turn_message = "White's Turn"
-          #self.turn.set(turn_message)
 
 
   
