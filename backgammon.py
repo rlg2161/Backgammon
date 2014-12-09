@@ -37,8 +37,8 @@ def main():
     fia1 =fia1.rstrip("\n")
     factor1 = try_strat_file.readline()
     factor1 = factor1.rstrip("\n")
-    gps1 = try_strat_file.readline()
-    gps1 = gps1.rstrip("\n")
+    mps1 = try_strat_file.readline()
+    mps1 = mps1.rstrip("\n")
 
 
     line = try_strat_file.readline()
@@ -62,8 +62,8 @@ def main():
       fia2 = fia2.rstrip("\n")
       factor2 = try_strat_file.readline()
       factor2 = factor2.rstrip("\n")
-      gps2 = try_strat_file.readline()
-      gps2 = gps2.rstrip("\n")
+      mps2 = try_strat_file.readline()
+      mps2 = mps2.rstrip("\n")
       
 
       line = try_strat_file.readline()
@@ -159,14 +159,14 @@ def main():
         except:
           second_strat = raw_input("\n" + "Please enter the appropriate option: ")
 
-    again = play(first_strat, second_strat, print_flag, factors_list1, factors_list2)
+    again = playMatch(15, first_strat, second_strat, print_flag, factors_list1, factors_list2)
 
     while(again):
-      again = play(first_strat, second_strat, print_flag, factors_list1, factors_list2)
+      again = playMatch(15, first_strat, second_strat, print_flag, factors_list1, factors_list2)
 
   elif (computer == 3):
     #On screen simulation
-    num_sims = raw_input("How many games would you like to simulate? ")
+    num_sims = raw_input("How many matches would you like to simulate? ")
     try:
       num_sims = int(num_sims)
     except:
@@ -180,8 +180,8 @@ def main():
     first_strat = raw_input("Choice for comp 1: ")
     second_strat = raw_input("Choice for comp 2: ")
 
-    #num_sims, fia, factor, gps
-    a = "_" + str(num_games1) +"_" + str(fia1) + "_" + str(factor1) + "_" + str(gps1) #+ "_" + "greaterThan6"
+    #num_sims, fia, factor, mps
+    a = "_" + str(num_games1) +"_" + str(fia1) + "_" + str(factor1) + "_" + str(mps1) + "_" + str(sys.argv[1])
     
 
     #raw_input("wait")
@@ -191,11 +191,12 @@ def main():
 
   elif (computer == 4):
     # Random strategy simulation to gather learning data
-    num_games = raw_input("How many rounds would you like to simulate? ")
-    gps = raw_input("How many games per strat/round? ")
+    num_games = raw_input("How many strats would you like to simulate? ")
+    mps = raw_input("How many matches per strat? ")
+    ppm = raw_input("How many points per match? ")
     name = raw_input("What would you like to name the output file? ")
 
-    generateSimulations(int(num_games), 12, 10, int(gps), name)
+    generateSimulations(int(num_games), 12, 10, int(mps), int(ppm), name)
     #print "change generateSimulations numer and restart program"
 
   elif (computer == 5): 
@@ -233,43 +234,23 @@ def main():
     # backgammonTester.py
     inFile = str_arg1
     backgammonTester.backgammonTester(inFile)
-    
-    
 
-def play(first_strat, second_strat, print_flag, factors_list1, factors_list2):
-  ''' Play a single game'''
+def playMatch(num_points, first_strat, second_strat, print_flag, factors_list1, factors_list2):
   
-  lastGameFile = open('lastgame.txt', 'w')
+  white_points = 0
+  black_points = 0
 
-  die = dice.oneDie(6)
+  while (white_points < 15 and black_points < 15):
+    winner, points = playSingleGame(first_strat, second_strat, print_flag, factors_list1, factors_list2)
 
-  state = createInitialState(die)
-  
-  winner = -1
+    if (winner == 0):
+      white_points = white_points + points
+    else:
+      black_points = black_points + points
 
-  #factors_list = None
-  
-
-  if (first_strat == 0 and second_strat == 0): #Play 2 humans
-    winner = playTwoHumans(first_strat, second_strat, print_flag)
- 
-  elif (first_strat == 0 and second_strat != 0): #Human vs. comp
-    winner = playHumanVsComp(first_strat, second_strat, print_flag, factors_list1)
-
-  elif(first_strat != 0 and second_strat != 0):
-    winner = playCompVsComp(first_strat, second_strat, print_flag, factors_list1, factors_list2)
-
-  stateList.append(copy.deepcopy(state))
-  
-  stateList.reverse()
-  while(len(stateList) > 0):
-    lastGameFile.write(str(stateList.pop()))
-  lastGameFile.close()
-
-  if (winner == 0):
-    print "Player One ('o') was the winner."
-  else:
-    print "Player Two ('x') was the winner."
+    if (print_flag):
+      print "White Points: " + str(white_points)
+      print "Black Points: " + str(black_points)
 
   again_in = raw_input("Would you like to play again?\nEnter y/Y/yes/Yes for another game:  ")
   if(again_in == "y" or again_in == "Y" or again_in == "yes" or again_in == "Yes"):
@@ -277,7 +258,71 @@ def play(first_strat, second_strat, print_flag, factors_list1, factors_list2):
   else:
     again = False
   
-  return again
+  return again  
+
+def playSingleGame(first_strat, second_strat, print_flag, factors_list1, factors_list2):
+  ''' Play a single game'''
+  
+  #lastGameFile = open('lastgame.txt', 'w')
+
+  winner = -1
+  points = 1
+  
+
+  if (first_strat == 0 and second_strat == 0): #Play 2 humans
+    winner, points = playTwoHumans(first_strat, second_strat, print_flag)
+ 
+  elif (first_strat == 0 and second_strat != 0): #Human vs. comp
+    winner, points = playHumanVsComp(first_strat, second_strat, print_flag, factors_list1)
+
+  elif(first_strat != 0 and second_strat != 0):
+    winner, points = playCompVsComp(first_strat, second_strat, print_flag, factors_list1, factors_list2)
+
+    
+  #stateList.reverse()
+  #while(len(stateList) > 0):
+    #lastGameFile.write(str(stateList.pop()))
+  #lastGameFile.close()
+  if (print_flag):
+    if (winner == 0):
+      if (points == 1):
+        print "Player One ('o') was the winner."
+      elif (points == 2):
+        print "Player One ('o') was the winner with a gammon (2 points)."
+      else:
+        print "Player One ('o') was the winner with a backgammon (3 points)."
+    else:
+      if (points == 1):
+        print "Player Two ('x') was the winner."
+      elif (points == 2):
+        print "Player Two ('x') was the winner with a gammon (2 points)."
+      else:
+        print "Player Two ('x') was the winner with a backgammon (3 points)."
+
+  return(winner, points)
+  
+
+def checkGammon(state, winner):
+
+  last_white, last_black = state.lastOccupiedSpace()
+
+  points_for_win = 1
+
+  if (winner == 0): #white won
+    if (state.board[25] == 0):
+      if (last_black < 7):
+        points_for_win = 3
+      else:
+        points_for_win = 2
+
+  if (winner == 1): #black won
+    if(state.board[0] == 0):
+      if(last_white > 18):
+        points_for_win = 3
+      else:
+        points_for_win = 2
+
+  return points_for_win
 
 def playTwoHumans(first_strat, second_strat, print_flag):
   '''Function to manage gameplay between 2 humans'''
@@ -297,8 +342,9 @@ def playTwoHumans(first_strat, second_strat, print_flag):
     playTurn(state, second_strat, print_flag)
 
     winner = state.testGameOver()
-
-  return winner
+  
+  points = checkGammon(state, winner)
+  return (winner, points)
 
 def playHumanVsComp(first_strat, second_strat, print_flag, factors_list):
 
@@ -330,7 +376,8 @@ def playHumanVsComp(first_strat, second_strat, print_flag, factors_list):
   if (winner == -1):
     state.printState()
 
-  return winner
+  points = checkGammon(state, winner)
+  return (winner, points)
 
 def playCompVsComp(first_strat, second_strat, print_flag, factors_list1, factors_list2):
   
@@ -357,8 +404,8 @@ def playCompVsComp(first_strat, second_strat, print_flag, factors_list1, factors
     winner = state.testGameOver()
   
   #state.printState()
-  #print winner
-  return winner
+  points = checkGammon(state, winner)
+  return (winner, points)
 
 
 def playCompTurn(state, strat, print_flag, factors_list):
@@ -367,7 +414,6 @@ def playCompTurn(state, strat, print_flag, factors_list):
     st_copy = copy.deepcopy(state)
     if (print_flag):
       state.printState()
-      #HERE
 
       raw_input("wait")
     #print "playcompturn" + str(factors_list)
@@ -474,56 +520,77 @@ def playTurn(state, num_flag, print_mode):
       state.printState()
 
 
-def simulateSession(first_strat, second_strat, number_games, factors_list1, factors_list2, a):
+def simulateSession(first_strat, second_strat, number_matches, factors_list1, factors_list2, a):
   '''Simulates a given number of games and keeps track of results'''
+  #ppm = points per match
+
+  #name_learning_file = raw_input("What is the name of the learning file: ")
+
+  #a = a + name_learning_file
   
   fname = "simSessionFile" + a + ".txt" 
 
   sim_session_file = open(fname, 'a')
-  num_games = raw_input("How many games are being calculated by learning?: ")
-  white_score = 0
-  black_score = 0
+  
+  ppm = input ("How many points in each match: ")
 
-  for x in range(0, number_games):
-    winner = playCompVsComp(first_strat, second_strat, False, factors_list1, factors_list2)
+  matches_won_by_white = 0
+  matches_won_by_black = 0
+  match_score_string = ""
+  
+  for x in range(0, number_matches):
+    white_score = 0
+    black_score = 0
+
+    while (white_score < ppm and black_score < ppm):
+      winner, points = playCompVsComp(first_strat, second_strat, False, factors_list1, factors_list2)
           
-    if (winner == 0):
-      white_score += 1
-    elif(winner == 1):
-      black_score += 1
+      if (winner == 0):
+        white_score = white_score + points
+      elif(winner == 1):
+        black_score = black_score + points
 
-    print "Game " + str(x + 1) + " completed - ",
+    print "Match " + str(x + 1) + " completed - ",
     #print winner
-    if (winner == 0):
+    if (white_score > black_score):
       print "White won"
+      matches_won_by_white += 1
     else:
       print "Black won"
+      matches_won_by_black += 1
+
+    val = str(white_score - black_score) + "\n"
+    print val
+    match_score_string = match_score_string + val
+
+
  
-  if (white_score > black_score):
+  if (matches_won_by_white > matches_won_by_black):
     print "White wins"
   else:
     print "Black wins"
  
-  fp1 = "White's score for this round was: " + str(white_score) + \
+  fp1 = "White's score for this round was: " + str(matches_won_by_white) + \
   " while playing " + str(first_strat)
-  fp2 = "Black's score for this round was: " + str(black_score) + \
+  fp2 = "Black's score for this round was: " + str(matches_won_by_black) + \
   " while playing " + str(second_strat)
 
   print fp1
   print fp2
 
-  sim_session_file.write("learning w/ " + num_games + "\n")
-  #The strategy being used is based on learning in commit ad03b14369 (aka when I fixed the linear algebra
-
+  #sim_session_file.write("learning w/ " + num_games + "\n")
+  sim_session_file.write(match_score_string)
   sim_session_file.write(fp1 + "\n" + fp2 + "\n")
 
 
-def generateSimulations(num_sims, fia, factor, gps, name):
+def generateSimulations(num_sims, fia, factor, mps, ppm, name):
+  ''' Generate and run random simulations to generate data for learning'''
   #fia == factors_in_algo
-  #gps == games_per_strat
+  #mps == matches_per_strat
+  #ppm = points per match
 
   if (name == ""):
-    a = "_" + str(num_sims) +"_" + str(fia) + "_" + str(factor) + "_" + str(gps)
+    a = "_" + str(num_sims) +"s_" + str(mps) + "m_" + str(ppm) + "p"
     fname = "stratListviaGen" + a + ".txt" 
   
   else:
@@ -534,12 +601,20 @@ def generateSimulations(num_sims, fia, factor, gps, name):
   good_strats_file.write(str(num_sims) + "\n")
   good_strats_file.write(str(fia) + "\n")
   good_strats_file.write(str(factor) + "\n")
-  good_strats_file.write(str(gps) + "\n")
+  good_strats_file.write(str(mps) + "\n")
+  good_strats_file.write(str(ppm) + "\n")
 
   #factors_file = open("factors_file.txt", "w")
   die = dice.oneDie()
 
   for x in range(0, num_sims):
+    matches_won_by_white = 0
+    matches_won_by_black = 0
+    rand_matches_won_by_white = 0
+    rand_matches_won_by_black = 0
+    agg_match_score = 0
+    agg_rand_match_score = 0
+
     print "Strategy " +str(x+1) + " of " + str(num_sims) 
     #For each simulation num_sim random strategies will be created
     factors_list = []
@@ -548,51 +623,67 @@ def generateSimulations(num_sims, fia, factor, gps, name):
       for item in fl:
         factors_list.append(item)
 
-    #factors_file.write(in_string)
-    #factors_file.write("\n")
+    for x in range(0, mps):
 
+      black_rand_points = 0
+      white_rand_points = 0
 
-    black_rand_points = 0
-    white_rand_points = 0
-    white_points = 0
-    black_points = 0
-    
+      while (black_rand_points < ppm and white_rand_points < ppm):
 
-    for x in range(0, gps):
-
-      winnerRand = playCompVsComp(4, 1, False, factors_list, None)
+        winnerRand, points = playCompVsComp(4, 1, False, factors_list, None)
       
                
-      if (winnerRand == 1):
-        black_rand_points = black_rand_points + 1
+        if (winnerRand == 1):
+          black_rand_points = black_rand_points + points
+        else:
+          white_rand_points = white_rand_points + points
+
+      if (white_rand_points >= 15):
+        rand_matches_won_by_white += 1
       else:
-        white_rand_points = white_rand_points + 1
+        rand_matches_won_by_black += 1
+
+      print (white_rand_points, black_rand_points)
+
+      agg_rand_match_score = agg_rand_match_score + (white_rand_points - black_rand_points)
 
 
-    print "vs. random: " + str((white_rand_points, black_rand_points))
-    #if (white_rand_points >= 40):
+    print "vs. random: " + str(rand_matches_won_by_white) + " " + str(agg_rand_match_score)
       
 
-    for x in range(0, gps):
-      winner = playCompVsComp(4, 2, False, factors_list, None)
+    for x in range(0, mps):
+      white_points = 0
+      black_points = 0
 
-      if (winner == 1):
-        black_points = black_points + 1
+      while (white_points < ppm and black_points < ppm):
+        winner, points = playCompVsComp(4, 2, False, factors_list, None)
+
+        if (winner == 1):
+          black_points = black_points + points
+        else:
+          white_points = white_points + points
+
+      if (white_points >= 15):
+        matches_won_by_white += 1
       else:
-        white_points = white_points + 1
+        matches_won_by_black += 1
+
+      print (white_points, black_points)
+
+      agg_match_score = agg_match_score + (white_points - black_points)
 
   
-    print "vs. strat: " + str((white_points, black_points))
+    print "vs. strat: " + str(matches_won_by_white) + " " + str(agg_match_score)
 
     good_strats_string = ""
-    good_strats_string = good_strats_string + "Points vs. Random: " + str(white_rand_points) + " " + str(black_rand_points) + "\n"
-    good_strats_string = good_strats_string + "Points vs. Strat: " + str(white_points) + " "+ str(black_points) + "\n"
+    good_strats_string = good_strats_string + "Points vs. Random: " + str(rand_matches_won_by_white) + " " + str(agg_rand_match_score) + "\n"
+    good_strats_string = good_strats_string + "Points vs. Strat: " + str(matches_won_by_white) + " "+ str(agg_match_score) + "\n"
 
     #good_strats_file.write("Points vs. Random: " + str(white_rand_points) + " " + str(black_rand_points) + "\n")
     #good_strats_file.write("Points vs. Strat: " + str(white_points) + " "+ str(black_points) + "\n")
 
-    print "Points vs. Random: " + str(white_rand_points) + " " + str(black_rand_points)
-    print "Points vs. Strat: " + str(white_points) + " "+ str(black_points)
+    #print "Points vs. Random: " + str(rand_matches_won_by_white) + " " + str(agg_rand_match_score)
+    #print "Points vs. Strat: " + str(matches_won_by_white) + " "+ str(agg_match_score)
 
     for item in factors_list:
       #print str(item) + ", "
