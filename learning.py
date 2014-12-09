@@ -101,7 +101,8 @@ def getData(filename, length):
   num_games = in_file.readline()
   fia = in_file.readline()
   factor = in_file.readline()
-  gps = in_file.readline()
+  mps = in_file.readline()
+  ppm = in_file.readline()
 
   #print "num_games"
   #print str(num_games)
@@ -118,7 +119,7 @@ def getData(filename, length):
 
     strat_score = in_file.readline()
     strat_score_split = strat_score.split()
-    test = strat_score_split[3]
+    test = strat_score_split[4]
     #print test
 
     strat = in_file.readline()

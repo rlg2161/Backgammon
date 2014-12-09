@@ -15,68 +15,6 @@ stateList = []
 
 def main():
 
-  if (len(sys.argv) != 2 and len(sys.argv) != 3):
-    print len(sys.argv)
-    print "usage = backgammon.py + <first_strat_file.txt> + <<second_strat_file.txt>>"
-    exit(1)
-
-  if (len(sys.argv) >= 2):
-    str_arg1 = str(sys.argv[1])
-  if (len(sys.argv) == 3):
-    str_arg2 = str(sys.argv[2])
-  
-  try:
-    factors_list1 = []
-    print str_arg1
-
-    try_strat_file = open(str_arg1, 'r')
-
-    num_games1 = try_strat_file.readline()
-    num_games1 = num_games1.rstrip("\n")
-    fia1 = try_strat_file.readline()
-    fia1 =fia1.rstrip("\n")
-    factor1 = try_strat_file.readline()
-    factor1 = factor1.rstrip("\n")
-    mps1 = try_strat_file.readline()
-    mps1 = mps1.rstrip("\n")
-
-
-    line = try_strat_file.readline()
-    splitLine = line.split()
-
-    for item in splitLine:
-      factors_list1.append(float(item))
-    #print factors_list
-
-    factors_list2 = []
-
-    if (len(sys.argv) == 2):
-      factors_list2 = factors_list1
-
-    else:  
-      try_strat_file = open(str_arg2, 'r')
-      
-      num_games2 = try_strat_file.readline()
-      num_games2 = num_games2.rstrip("\n")
-      fia2 = try_strat_file.readline()
-      fia2 = fia2.rstrip("\n")
-      factor2 = try_strat_file.readline()
-      factor2 = factor2.rstrip("\n")
-      mps2 = try_strat_file.readline()
-      mps2 = mps2.rstrip("\n")
-      
-
-      line = try_strat_file.readline()
-      splitLine = line.split()
-
-      for item in splitLine:
-        factors_list2.append(float(item))
-      #print factors_list
-  
-  except:
-    print "Files could not be opened - please recheck file names and restart program"
-    exit()
-
   print "Would you like to play against another person or the computer?"
   print ""
   print "0: two people to play each other"
@@ -105,89 +43,150 @@ def main():
   
   
   computer = int(computer)
-  if (computer < 3):
-    #Single Game Play
+
+  if (computer < 4):
     
-    if (computer == 0):
-      print_flag = 1
-      first_strat = 0
-      second_strat = 0
+    if (len(sys.argv) != 2 and len(sys.argv) != 3):
+      str_arg1 = raw_input("What is the name of the first strat file? ")
+      str_arg2 = raw_input("What is the name of the second strat file? ")
 
-    elif (computer == 1):
-      print "What strategies would you like the computer to use? They are, currently: "
-      print "1: Random computer player"
-      print "2: My own, custom algorithm"
-      print "3: My own algo but customized to minimize opponent move values"
-      print "4: Learned algo (make sure to run learning.py first)"
-      print "... More to come ..."
+    if (len(sys.argv) >= 2):
+      str_arg1 = str(sys.argv[1])
+    if (len(sys.argv) == 3):
+      str_arg2 = str(sys.argv[2])
+    
+    try:
+      factors_list1 = []
+      try_strat_file = open(str_arg1, 'r')
 
-      good_input = False
-      print_flag = 1
-      first_strat = 0
-      second_strat = raw_input("\n" + "Please enter the desired computer strategy: ")
-      while (good_input != True):
-        try:
-          second_strat = int(second_strat)
-          good_input = True
-        except:
-          second_strat = raw_input("\n" + "Please enter the appropriate option: ")
+      num_games1 = try_strat_file.readline()
+      num_games1 = num_games1.rstrip("\n")
+      fia1 = try_strat_file.readline()
+      fia1 =fia1.rstrip("\n")
+      factor1 = try_strat_file.readline()
+      factor1 = factor1.rstrip("\n")
+      mps1 = try_strat_file.readline()
+      mps1 = mps1.rstrip("\n")
 
-    elif (computer == 2):
-      print "What strategies would you like the computer to use? They are, currently: "
-      print "1: Random computer player"
-      print "2: My own, custom algorithm"
-      print "3: My own algo but customized to minimize opponent move values"
-      print "4: Learned algo (make sure to run learning.py first)"
-      print "... More to come ..."
 
-      good_input = False
-      print_flag = True
-      first_strat = raw_input("\n" + "Please enter the desired computer strategy: ")
+      line = try_strat_file.readline()
+      splitLine = line.split()
 
-      while (good_input != True):
-        try:
-          first_strat = int(first_strat)
-          good_input = True
-        except:
-          first_strat = raw_input("\n" + "Please enter the appropriate option: ")
+      for item in splitLine:
+        factors_list1.append(float(item))
+      #print factors_list
 
-      second_strat = raw_input("\n" + "Please enter the desired computer strategy: ")
-      while (good_input != True):
-        try:
-          second_strat = int(second_strat)
-          good_input = True
-        except:
-          second_strat = raw_input("\n" + "Please enter the appropriate option: ")
+      factors_list2 = []
 
-    again = playMatch(15, first_strat, second_strat, print_flag, factors_list1, factors_list2)
+      if (len(str_arg2) == 0):
+        factors_list2 = factors_list1
 
-    while(again):
+      else:  
+        try_strat_file = open(str_arg2, 'r')
+        
+        num_games2 = try_strat_file.readline()
+        num_games2 = num_games2.rstrip("\n")
+        fia2 = try_strat_file.readline()
+        fia2 = fia2.rstrip("\n")
+        factor2 = try_strat_file.readline()
+        factor2 = factor2.rstrip("\n")
+        mps2 = try_strat_file.readline()
+        mps2 = mps2.rstrip("\n")
+        
+
+        line = try_strat_file.readline()
+        splitLine = line.split()
+
+        for item in splitLine:
+          factors_list2.append(float(item))
+        #print factors_list
+    
+    except:
+      print "Files could not be opened - please recheck file names and restart program"
+      exit()
+    if (computer < 3):
+      #Single Game Play
+      
+      if (computer == 0):
+        print_flag = 1
+        first_strat = 0
+        second_strat = 0
+
+      elif (computer == 1):
+        print "What strategies would you like the computer to use? They are, currently: "
+        print "1: Random computer player"
+        print "2: My own, custom algorithm"
+        print "3: My own algo but customized to minimize opponent move values"
+        print "4: Learned algo (make sure to run learning.py first)"
+        print "... More to come ..."
+
+        good_input = False
+        print_flag = 1
+        first_strat = 0
+        second_strat = raw_input("\n" + "Please enter the desired computer strategy: ")
+        while (good_input != True):
+          try:
+            second_strat = int(second_strat)
+            good_input = True
+          except:
+            second_strat = raw_input("\n" + "Please enter the appropriate option: ")
+
+      elif (computer == 2):
+        print "What strategies would you like the computer to use? They are, currently: "
+        print "1: Random computer player"
+        print "2: My own, custom algorithm"
+        print "3: My own algo but customized to minimize opponent move values"
+        print "4: Learned algo (make sure to run learning.py first)"
+        print "... More to come ..."
+
+        good_input = False
+        print_flag = True
+        first_strat = raw_input("\n" + "Please enter the desired computer strategy: ")
+
+        while (good_input != True):
+          try:
+            first_strat = int(first_strat)
+            good_input = True
+          except:
+            first_strat = raw_input("\n" + "Please enter the appropriate option: ")
+
+        second_strat = raw_input("\n" + "Please enter the desired computer strategy: ")
+        while (good_input != True):
+          try:
+            second_strat = int(second_strat)
+            good_input = True
+          except:
+            second_strat = raw_input("\n" + "Please enter the appropriate option: ")
+
       again = playMatch(15, first_strat, second_strat, print_flag, factors_list1, factors_list2)
 
-  elif (computer == 3):
-    #On screen simulation
-    num_sims = raw_input("How many matches would you like to simulate? ")
-    try:
-      num_sims = int(num_sims)
-    except:
-      num_sims = int(raw_input("Please enter a # of sims: "))
-    print "What strategies would you like the computer to use? They are, currently: "
-    print "1: Random computer player"
-    print "2: My own, custom algorithm"
-    print "3: My own algo but customized to minimize opponent move values"
-    print "4: Learned algo (make sure to run learning.py first)"
-    print "... More to come ..."
-    first_strat = raw_input("Choice for comp 1: ")
-    second_strat = raw_input("Choice for comp 2: ")
+      while(again):
+        again = playMatch(15, first_strat, second_strat, print_flag, factors_list1, factors_list2)
 
-    #num_sims, fia, factor, mps
-    a = "_" + str(num_games1) +"_" + str(fia1) + "_" + str(factor1) + "_" + str(mps1) + "_" + str(sys.argv[1])
+    elif (computer == 3):
+      #On screen simulation
+      num_sims = raw_input("How many matches would you like to simulate? ")
+      try:
+        num_sims = int(num_sims)
+      except:
+        num_sims = int(raw_input("Please enter a # of sims: "))
+      print "What strategies would you like the computer to use? They are, currently: "
+      print "1: Random computer player"
+      print "2: My own, custom algorithm"
+      print "3: My own algo but customized to minimize opponent move values"
+      print "4: Learned algo (make sure to run learning.py first)"
+      print "... More to come ..."
+      first_strat = raw_input("Choice for comp 1: ")
+      second_strat = raw_input("Choice for comp 2: ")
+
+      #num_sims, fia, factor, mps
+      a = "_" + str(num_games1) +"_" + str(fia1) + "_" + str(factor1) + "_" + str(mps1) + "_" + str(sys.argv[1])
+      
+
+      #raw_input("wait")
+      #print "verify a, then re-run program"
+      simulateSession(first_strat, second_strat, num_sims, factors_list1, factors_list2, a)
     
-
-    #raw_input("wait")
-    #print "verify a, then re-run program"
-    simulateSession(first_strat, second_strat, num_sims, factors_list1, factors_list2, a)
-  
 
   elif (computer == 4):
     # Random strategy simulation to gather learning data
