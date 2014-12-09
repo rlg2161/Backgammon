@@ -8,6 +8,7 @@ import stateTreeNode
 import datetime
 import learning
 import plotResults
+import backgammonTester
 import sys
 
 stateList = []
@@ -205,10 +206,10 @@ def main():
     print_flag_in = raw_input("Would you like to print intermediate steps and results -y/Y/yes/Yes?")
     print_flag = False
     
-    if(print_flat_in == "y" or again_in == "Y" or again_in == "yes" or again_in == "Yes"):
+    if(print_flag_in == "y" or again_in == "Y" or again_in == "yes" or again_in == "Yes"):
       print_flag = True
     
-    learning.learningFxn(inFile, sizeInput, outFile, print_flag)
+    learning.learningFxn(inFile, int(sizeInput), outFile, print_flag)
 
 
   elif (computer == 6):
@@ -230,7 +231,7 @@ def main():
 
   else:
     # backgammonTester.py
-    inFile = raw_input("What file contains the correct algorithm weights? ")
+    inFile = str_arg1
     backgammonTester.backgammonTester(inFile)
     
     
