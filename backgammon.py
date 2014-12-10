@@ -18,14 +18,14 @@ def main():
   next = True
 
   while (next == True):
-    gameloop()
+    programLoop()
     next_in = raw_input("Continue? Y/y/Yes/yes: ")
     if (next_in == "Y" or next_in == "y" or next_in == "Yes" or next_in == "yes"):
       continue
     else:
       next = False
 
-def gameloop():  
+def programLoop():  
 
   print "Would you like to play against another person or the computer?"
   print ""
@@ -196,7 +196,7 @@ def gameloop():
       second_strat = raw_input("Choice for comp 2: ")
 
       #num_sims, fia, factor, mps
-      a = "_" + str(num_games1) +"_" + str(fia1) + "_" + str(factor1) + "_" + str(mps1) + "_" + str(sys.argv[1])
+      a = "_" + str(num_games1) +"_" + str(fia1) + "_" + str(factor1) + "_" + str(mps1) + "_" + str(str_arg1)
       
 
       #raw_input("wait")
@@ -653,7 +653,7 @@ def generateSimulations(num_sims, fia, factor, mps, ppm, name):
         else:
           white_rand_points = white_rand_points + points
 
-      if (white_rand_points >= 15):
+      if (white_rand_points >= ppm):
         rand_matches_won_by_white += 1
       else:
         rand_matches_won_by_black += 1
@@ -661,8 +661,7 @@ def generateSimulations(num_sims, fia, factor, mps, ppm, name):
       print (white_rand_points, black_rand_points)
 
       agg_rand_match_score = agg_rand_match_score + (white_rand_points - black_rand_points)
-
-
+     
     print "vs. random: " + str(rand_matches_won_by_white) + " " + str(agg_rand_match_score)
       
 
@@ -678,7 +677,7 @@ def generateSimulations(num_sims, fia, factor, mps, ppm, name):
         else:
           white_points = white_points + points
 
-      if (white_points >= 15):
+      if (white_points >= ppm):
         matches_won_by_white += 1
       else:
         matches_won_by_black += 1
@@ -686,8 +685,7 @@ def generateSimulations(num_sims, fia, factor, mps, ppm, name):
       print (white_points, black_points)
 
       agg_match_score = agg_match_score + (white_points - black_points)
-
-  
+        
     print "vs. strat: " + str(matches_won_by_white) + " " + str(agg_match_score)
 
     good_strats_string = ""
