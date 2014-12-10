@@ -67,6 +67,8 @@ def main():
       factor1 = factor1.rstrip("\n")
       mps1 = try_strat_file.readline()
       mps1 = mps1.rstrip("\n")
+      ppm1 = try_strat_file.readline()
+      ppm1 = ppm1.rstrip("\n")
 
 
       line = try_strat_file.readline()
@@ -92,6 +94,8 @@ def main():
         factor2 = factor2.rstrip("\n")
         mps2 = try_strat_file.readline()
         mps2 = mps2.rstrip("\n")
+        ppm2 = try_strat_file.readline()
+        ppm2 = ppm2.rstrip("\n")
         
 
         line = try_strat_file.readline()
@@ -769,7 +773,7 @@ def evalStratMove(factors_list, posStates):
   return best_move_state
 
 def calcStratMove(state, fl, print_flag):
-  
+
   move_value = 0
 
   turn = state.turn
@@ -804,9 +808,6 @@ def calcStratMove(state, fl, print_flag):
   white_highest_blocade_count = 0
   black_highest_blocade_count = 0  #8
   
-  
-
-
   # Factors but not scores
   white_blocade_count = 0          #9
   black_blocade_count = 0
