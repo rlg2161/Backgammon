@@ -14,6 +14,18 @@ import sys
 stateList = []
 
 def main():
+  
+  next = True
+
+  while (next == True):
+    gameloop()
+    next_in = raw_input("Continue? Y/y/Yes/yes: ")
+    if (next_in == "Y" or next_in == "y" or next_in == "Yes" or next_in == "yes"):
+      continue
+    else:
+      next = False
+
+def gameloop():  
 
   print "Would you like to play against another person or the computer?"
   print ""
