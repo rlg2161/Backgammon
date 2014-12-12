@@ -207,7 +207,7 @@ class backgammonGUI():
 
       if (self.state.turn == 1):
         print roll_message
-        bg.playCompTurn(self.state, 4, False, self.factors_list)
+        bg.playCompTurn(None, self.state, 4, False, self.factors_list)
       
         self.redraw(self.state)
 
@@ -450,7 +450,7 @@ class backgammonGUI():
     # Play comp first turn if it goes first
     if (self.state.turn == 1):
       print self.state.roll
-      bg.playCompTurn(self.state, 4, False, self.factors_list)
+      bg.playCompTurn(None, self.state, 4, False, self.factors_list)
 
       self.redraw(self.state)
 
@@ -489,7 +489,7 @@ class backgammonGUI():
       
 
       # Calculate and play turn
-      bg.playCompTurn(self.state, 4, False, self.factors_list)
+      bg.playCompTurn(None, self.state, 4, False, self.factors_list)
       self.redraw(self.state)
       
       # Update and return move to other player

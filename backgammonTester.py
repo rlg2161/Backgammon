@@ -10,6 +10,7 @@ def main():
 
 
 def backgammonTester(stratFile):
+  # UPDATE TO FIT NEW stratFile FORMAT
   try_strat_file = open(stratFile, 'r')
   factors_list = []
   

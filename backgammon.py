@@ -250,7 +250,7 @@ def programLoop():
 
   else:
     # backgammonTester.py
-    inFile = str_arg1
+    inFile = 'tryStratFile2001.txt'
     backgammonTester.backgammonTester(inFile)
 
 def playMatch(net, num_points, first_strat, second_strat, print_flag, factors_list1, factors_list2):
