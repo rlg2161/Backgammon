@@ -1,4 +1,4 @@
-
+import numpy as np
 import dice
 import state
 import copy
@@ -15,15 +15,24 @@ stateList = []
 
 def main():
   
-  next = True
+  die = dice.oneDie(6)
+  state = createInitialState(die)
+  state.printState()
 
-  while (next == True):
-    programLoop()
-    next_in = raw_input("Continue? Y/y/Yes/yes: ")
-    if (next_in == "Y" or next_in == "y" or next_in == "Yes" or next_in == "yes"):
-      continue
-    else:
-      next = False
+  nnArray = getNNValues(state)
+  print nnArray
+  print len(nnArray)
+
+
+  #next = True
+
+  #while (next == True):
+    #programLoop()
+    #next_in = raw_input("Continue? Y/y/Yes/yes: ")
+    #if (next_in == "Y" or next_in == "y" or next_in == "Yes" or next_in == "yes"):
+      #continue
+    #else:
+      #next = False
 
 def programLoop():  
 
@@ -575,7 +584,7 @@ def simulateSession(first_strat, second_strat, number_matches, factors_list1, fa
       matches_won_by_black += 1
 
     val = str(white_score - black_score) + "\n"
-    print val
+    print val,
     match_score_string = match_score_string + val
 
 
@@ -723,8 +732,89 @@ def genFactorsList(fia, factor):
   
   return factors_list  
 
+def getAllNNinputs(state):
   
+  NNdict = { }
 
+  posStates = [state]
+  genAllPossMoves(posStates)
+
+  for st in posStates:
+    NNValues = getNNValues(st)
+     
+
+
+def getNNValues(state):
+  #use Tesauro's values to generate a 198 unit neural network
+  NNinputArr = np.zeros(198)
+  #[0:1] == binary turn values
+  #[2:3] == scores/15
+  #[4:5] == pieces in jail/2
+  #[6:197] == encoding for each space
+    # [6:9] == white encoding on space 1
+    # [10:13] == black encoding on space 1
+    # [14:17] == white encoding on space 2
+    # ...
+
+
+  # input turn values
+  if (state.turn == 0):
+    NNinputArr[0] = 1
+  else:
+    NNinputArr[1] = 1
+
+  # get points scored
+  NNinputArr[2] = state.board[0]/15
+  NNinputArr[3] = state.board[25]/15
+
+  # get jail scores
+  NNinputArr[4] = state.board[26]/2
+  NNinputArr[5] = state.board[27]/2
+
+  # get individual space scores
+  for x in range(1,25): #24 spaces on board
+    counter = (x-1)*8
+    pos = 6 + counter
+    if (state.board[x] == 0):
+      continue
+
+    if (state.board[x] > 0): #white position
+      NNinputArr[pos] = 1
+
+      if (state.board[x] == 2):
+        NNinputArr[pos+1] = 1
+      if (state.board[x] == 3):
+        NNinputArr[pos + 1] = 1
+        NNinputArr[pos + 2] = .5
+      if (state.board[x] == 4):
+        NNinputArr[pos + 1] = 1
+        NNinputArr[pos + 2] = 1
+      if (state.board[x] > 4):
+        NNinputArr[pos + 1] = 1
+        NNinputArr[pos + 2] = 1
+        NNinputArr[pos + 3] = (state.board[x] -4)/2
+
+
+    if (state.board[x] < 0): #black position
+      NNinputArr[pos + 4] = 1
+    
+      if (state.board[x] == -2):
+        NNinputArr[pos+5] = 1
+      if (state.board[x] == -3):
+        NNinputArr[pos + 5] = 1
+        NNinputArr[pos + 6] = .5
+      if (state.board[x] == -4):
+        NNinputArr[pos + 5] = 1
+        NNinputArr[pos + 6] = 1
+      if (state.board[x] < -4):
+        NNinputArr[pos + 5] = 1
+        NNinputArr[pos + 6] = 1
+        NNinputArr[pos + 7] = (math.fabs(state.board[x]) -4)/2
+
+    #print x
+    #print NNinputArr[pos:(pos+8)]
+    
+  return NNinputArr
   
 def playStratCompTurn(state, factors_list):
 
@@ -1252,30 +1342,41 @@ def elimInvalidMoves(stateList):
   '''Eliminates moves from stateList that are not "complete" turns (i.e. not all
     dice are used) so that they can not be considered and illegally returned by
     move checking functions'''
-  new_list = []
+  if (len(stateList) == 1):
+    return stateList
 
-  for state in stateList:
-    if (len(state.roll) == 0 or state.testGameOver() >= 0):
-      new_list.append(state)
-
-  if (len(new_list) > 0):
-    return new_list
-    
-
-  else:
-    max_remaining_roll = -1
+  else: 
+    new_list = []
 
     for state in stateList:
-      temp = max(state.roll)
-      if (temp > max_remaining_roll):
-        max_remaining_roll = temp
-
-    for state in stateList:
-      temp = max(state.roll)
-      if (temp >= max_remaining_roll):
+      if (len(state.roll) == 0 or state.testGameOver() >= 0):
         new_list.append(state)
 
-    return new_list
+    if (len(new_list) > 0):
+      return new_list
+      
+
+    else:
+      min_pip_sum = 1000
+
+      for state in stateList:
+        tempW, tempB = state.getPipCount()
+        if ((tempW + tempB) < min_pip_sum):
+          min_pip_sum = (tempW + tempB)
+
+      for state in stateList:
+        tempW, tempB = state.getPipCount()
+        if ((tempW + tempB) <= min_pip_sum):
+          new_list.append(state)
+
+      if (len(new_list) ==0):
+        print "Error in elimInvalidMoves"
+        print len(stateList)
+        for item in stateList:
+          item.printState()
+        exit(1)
+
+      return new_list
 
 
 def evalMoves(posStates):
