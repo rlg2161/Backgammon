@@ -2,12 +2,34 @@ import numpy as np
 import pybrain
 import pickle
 import math
+import backgammon as bg 
+import dice
 
 
 def main():
   nn = createNN(198)
   print nn
-  saveNN(nn, 'firstNN.p')
+  #saveNN(nn, 'firstNN.p')
+
+  wMove = None
+  bMove = None
+
+  die = dice.oneDie(6)
+  state = bg.createInitialState(die)
+  winner = -1
+
+  if (state.turn == 0):
+    wMove = bg.playCompTurn(nn, state, 5, True, [])
+  else:
+    bMove = bg.playCompTurn(nn, state, 5, True, [])
+
+  state.printState()
+
+  if (wMove != None):
+    print wMove
+  else:
+    print bMove
+
 
 
 
@@ -20,25 +42,25 @@ def createNN(sizeInputLayer):
   
   # Create layers
   inLayer = pybrain.structure.LinearLayer(sizeInputLayer, name ='in')
-  hiddenLayer1 = pybrain.structure.SigmoidLayer(40, name ='hidden1')
-  hiddenLayer2 = pybrain.structure.SigmoidLayer(3, name = 'win/gammon/backgammon')
+  hiddenLayer = pybrain.structure.SigmoidLayer(40, name ='hidden')
+  #hiddenLayer2 = pybrain.structure.SigmoidLayer(3, name = 'win/gammon/backgammon')
   outLayer = pybrain.structure.LinearLayer(1, name ='out')
 
   #Add modules
   nn.addInputModule(inLayer)
-  nn.addModule(hiddenLayer1)
-  nn.addModule(hiddenLayer2)
+  nn.addModule(hiddenLayer)
+  #nn.addModule(hiddenLayer2)
   nn.addOutputModule(outLayer)
 
   # Create connections
-  in_to_hidden1 = pybrain.structure.FullConnection(inLayer, hiddenLayer1, name = "i-->h1")
-  hidden1_to_hidden2 = pybrain.structure.FullConnection(hiddenLayer1, hiddenLayer2, name = "h1-->h2")
-  hidden2_to_out = pybrain.structure.FullConnection(hiddenLayer2, outLayer, name = "h2-->o")
+  in_to_hidden = pybrain.structure.FullConnection(inLayer, hiddenLayer, name = "i-->h1")
+  #hidden1_to_hidden2 = pybrain.structure.FullConnection(hiddenLayer1, hiddenLayer2, name = "h1-->h2")
+  hidden_to_out = pybrain.structure.FullConnection(hiddenLayer, outLayer, name = "h1-->o")
 
   # add connections
-  nn.addConnection(in_to_hidden1)
-  nn.addConnection(hidden1_to_hidden2)
-  nn.addConnection(hidden2_to_out)
+  nn.addConnection(in_to_hidden)
+  #nn.addConnection(hidden1_to_hidden2)
+  nn.addConnection(hidden_to_out)
 
   # initialize net
   nn.sortModules()

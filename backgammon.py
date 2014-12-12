@@ -15,30 +15,7 @@ import operator
 stateList = []
 
 def main():
-  
-  #die = dice.oneDie(6)
-  #state = createInitialState(die)
-  #state.printState()
 
-  #posStates = [state]
-  #genAllPossMoves(posStates)
-
-  
-
-  #playWithNN(nn)
-
-#def playWithNN(nn):
-
-  #nnDict = NN.getAllNNinputs(net, posStates)
-
-  #print nnDict
-
-  #desiredState = max(nnDict.iteritems(), key=operator.itemgetter(1))[0]
-  #print desiredState
-  
-
-
-  #Old main method
   next = True
 
   while (next == True):
@@ -345,6 +322,9 @@ def playSingleGame(net, first_strat, second_strat, print_flag, factors_list1, fa
 
 def checkGammon(state, winner):
 
+  if (winner == -1):
+    return 0
+
   last_white, last_black = state.lastOccupiedSpace()
 
   points_for_win = 1
@@ -458,6 +438,8 @@ def playCompTurn(net, state, strat, print_flag, factors_list):
 
       raw_input("wait")
 
+    orig_state = state 
+
     # Use neural net to select a move
     
     #Gen states
@@ -466,14 +448,18 @@ def playCompTurn(net, state, strat, print_flag, factors_list):
  
     #use net to get state values
     nnDict = NN.getAllNNinputs(net, posStates)
+    #print len(nnDict)
+    #print nnDict
 
     #find highest one
     desiredState = max(nnDict.iteritems(), key=operator.itemgetter(1))[0]
+    desiredStateScore = max(nnDict.iteritems(), key=operator.itemgetter(1))[1]
     
 
 
     #update board to new position
     state.updateFromState(desiredState)
+    return (orig_state, desiredStateScore)
 
   if(int(strat) == 4):
     #Use factors list to play a 'random' strat
