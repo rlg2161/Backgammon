@@ -1,4 +1,4 @@
-import numpy as np
+import bgNeuralNetwork as NN 
 import dice
 import state
 import copy
@@ -10,31 +10,48 @@ import learning
 import plotResults
 import backgammonTester
 import sys
+import operator
 
 stateList = []
 
 def main():
   
-  die = dice.oneDie(6)
-  state = createInitialState(die)
-  state.printState()
+  #die = dice.oneDie(6)
+  #state = createInitialState(die)
+  #state.printState()
 
-  nnArray = getNNValues(state)
-  print nnArray
-  print len(nnArray)
+  #posStates = [state]
+  #genAllPossMoves(posStates)
+
+  
+
+  #playWithNN(nn)
+
+#def playWithNN(nn):
+
+  #nnDict = NN.getAllNNinputs(net, posStates)
+
+  #print nnDict
+
+  #desiredState = max(nnDict.iteritems(), key=operator.itemgetter(1))[0]
+  #print desiredState
+  
 
 
-  #next = True
+  #Old main method
+  next = True
 
-  #while (next == True):
-    #programLoop()
-    #next_in = raw_input("Continue? Y/y/Yes/yes: ")
-    #if (next_in == "Y" or next_in == "y" or next_in == "Yes" or next_in == "yes"):
-      #continue
-    #else:
-      #next = False
+  while (next == True):
+    programLoop()
+    next_in = raw_input("Continue? Y/y/Yes/yes: ")
+    if (next_in == "Y" or next_in == "y" or next_in == "Yes" or next_in == "yes"):
+      continue
+    else:
+      next = False
 
 def programLoop():  
+
+  net = NN.createNN(198)
 
   print "Would you like to play against another person or the computer?"
   print ""
@@ -183,10 +200,10 @@ def programLoop():
           except:
             second_strat = raw_input("\n" + "Please enter the appropriate option: ")
 
-      again = playMatch(15, first_strat, second_strat, print_flag, factors_list1, factors_list2)
+      again = playMatch(net, 15, first_strat, second_strat, print_flag, factors_list1, factors_list2)
 
       while(again):
-        again = playMatch(15, first_strat, second_strat, print_flag, factors_list1, factors_list2)
+        again = playMatch(net, 15, first_strat, second_strat, print_flag, factors_list1, factors_list2)
 
     elif (computer == 3):
       #On screen simulation
@@ -210,7 +227,7 @@ def programLoop():
 
       #raw_input("wait")
       #print "verify a, then re-run program"
-      simulateSession(first_strat, second_strat, num_sims, factors_list1, factors_list2, a)
+      simulateSession(net, first_strat, second_strat, num_sims, factors_list1, factors_list2, a)
     
 
   elif (computer == 4):
@@ -259,13 +276,13 @@ def programLoop():
     inFile = str_arg1
     backgammonTester.backgammonTester(inFile)
 
-def playMatch(num_points, first_strat, second_strat, print_flag, factors_list1, factors_list2):
+def playMatch(net, num_points, first_strat, second_strat, print_flag, factors_list1, factors_list2):
   
   white_points = 0
   black_points = 0
 
   while (white_points < 15 and black_points < 15):
-    winner, points = playSingleGame(first_strat, second_strat, print_flag, factors_list1, factors_list2)
+    winner, points = playSingleGame(net, first_strat, second_strat, print_flag, factors_list1, factors_list2)
 
     if (winner == 0):
       white_points = white_points + points
@@ -284,7 +301,7 @@ def playMatch(num_points, first_strat, second_strat, print_flag, factors_list1, 
   
   return again  
 
-def playSingleGame(first_strat, second_strat, print_flag, factors_list1, factors_list2):
+def playSingleGame(net, first_strat, second_strat, print_flag, factors_list1, factors_list2):
   ''' Play a single game'''
   
   #lastGameFile = open('lastgame.txt', 'w')
@@ -297,10 +314,10 @@ def playSingleGame(first_strat, second_strat, print_flag, factors_list1, factors
     winner, points = playTwoHumans(first_strat, second_strat, print_flag)
  
   elif (first_strat == 0 and second_strat != 0): #Human vs. comp
-    winner, points = playHumanVsComp(first_strat, second_strat, print_flag, factors_list1)
+    winner, points = playHumanVsComp(net, first_strat, second_strat, print_flag, factors_list1)
 
   elif(first_strat != 0 and second_strat != 0):
-    winner, points = playCompVsComp(first_strat, second_strat, print_flag, factors_list1, factors_list2)
+    winner, points = playCompVsComp(net, first_strat, second_strat, print_flag, factors_list1, factors_list2)
 
     
   #stateList.reverse()
@@ -370,7 +387,7 @@ def playTwoHumans(first_strat, second_strat, print_flag):
   points = checkGammon(state, winner)
   return (winner, points)
 
-def playHumanVsComp(first_strat, second_strat, print_flag, factors_list):
+def playHumanVsComp(net, first_strat, second_strat, print_flag, factors_list):
 
   #set up initial parameters
   die = dice.oneDie(6)
@@ -384,7 +401,7 @@ def playHumanVsComp(first_strat, second_strat, print_flag, factors_list):
   else:
     #Comp first
     print "Comp first"
-    playCompTurn(state, second_strat, print_flag, factors_list)
+    playCompTurn(net, state, second_strat, print_flag, factors_list)
 
   while (winner == -1):
     roll = die.rollDie()
@@ -393,7 +410,7 @@ def playHumanVsComp(first_strat, second_strat, print_flag, factors_list):
     if (state.turn == 0):
       playTurn(state, first_strat, 1)
     else:
-      playCompTurn(state, second_strat, print_flag, factors_list)
+      playCompTurn(net, state, second_strat, print_flag, factors_list)
 
     winner = state.testGameOver()
 
@@ -403,7 +420,7 @@ def playHumanVsComp(first_strat, second_strat, print_flag, factors_list):
   points = checkGammon(state, winner)
   return (winner, points)
 
-def playCompVsComp(first_strat, second_strat, print_flag, factors_list1, factors_list2):
+def playCompVsComp(net, first_strat, second_strat, print_flag, factors_list1, factors_list2):
   
   #set up initial parameters
   die = dice.oneDie(6)
@@ -411,9 +428,9 @@ def playCompVsComp(first_strat, second_strat, print_flag, factors_list1, factors
   winner = -1
 
   if (state.turn == 0):
-    playCompTurn(state, first_strat, print_flag, factors_list1)
+    playCompTurn(net, state, first_strat, print_flag, factors_list1)
   else:
-    playCompTurn(state, second_strat, print_flag, factors_list2)
+    playCompTurn(net, state, second_strat, print_flag, factors_list2)
 
   #raw_input("wait")
   while (winner == -1):
@@ -421,9 +438,9 @@ def playCompVsComp(first_strat, second_strat, print_flag, factors_list1, factors
     state.updateRoll(roll)
     state.switchTurn()
     if (state.turn == 0):
-      playCompTurn(state, first_strat, print_flag, factors_list1)
+      playCompTurn(net, state, first_strat, print_flag, factors_list1)
     elif(state.turn == 1):
-      playCompTurn(state, second_strat, print_flag, factors_list2)
+      playCompTurn(net, state, second_strat, print_flag, factors_list2)
 
     winner = state.testGameOver()
   
@@ -432,10 +449,34 @@ def playCompVsComp(first_strat, second_strat, print_flag, factors_list1, factors
   return (winner, points)
 
 
-def playCompTurn(state, strat, print_flag, factors_list):
+def playCompTurn(net, state, strat, print_flag, factors_list):
+  '''Determine computer moves depending on desired strategy'''
+  if(int(strat) == 5):
+    
+    if (print_flag):
+      state.printState()
+
+      raw_input("wait")
+
+    # Use neural net to select a move
+    
+    #Gen states
+    posStates = [state]
+    genAllPossMoves(posStates)
+ 
+    #use net to get state values
+    nnDict = NN.getAllNNinputs(net, posStates)
+
+    #find highest one
+    desiredState = max(nnDict.iteritems(), key=operator.itemgetter(1))[0]
+    
+
+
+    #update board to new position
+    state.updateFromState(desiredState)
+
   if(int(strat) == 4):
     #Use factors list to play a 'random' strat
-    st_copy = copy.deepcopy(state)
     if (print_flag):
       state.printState()
 
@@ -544,7 +585,7 @@ def playTurn(state, num_flag, print_mode):
       state.printState()
 
 
-def simulateSession(first_strat, second_strat, number_matches, factors_list1, factors_list2, a):
+def simulateSession(net, first_strat, second_strat, number_matches, factors_list1, factors_list2, a):
   '''Simulates a given number of games and keeps track of results'''
   #ppm = points per match
 
@@ -567,7 +608,7 @@ def simulateSession(first_strat, second_strat, number_matches, factors_list1, fa
     black_score = 0
 
     while (white_score < ppm and black_score < ppm):
-      winner, points = playCompVsComp(first_strat, second_strat, False, factors_list1, factors_list2)
+      winner, points = playCompVsComp(net, first_strat, second_strat, False, factors_list1, factors_list2)
           
       if (winner == 0):
         white_score = white_score + points
@@ -732,89 +773,7 @@ def genFactorsList(fia, factor):
   
   return factors_list  
 
-def getAllNNinputs(state):
-  
-  NNdict = { }
 
-  posStates = [state]
-  genAllPossMoves(posStates)
-
-  for st in posStates:
-    NNValues = getNNValues(st)
-     
-
-
-def getNNValues(state):
-  #use Tesauro's values to generate a 198 unit neural network
-  NNinputArr = np.zeros(198)
-  #[0:1] == binary turn values
-  #[2:3] == scores/15
-  #[4:5] == pieces in jail/2
-  #[6:197] == encoding for each space
-    # [6:9] == white encoding on space 1
-    # [10:13] == black encoding on space 1
-    # [14:17] == white encoding on space 2
-    # ...
-
-
-  # input turn values
-  if (state.turn == 0):
-    NNinputArr[0] = 1
-  else:
-    NNinputArr[1] = 1
-
-  # get points scored
-  NNinputArr[2] = state.board[0]/15
-  NNinputArr[3] = state.board[25]/15
-
-  # get jail scores
-  NNinputArr[4] = state.board[26]/2
-  NNinputArr[5] = state.board[27]/2
-
-  # get individual space scores
-  for x in range(1,25): #24 spaces on board
-    counter = (x-1)*8
-    pos = 6 + counter
-    if (state.board[x] == 0):
-      continue
-
-    if (state.board[x] > 0): #white position
-      NNinputArr[pos] = 1
-
-      if (state.board[x] == 2):
-        NNinputArr[pos+1] = 1
-      if (state.board[x] == 3):
-        NNinputArr[pos + 1] = 1
-        NNinputArr[pos + 2] = .5
-      if (state.board[x] == 4):
-        NNinputArr[pos + 1] = 1
-        NNinputArr[pos + 2] = 1
-      if (state.board[x] > 4):
-        NNinputArr[pos + 1] = 1
-        NNinputArr[pos + 2] = 1
-        NNinputArr[pos + 3] = (state.board[x] -4)/2
-
-
-    if (state.board[x] < 0): #black position
-      NNinputArr[pos + 4] = 1
-    
-      if (state.board[x] == -2):
-        NNinputArr[pos+5] = 1
-      if (state.board[x] == -3):
-        NNinputArr[pos + 5] = 1
-        NNinputArr[pos + 6] = .5
-      if (state.board[x] == -4):
-        NNinputArr[pos + 5] = 1
-        NNinputArr[pos + 6] = 1
-      if (state.board[x] < -4):
-        NNinputArr[pos + 5] = 1
-        NNinputArr[pos + 6] = 1
-        NNinputArr[pos + 7] = (math.fabs(state.board[x]) -4)/2
-
-    #print x
-    #print NNinputArr[pos:(pos+8)]
-    
-  return NNinputArr
   
 def playStratCompTurn(state, factors_list):
 
