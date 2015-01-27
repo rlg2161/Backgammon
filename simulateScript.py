@@ -3,7 +3,7 @@ import sys
 import backgammon as bg
 
 if (len(sys.argv) != 5):
-  print "Usage == ./simulateScript.py <# strats to sim> <# matches> <# points per match> <output file name>"
+  print "Usage == ./genSimsScript.py <# strats to sim> <# matches> <# points per match> <output file name>"
   sys.exit(0)
 else:
   num_games = int(sys.argv[1])

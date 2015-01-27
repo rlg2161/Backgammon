@@ -6,7 +6,7 @@ import dice
 
 def main():
 
-  backgammonTester('try_strat_file2001.txt', 'r')
+  backgammonTester('tryStratFile2001.txt')
 
 
 def backgammonTester(stratFile):
