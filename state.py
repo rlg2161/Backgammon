@@ -11,12 +11,12 @@ def main():
   # Used for testing state constructor and state compare functions
 
   factors_list1 = []
-  try_strat_file = open('tryStratFile104.txt', 'r')
+  try_strat_file = open('tryStratFile2001.txt', 'r')
   
   num_games = try_strat_file.readline()
   num_games = num_games.rstrip("\n")
   fia = try_strat_file.readline()
-  fia =fia.rstrip("\n")
+  fia = fia.rstrip("\n")
   factor = try_strat_file.readline()
   factor = factor.rstrip("\n")
   gps = try_strat_file.readline()
@@ -30,7 +30,7 @@ def main():
     factors_list1.append(float(item))
 
   state1 = state()
-  stateList = [state1]
+  #stateList = [state1]
   state1.printState()
   
   backgammon.calcStratMove(state1, factors_list1, True)
