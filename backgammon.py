@@ -1,4 +1,3 @@
-import bgNeuralNetwork as NN 
 import dice
 import state
 import copy
@@ -28,8 +27,6 @@ def main():
 
 def programLoop():  
 
-  net = NN.createNN(198)
-
   print "Would you like to play against another person or the computer?"
   print ""
   print "0: two people to play each other"
@@ -40,174 +37,158 @@ def programLoop():
   print "5: calculate learning values"
   print "6: plot results "
   print "7: GUI "
-  computer = raw_input("Please make your selection:   ")
-  #print computer
+  option = raw_input("Please make your selection:   ")
   
   good_input = False
 
   while (good_input != True):
     try:
-      int(computer)
-      #computer = int(computer)
+      int(option)
       good_input = True
       continue
-      #else:
-        #computer = raw_input("Please enter 0 to play against a person or 1 for computer or 2 for 2 computers against eachother:  ")
     except:
-      computer = raw_input("Please enter the appropriate option: ")
+      option = raw_input("Please enter the appropriate option: ")
   
   
-  computer = int(computer)
+  option = int(option)
+  
+  if (option == 0):
+    # Human vs. Human
+    print_flag = 1
+    first_strat = 0
+    second_strat = 0
 
-  if (computer < 4):
-    
-    if (len(sys.argv) != 2 and len(sys.argv) != 3):
-      str_arg1 = raw_input("What is the name of the first strat file? ")
-      str_arg2 = raw_input("What is the name of the second strat file? ")
+    again = playMatch(15, first_strat, second_strat, print_flag, None, None)
 
-    if (len(sys.argv) >= 2):
-      str_arg1 = str(sys.argv[1])
-    if (len(sys.argv) == 3):
-      str_arg2 = str(sys.argv[2])
-    
+    while(again):
+      again = playMatch(15, first_strat, second_strat, print_flag, factors_list1, factors_list2)
+
+  elif (option == 1):
+    # Human v. Comp
+    print "What strategies would you like the computer to use? They are, currently: "
+    print "1: Random computer player"
+    print "2: My own, custom algorithm"
+    print "3: My own algo but customized to minimize opponent move values"
+    print "4: Learned algo (make sure to run learning.py first)"
+    print "... More to come ..."
+
+    good_input = False
+    print_flag = 1
+    first_strat = 0
+    factors_list1 = []
+    second_strat = raw_input("\n" + "Please enter the desired computer strategy: ")
+    while (good_input != True):
+      second_strat = int(second_strat)
+      if (second_strat == 4):
+        stratFile = raw_input("What is the name of the computer strat file? Press enter to use default  ")
+        factors_list1 = loadStratFile(stratFile)
+        good_input = True
+      else:
+        good_input = True
+        
+    again = playMatch(15, first_strat, second_strat, print_flag, factors_list1, None)
+
+    while(again):
+      again = playMatch(15, first_strat, second_strat, print_flag, factors_list1, None)
+
+  elif (option == 2):
+    # Comp v. Comp
+    print "What strategies would you like the computer to use? They are, currently: "
+    print "1: Random computer player"
+    print "2: My own, custom algorithm"
+    print "3: My own algo but customized to minimize opponent move values"
+    print "4: Learned algo (make sure to run learning.py first)"
+    print "... More to come ..."
+
+    good_input = False
+    print_flag = True
+    first_strat = raw_input("\n" + "Please enter the first desired computer strategy: ")
+    factors_list1 = factors_list2 = []
+
+    while (good_input != True):
+      first_strat = int(first_strat)
+      if (first_strat == 4):
+        stratFile = raw_input("What is the name of the computer strat file? Press enter to use default  ")
+        factors_list1 = loadStratFile(stratFile)
+        good_input = True
+      else:
+        good_input = True
+
+
+    good_input = False
+    second_strat = raw_input("\n" + "Please enter the second desired computer strategy: ")
+    while (good_input != True):
+      second_strat = int(second_strat)
+      if (second_strat == 4):
+        stratFile = raw_input("What is the name of the computer strat file? Press enter to use default  ")
+        factors_list2 = loadStratFile(stratFile)
+        good_input = True
+      else:
+        good_input = True
+
+    print first_strat
+    print factors_list1
+
+    print second_strat
+    print factors_list2
+
+    again = playMatch(15, first_strat, second_strat, print_flag, factors_list1, factors_list2)
+
+    while(again):
+      again = playMatch(15, first_strat, second_strat, print_flag, factors_list1, factors_list2)
+
+  elif (option == 3):
+    #On screen simulation
+    num_sims = raw_input("How many matches would you like to simulate? ")
     try:
-      factors_list1 = []
-      try_strat_file = open(str_arg1, 'r')
-
-      num_games1 = try_strat_file.readline()
-      num_games1 = num_games1.rstrip("\n")
-      fia1 = try_strat_file.readline()
-      fia1 =fia1.rstrip("\n")
-      factor1 = try_strat_file.readline()
-      factor1 = factor1.rstrip("\n")
-      mps1 = try_strat_file.readline()
-      mps1 = mps1.rstrip("\n")
-      ppm1 = try_strat_file.readline()
-      ppm1 = ppm1.rstrip("\n")
-
-
-      line = try_strat_file.readline()
-      splitLine = line.split()
-
-      for item in splitLine:
-        factors_list1.append(float(item))
-      #print factors_list
-
-      factors_list2 = []
-
-      if (len(str_arg2) == 0):
-        factors_list2 = factors_list1
-
-      else:  
-        try_strat_file = open(str_arg2, 'r')
-        
-        num_games2 = try_strat_file.readline()
-        num_games2 = num_games2.rstrip("\n")
-        fia2 = try_strat_file.readline()
-        fia2 = fia2.rstrip("\n")
-        factor2 = try_strat_file.readline()
-        factor2 = factor2.rstrip("\n")
-        mps2 = try_strat_file.readline()
-        mps2 = mps2.rstrip("\n")
-        ppm2 = try_strat_file.readline()
-        ppm2 = ppm2.rstrip("\n")
-        
-
-        line = try_strat_file.readline()
-        splitLine = line.split()
-
-        for item in splitLine:
-          factors_list2.append(float(item))
-        #print factors_list
-    
+      num_sims = int(num_sims)
     except:
-      print "Files could not be opened - please recheck file names and restart program"
-      exit()
-    if (computer < 3):
-      #Single Game Play
-      
-      if (computer == 0):
-        print_flag = 1
-        first_strat = 0
-        second_strat = 0
+      num_sims = int(raw_input("Please enter a # of sims: "))
+    print "What strategies would you like the computer to use? They are, currently: "
+    print "1: Random computer player"
+    print "2: My own, custom algorithm"
+    print "3: My own algo but customized to minimize opponent move values"
+    print "4: Learned algo (make sure to run learning.py first)"
+    print "... More to come ..."
+    first_strat = raw_input("Choice for comp 1: ")
+    second_strat = raw_input("Choice for comp 2: ")
 
-      elif (computer == 1):
-        print "What strategies would you like the computer to use? They are, currently: "
-        print "1: Random computer player"
-        print "2: My own, custom algorithm"
-        print "3: My own algo but customized to minimize opponent move values"
-        print "4: Learned algo (make sure to run learning.py first)"
-        print "... More to come ..."
+    factors_list1 = factors_list2 = []
 
-        good_input = False
-        print_flag = 1
-        first_strat = 0
-        second_strat = raw_input("\n" + "Please enter the desired computer strategy: ")
-        while (good_input != True):
-          try:
-            second_strat = int(second_strat)
-            good_input = True
-          except:
-            second_strat = raw_input("\n" + "Please enter the appropriate option: ")
+    good_input = False
 
-      elif (computer == 2):
-        print "What strategies would you like the computer to use? They are, currently: "
-        print "1: Random computer player"
-        print "2: My own, custom algorithm"
-        print "3: My own algo but customized to minimize opponent move values"
-        print "4: Learned algo (make sure to run learning.py first)"
-        print "... More to come ..."
+    while (good_input != True):
+      first_strat = int(first_strat)
+      if (first_strat == 4):
+        stratFile = raw_input("What is the name of the computer strat file? Press enter to use default  ")
+        factors_list1 = loadStratFile(stratFile)
+        good_input = True
+      else:
+        good_input = True
 
-        good_input = False
-        print_flag = True
-        first_strat = raw_input("\n" + "Please enter the desired computer strategy: ")
+    good_input = False
 
-        while (good_input != True):
-          try:
-            first_strat = int(first_strat)
-            good_input = True
-          except:
-            first_strat = raw_input("\n" + "Please enter the appropriate option: ")
+    while (good_input != True):
+      second_strat = int(second_strat)
+      if (second_strat == 4):
+        stratFile = raw_input("What is the name of the computer strat file? Press enter to use default  ")
+        factors_list2 = loadStratFile(stratFile)
+        good_input = True
+      else:
+        good_input = True
 
-        second_strat = raw_input("\n" + "Please enter the desired computer strategy: ")
-        while (good_input != True):
-          try:
-            second_strat = int(second_strat)
-            good_input = True
-          except:
-            second_strat = raw_input("\n" + "Please enter the appropriate option: ")
+    #num_sims, fia, factor, mps
+    ppm = raw_input("How many points per match? ")
 
-      again = playMatch(net, 15, first_strat, second_strat, print_flag, factors_list1, factors_list2)
-
-      while(again):
-        again = playMatch(net, 15, first_strat, second_strat, print_flag, factors_list1, factors_list2)
-
-    elif (computer == 3):
-      #On screen simulation
-      num_sims = raw_input("How many matches would you like to simulate? ")
-      try:
-        num_sims = int(num_sims)
-      except:
-        num_sims = int(raw_input("Please enter a # of sims: "))
-      print "What strategies would you like the computer to use? They are, currently: "
-      print "1: Random computer player"
-      print "2: My own, custom algorithm"
-      print "3: My own algo but customized to minimize opponent move values"
-      print "4: Learned algo (make sure to run learning.py first)"
-      print "... More to come ..."
-      first_strat = raw_input("Choice for comp 1: ")
-      second_strat = raw_input("Choice for comp 2: ")
-
-      #num_sims, fia, factor, mps
-      a = "_" + str(num_games1) +"_" + str(fia1) + "_" + str(factor1) + "_" + str(mps1) + "_" + str(str_arg1)
-      
-
-      #raw_input("wait")
-      #print "verify a, then re-run program"
-      simulateSession(net, first_strat, second_strat, num_sims, factors_list1, factors_list2, a)
+    a = "_" + str(num_sims) +"_" + str(ppm) + "_" + str(first_strat) + "_" + str(second_strat)
     
 
-  elif (computer == 4):
+    #raw_input("wait")
+    #print "verify a, then re-run program"
+    simulateSession(first_strat, second_strat, num_sims, ppm, factors_list1, factors_list2, a)
+  
+
+  elif (option == 4):
     # Random strategy simulation to gather learning data
     num_games = raw_input("How many strats would you like to simulate? ")
     mps = raw_input("How many matches per strat? ")
@@ -217,7 +198,7 @@ def programLoop():
     generateSimulations(int(num_games), 12, 10, int(mps), int(ppm), name)
     #print "change generateSimulations numer and restart program"
 
-  elif (computer == 5): 
+  elif (option == 5): 
     #learning.py
     inFile = raw_input("What file would you like to draw learning examples from? ")
     sizeInput = raw_input("How many learning examples in the file? ")
@@ -231,7 +212,7 @@ def programLoop():
     learning.learningFxn(inFile, int(sizeInput), outFile, print_flag)
 
 
-  elif (computer == 6):
+  elif (option == 6):
     # plotResults.py
     inFile = raw_input("What file would you like to plot algorithm values from? ")
     factor = raw_input("What factor would you like to use? ")
@@ -248,18 +229,57 @@ def programLoop():
     plotResults.plotResults(inFile, f)
 
 
-  else:
+  elif (option == 7):
     # backgammonTester.py
     inFile = 'tryStratFile2001.txt'
     backgammonTester.backgammonTester(inFile)
 
-def playMatch(net, num_points, first_strat, second_strat, print_flag, factors_list1, factors_list2):
+def loadStratFile(fileName):
+  print fileName
+  if (fileName == ""):
+    fileName = "tryStratFile2001.txt"
+  try:
+    try_strat_file = open(fileName, 'r')
+  except:
+    print "Bad strategy file name entered. Using default "
+    fileName = "tryStratFile2001.txt"
+    try_strat_file = open(fileName, 'r')
+
+  factors_list = []
+  num_games1 = try_strat_file.readline()
+  num_games1 = num_games1.rstrip("\n")
+  print num_games1
+  fia1 = try_strat_file.readline()
+  fia1 =fia1.rstrip("\n")
+  print fia1
+  mps1 = try_strat_file.readline()
+  mps1 = mps1.rstrip("\n")
+  print mps1
+  ppm1 = try_strat_file.readline()
+  ppm1 = ppm1.rstrip("\n")
+  print ppm1
+
+
+  line = try_strat_file.readline().rstrip(' ')
+  splitLine = line.split(' ')
+  print "Line: " + line
+  print splitLine
+
+  for item in splitLine:
+    factors_list.append(float(item))
+  print "factorsList: ",
+  print factors_list
+  return factors_list
+
+
+
+def playMatch(num_points, first_strat, second_strat, print_flag, factors_list1, factors_list2):
   
   white_points = 0
   black_points = 0
 
   while (white_points < 15 and black_points < 15):
-    winner, points = playSingleGame(net, first_strat, second_strat, print_flag, factors_list1, factors_list2)
+    winner, points = playSingleGame(first_strat, second_strat, print_flag, factors_list1, factors_list2)
 
     if (winner == 0):
       white_points = white_points + points
@@ -278,11 +298,9 @@ def playMatch(net, num_points, first_strat, second_strat, print_flag, factors_li
   
   return again  
 
-def playSingleGame(net, first_strat, second_strat, print_flag, factors_list1, factors_list2):
+def playSingleGame(first_strat, second_strat, print_flag, factors_list1, factors_list2):
   ''' Play a single game'''
   
-  #lastGameFile = open('lastgame.txt', 'w')
-
   winner = -1
   points = 1
   
@@ -291,16 +309,11 @@ def playSingleGame(net, first_strat, second_strat, print_flag, factors_list1, fa
     winner, points = playTwoHumans(first_strat, second_strat, print_flag)
  
   elif (first_strat == 0 and second_strat != 0): #Human vs. comp
-    winner, points = playHumanVsComp(net, first_strat, second_strat, print_flag, factors_list1)
+    winner, points = playHumanVsComp(first_strat, second_strat, print_flag, factors_list1)
 
   elif(first_strat != 0 and second_strat != 0):
-    winner, points = playCompVsComp(net, first_strat, second_strat, print_flag, factors_list1, factors_list2)
-
-    
-  #stateList.reverse()
-  #while(len(stateList) > 0):
-    #lastGameFile.write(str(stateList.pop()))
-  #lastGameFile.close()
+    winner, points = playCompVsComp(first_strat, second_strat, print_flag, factors_list1, factors_list2)
+  
   if (print_flag):
     if (winner == 0):
       if (points == 1):
@@ -367,7 +380,7 @@ def playTwoHumans(first_strat, second_strat, print_flag):
   points = checkGammon(state, winner)
   return (winner, points)
 
-def playHumanVsComp(net, first_strat, second_strat, print_flag, factors_list):
+def playHumanVsComp(first_strat, second_strat, print_flag, factors_list):
 
   #set up initial parameters
   die = dice.oneDie(6)
@@ -381,7 +394,7 @@ def playHumanVsComp(net, first_strat, second_strat, print_flag, factors_list):
   else:
     #Comp first
     print "Comp first"
-    playCompTurn(net, state, second_strat, print_flag, factors_list)
+    playCompTurn(state, second_strat, print_flag, factors_list)
 
   while (winner == -1):
     roll = die.rollDie()
@@ -390,7 +403,7 @@ def playHumanVsComp(net, first_strat, second_strat, print_flag, factors_list):
     if (state.turn == 0):
       playTurn(state, first_strat, 1)
     else:
-      playCompTurn(net, state, second_strat, print_flag, factors_list)
+      playCompTurn(state, second_strat, print_flag, factors_list)
 
     winner = state.testGameOver()
 
@@ -400,7 +413,7 @@ def playHumanVsComp(net, first_strat, second_strat, print_flag, factors_list):
   points = checkGammon(state, winner)
   return (winner, points)
 
-def playCompVsComp(net, first_strat, second_strat, print_flag, factors_list1, factors_list2):
+def playCompVsComp(first_strat, second_strat, print_flag, factors_list1, factors_list2):
   
   #set up initial parameters
   die = dice.oneDie(6)
@@ -408,58 +421,30 @@ def playCompVsComp(net, first_strat, second_strat, print_flag, factors_list1, fa
   winner = -1
 
   if (state.turn == 0):
-    playCompTurn(net, state, first_strat, print_flag, factors_list1)
+    playCompTurn(state, first_strat, print_flag, factors_list1)
   else:
-    playCompTurn(net, state, second_strat, print_flag, factors_list2)
+    playCompTurn(state, second_strat, print_flag, factors_list2)
 
   #raw_input("wait")
   while (winner == -1):
+    # state.printState()
     roll = die.rollDie()
     state.updateRoll(roll)
     state.switchTurn()
     if (state.turn == 0):
-      playCompTurn(net, state, first_strat, print_flag, factors_list1)
+      playCompTurn(state, first_strat, print_flag, factors_list1)
     elif(state.turn == 1):
-      playCompTurn(net, state, second_strat, print_flag, factors_list2)
+      playCompTurn(state, second_strat, print_flag, factors_list2)
 
     winner = state.testGameOver()
-  
-  #state.printState()
+
   points = checkGammon(state, winner)
   return (winner, points)
 
 
-def playCompTurn(net, state, strat, print_flag, factors_list):
+def playCompTurn(state, strat, print_flag, factors_list):
   '''Determine computer moves depending on desired strategy'''
-  if(int(strat) == 5):
-    
-    if (print_flag):
-      state.printState()
-
-      raw_input("wait")
-
-    orig_state = state 
-
-    # Use neural net to select a move
-    
-    #Gen states
-    posStates = [state]
-    genAllPossMoves(posStates)
- 
-    #use net to get state values
-    nnDict = NN.getAllNNinputs(net, posStates)
-    #print len(nnDict)
-    #print nnDict
-
-    #find highest one
-    desiredState = max(nnDict.iteritems(), key=operator.itemgetter(1))[0]
-    desiredStateScore = max(nnDict.iteritems(), key=operator.itemgetter(1))[1]
-    
-
-
-    #update board to new position
-    state.updateFromState(desiredState)
-    return (orig_state, desiredStateScore)
+  print strat
 
   if(int(strat) == 4):
     #Use factors list to play a 'random' strat
@@ -571,19 +556,17 @@ def playTurn(state, num_flag, print_mode):
       state.printState()
 
 
-def simulateSession(net, first_strat, second_strat, number_matches, factors_list1, factors_list2, a):
+def simulateSession(first_strat, second_strat, number_matches, points_per_match, factors_list1, factors_list2, a):
   '''Simulates a given number of games and keeps track of results'''
   #ppm = points per match
 
   #name_learning_file = raw_input("What is the name of the learning file: ")
 
   #a = a + name_learning_file
-  
+  ppm = int(points_per_match)
   fname = "simSessionFile" + a + ".txt" 
 
   sim_session_file = open(fname, 'a')
-  
-  ppm = input ("How many points in each match: ")
 
   matches_won_by_white = 0
   matches_won_by_black = 0
@@ -594,7 +577,7 @@ def simulateSession(net, first_strat, second_strat, number_matches, factors_list
     black_score = 0
 
     while (white_score < ppm and black_score < ppm):
-      winner, points = playCompVsComp(net, first_strat, second_strat, False, factors_list1, factors_list2)
+      winner, points = playCompVsComp(first_strat, second_strat, False, factors_list1, factors_list2)
           
       if (winner == 0):
         white_score = white_score + points
@@ -630,8 +613,9 @@ def simulateSession(net, first_strat, second_strat, number_matches, factors_list
   print fp2
 
   #sim_session_file.write("learning w/ " + num_games + "\n")
-  sim_session_file.write(match_score_string)
-  sim_session_file.write(fp1 + "\n" + fp2 + "\n")
+  # sim_session_file.write(match_score_string)
+  # sim_session_file.write(fp1 + "\n" + fp2 + "\n")
+  sim_session_file.close()
 
 
 def generateSimulations(num_sims, fia, factor, mps, ppm, name):

@@ -8,7 +8,7 @@ def main():
 
   backgammonTester('tryStratFile2001.txt')
 
-def backgammonTester(stratFIle):
+def backgammonTester(stratFile):
   try_strat_file = open(stratFile, 'r')
   factors_list = []
 
