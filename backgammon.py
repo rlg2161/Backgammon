@@ -444,7 +444,6 @@ def playCompVsComp(first_strat, second_strat, print_flag, factors_list1, factors
 
 def playCompTurn(state, strat, print_flag, factors_list):
   '''Determine computer moves depending on desired strategy'''
-  print strat
 
   if(int(strat) == 4):
     #Use factors list to play a 'random' strat
@@ -1393,10 +1392,6 @@ def calcMoveValue1(state, turn):
         if (blocade_count > 1):
           blocade_score += blocade_count*2
 
-  #print "points scored: " + str(points_scored) + " opponent jail score: " + str(opp_jail_score) \
-  #+ " blocade score: " + str(blocade_score) + \
-  #" covered score: " + str(covered_score) + " Uncovered score: -" + str(uncovered_score)
-  #print state.board
   move_value = points_scored + opp_jail_score + blocade_score + covered_score - uncovered_score
   return move_value
 
@@ -1446,10 +1441,6 @@ def playStrategicCompTurn(state):
   '''Plays a computer turn if a non-random strategy is being played'''
   posStates = [state]
   genAllPossMoves(posStates)
-  #posMovesList = open('posMovesList.txt', 'w')
-  #for item in posStates:
-    #posMovesList.write(str(item))
-  #posMovesList.close()
   
   best = evalMoves(posStates)
   return best
