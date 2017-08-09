@@ -1,14 +1,14 @@
 #!flask/bin/python
 from flask import Flask, jsonify, request
-import dice
-import state
+import lib.dice
+import lib.gamestatestate
 import backgammon
 
 app = Flask(__name__)
 
 @app.route('/')
 def index():
-    return "Hello, World!"
+    return "Welcome to backgammon."
 
 @app.route('/start/')
 def roll_die():

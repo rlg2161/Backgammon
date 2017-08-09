@@ -1,39 +1,9 @@
-# Represents the current state of the game (Turn, Remaining Rolls, 
+# Represents the current state of the game (Turn, Remaining Rolls,
 # Piece Locations)
 
 import copy
 import math
-import backgammon
 import numpy as np
-
-
-def main():
-  # Used for testing state constructor and state compare functions
-
-  factors_list1 = []
-  try_strat_file = open('tryStratFile2001.txt', 'r')
-  
-  num_games = try_strat_file.readline()
-  num_games = num_games.rstrip("\n")
-  fia = try_strat_file.readline()
-  fia = fia.rstrip("\n")
-  factor = try_strat_file.readline()
-  factor = factor.rstrip("\n")
-  gps = try_strat_file.readline()
-  gps = gps.rstrip("\n")
-  
-
-  line = try_strat_file.readline()
-  splitLine = line.split()
-
-  for item in splitLine:
-    factors_list1.append(float(item))
-
-  state1 = state()
-  #stateList = [state1]
-  state1.printState()
-  
-  backgammon.calcStratMove(state1, factors_list1, True)
 
 class state():
 
@@ -61,15 +31,15 @@ class state():
       self.board = copy.deepcopy(args[0].board)
       self.turn = args[0].turn
       self.roll = list(args[0].roll)
-    
-    
+
+
 
     if (len(args) == 0): #make custom state
       self.board = np.zeros(28)
       self.board[0] = 0
       self.board[1] = -2
       self.board[2] = 0
-      self.board[3] = 0 
+      self.board[3] = 0
       self.board[4] = 1
       self.board[5] =0
       self.board[6] = 5
@@ -94,12 +64,12 @@ class state():
       self.board[25] = 0
       self.board[26] = 0
       self.board[27] = 0
-      
+
       self.turn = 1
       self.roll = []
 
     self.pip_count = self.getPipCount()
-  
+
   def getPipCount(self):
     '''Calculate pip count'''
     w_pips = 0
@@ -135,7 +105,7 @@ class state():
     # Creates copy of roll list
 
   def compareStates(self, other_state):
-    '''Compare a given state to another state to determine if they represent the 
+    '''Compare a given state to another state to determine if they represent the
     same board configuration'''
 
     sameState = True
@@ -161,7 +131,7 @@ class state():
   def compareStateToList(self, stateList):
     '''Compare state to list of states to determine if it is already in the list'''
     alreadyInList = False
-    
+
     for posState in stateList:
       #counter = counter + 1
       #print "counter " +str(counter)
@@ -171,7 +141,7 @@ class state():
 
     return alreadyInList
 
-  def switchTurn(self): 
+  def switchTurn(self):
     '''Switch turn'''
     if (self.turn): #Black --> Black
       self.turn = 0
@@ -182,9 +152,9 @@ class state():
     '''Test game over conditions'''
     w_score = self.board[0]
     b_score = int(math.fabs(self.board[25]))
-    
+
     done = -1
-   
+
     if (w_score == 15):
       done = 0
     elif (b_score == 15):
@@ -212,7 +182,7 @@ class state():
     '''Returns tuple containing last occcupied space for both players'''
     furthest_white = 0
     furthest_black = 24
-    
+
     if (self.board[26] > 0 ):
       furthest_white = 25
     if (self.board[27] < 0):
@@ -245,10 +215,10 @@ class state():
     if (self.board[26 + self.turn] != 0):
       return True
     else:
-     return 
+     return
 
   def existValidMoves(self):
-    '''Check to see if valid moves exist''' 
+    '''Check to see if valid moves exist'''
     val_moves = False
 
     if (len(self.roll) == 0):
@@ -275,14 +245,14 @@ class state():
     else: #No pieces in Jail
       #print "no pieces in jail - checking other pieces"
       for x in range(1, 25):
-        if (val_moves): #Break out of loop if valid move already found 
-          break        
-        
+        if (val_moves): #Break out of loop if valid move already found
+          break
+
         if (self.turn): #Black
           #print "Black "
           if (self.board[x] >= 0):
             continue
-          
+
           else:
             space_from = x
 
@@ -291,7 +261,7 @@ class state():
                 pos_valid = self.checkSpaceTo(space_from, 25)
               else:
                 pos_valid = self.checkSpaceTo(space_from, space_from + self.roll[y])
-        
+
         else: #White
           #print "White ",
           if (self.board[x] <= 0):
@@ -303,7 +273,7 @@ class state():
                 pos_valid = self.checkSpaceTo(space_from, 0)
               else:
                 pos_valid = self.checkSpaceTo(space_from, space_from - self.roll[y])
-              
+
 
         if (pos_valid[0]):
           val_moves = True
@@ -367,7 +337,7 @@ class state():
       else:
        valid_move = False
        move_dist = -3
-       return (valid_move, orig_space_from, space_to, move_dist)       
+       return (valid_move, orig_space_from, space_to, move_dist)
 
     if (self.turn == 0 ): #White moving to black space
       if (self.board[space_to] < -1):
@@ -380,12 +350,12 @@ class state():
         valid_move = False
         move_dist = -4
         return (valid_move, orig_space_from, space_to, move_dist)
-        
+
     if (self.roll.count(move_dist) == 0):
       valid_move = False
       move_dist = -5
       return (valid_move, orig_space_from, space_to, move_dist)
-      
+
     return (valid_move, orig_space_from, space_to, move_dist)
 
   def printError(self, num):
@@ -407,24 +377,24 @@ class state():
 
     if (num == -5):
       print "tried to move a distance that wasn't rolled."
-   
+
   def printState(self):
     print str(self)
 
-  def __str__(self):  
+  def __str__(self):
     return_string = '\n'
-    
+
     if (self.turn == 0):
       return_string = return_string + "White's Turn" + "\n"
     else:
-      return_string = return_string + "Black's Turn" + "\n" 
-    
-    return_string = return_string + str(self.roll) + "\n" 
+      return_string = return_string + "Black's Turn" + "\n"
+
+    return_string = return_string + str(self.roll) + "\n"
     return_string = return_string + "White pip count: " + str(self.pip_count[0])
     return_string = return_string + " Black pip count: " + str(self.pip_count[1])
-    return_string = return_string + "\n" 
+    return_string = return_string + "\n"
     return_string = return_string + self.convBoardToString()
-    
+
     return return_string
 
 
@@ -454,16 +424,12 @@ class state():
       elif (x == 26):
         return_string = return_string + "White Jail: "
         for y in range (0, int(math.fabs(self.board[x]))):
-          return_string = return_string + "o " 
+          return_string = return_string + "o "
         return_string = return_string + "\n"
       else:
         return_string = return_string + "Black Jail: "
         for y in range (0, int(math.fabs(self.board[x]))):
-          return_string = return_string + "x " 
+          return_string = return_string + "x "
         return_string = return_string + "\n"
 
     return return_string
-
-
-if __name__ == "__main__":
-  main()

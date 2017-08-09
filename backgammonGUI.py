@@ -1,10 +1,10 @@
 # Basic GUI for my backgammon program
 
 import Tkinter
-import backgammon as bg 
+import backgammon as bg
 import random
 import math
-import dice
+import lib.dice as dice
 import time
 
 
@@ -13,12 +13,12 @@ canvasHeight = 260
 
 
 class backgammonGUI():
-    
+
   # Functions and Methods
   def redraw(self, state):
     self.drawBoard()
     self.drawPieces(state)
-      
+
     self.board.pack()
 
   def drawBoard(self):
@@ -42,14 +42,14 @@ class backgammonGUI():
 
       self.board.create_polygon(coordTop, outline = color, fill = color)
       self.board.create_polygon(coordBottom, outline = opp_color, fill = opp_color)
-      
+
     self.board.create_rectangle(228, 0, 255, 260, outline = '#6B4724', fill = '#6B4724')
 
     for x in range(0, 6):
       coordTop = 255 + (space_width*x), 0, 255 + space_width + (space_width*x), 0, \
-      ((255 + (space_width*x)) + (255 + space_width + space_width*x))/2, space_height 
+      ((255 + (space_width*x)) + (255 + space_width + space_width*x))/2, space_height
       coordBottom = 255 + (space_width*x), 260, 255 + space_width + (space_width*x), 260, \
-      ((255 + (space_width*x)) + (255 + space_width + space_width*x))/2, canvasHeight - space_height 
+      ((255 + (space_width*x)) + (255 + space_width + space_width*x))/2, canvasHeight - space_height
       if (x % 2 == 0):
         color = '#FFFFCC'
         opp_color = '#522900'
@@ -64,7 +64,7 @@ class backgammonGUI():
     self.board.create_rectangle(483, 260, 520, 130, fill = '#FFFFCC')
 
   def drawPieces(self, state):
-    
+
     #first quadrant
     for x in range(6, 0 , -1):
       if (state.board[x] > 0):
@@ -81,7 +81,7 @@ class backgammonGUI():
           self.board.create_oval(coords, fill = color)
         self.board.create_text(255 + (38*(6-x)) + 20, 110, text = str(int(math.fabs(state.board[x]))))
 
-     
+
     #second quadrant
     for x in range(12, 6, -1):
       if (state.board[x] > 0):
@@ -113,7 +113,7 @@ class backgammonGUI():
           coords = (38*(x-13))+9, 260 - 20*y, 38 + (38*(x-13)) - 9, 240 - 20*y
           self.board.create_oval(coords, fill = color)
         self.board.create_text(38*(x-13) + 20, 150, text = str(int(math.fabs(state.board[x]))))
-     
+
     #fourth quadrant
     for x in range(24, 18, -1):
       if (state.board[x] > 0):
@@ -129,7 +129,7 @@ class backgammonGUI():
           coords = (38*(x-13) + 27) + 9, 260 - 20*y, 65 + (38*(x-13)) -9, 240 -  20*y
           self.board.create_oval(coords, fill = color)
         self.board.create_text(38*(x-13) +27 + 20, 150, text = str(int(math.fabs(state.board[x]))))
-    
+
     # home spaces
     for x in range(0, int(math.fabs(state.board[0]))):
       coords = 485, 15 + (8*x), 518, 5 + (8*x)
@@ -156,10 +156,10 @@ class backgammonGUI():
     self.moveFrom = -1
     self.moveTo = -1
 
-    
+
     self.die = dice.oneDie(6)
     self.state = bg.createInitialState(self.die)
-    #winner = -1 
+    #winner = -1
 
     cur_roll = self.state.roll
 
@@ -167,7 +167,7 @@ class backgammonGUI():
       text_turn = "White's turn  "
     else:
       text_turn = "Black's turn  "
-    
+
     #winner = state.testGameOver()
 
     # GUI instructions
@@ -178,7 +178,7 @@ class backgammonGUI():
 
     # Create board frame
     self.board_frame = Tkinter.Frame()       # Display the board
-    
+
     # Create frames for move buttons
     self.top_button_frame = Tkinter.Frame()     # Contains position buttons
     self.bottom_button_frame = Tkinter.Frame()
@@ -189,7 +189,7 @@ class backgammonGUI():
 
 
     # Button Methods
-    
+
     def newGameButton():
       print "\n\n\n"
       self.state = bg.createInitialState(self.die)
@@ -208,14 +208,14 @@ class backgammonGUI():
       if (self.state.turn == 1):
         print roll_message
         bg.playCompTurn(None, self.state, 4, False, self.factors_list)
-      
+
         self.redraw(self.state)
 
         # Update and return move to other player
         r = self.die.rollDie()
         self.state.updateRoll(r)
         self.state.switchTurn()
-      
+
         roll_message = 'Roll: ' + str(self.state.roll)
         self.roll.set(roll_message)
         turn_message = "White's Turn"
@@ -227,7 +227,7 @@ class backgammonGUI():
 
     def hereButton(number):
       if (self.state.existValidMoves() == False):
-        
+
         turn_message = "No Moves for White"
         self.turn.set(turn_message)
         roll_message = "press next turn"
@@ -247,8 +247,8 @@ class backgammonGUI():
 
             # Execute move
             self.state.board[space_from] = self.state.board[space_from] - 1
-          
-          
+
+
             # Capture opponent piece and put it in jail
             if ((self.state.board[space_to] < 0 and self.state.turn == False)):
               if (int(math.fabs(self.state.board[space_to])) == 1):
@@ -257,39 +257,39 @@ class backgammonGUI():
 
             # Move to space to
             self.state.board[space_to] = self.state.board[space_to] + 1
-          
+
             #print state.roll
             self.state.roll.remove(move_dist)
             roll_message = 'Roll: ' + str(self.state.roll)
             self.roll.set(roll_message)
             self.state.updatePipCount()
 
-          
+
             self.redraw(self.state)
             self.moveFrom = -1
-            self.moveTo = -1 
+            self.moveTo = -1
 
 
           else:
             # Reset to allow moves to move retrevial to work
             self.moveFrom = -1
-            self.moveTo = -1 
-      
+            self.moveTo = -1
+
 
     def placeholderButton(num):
       self.moveFrom = int(num)
       print (self.moveFrom, self.moveTo)
 
-    
+
 
     # Board Frame
     self.board = Tkinter.Canvas(self.board_frame, width = canvasWidth, height = canvasHeight)
 
-    
-    
+
+
     # Movement buttons
     #for x in range(0, 6):
-      
+
     # Top Left
     here_button = Tkinter.Button(self.top_button_frame, text = u'\u2193', width = 1, command=lambda: hereButton(12))
     here_button.grid(row = 0, column = 0, columnspan = 1)
@@ -410,7 +410,7 @@ class backgammonGUI():
 
 
     # Control Frame
-     
+
     self.turn = Tkinter.StringVar(value = text_turn)
     turn_label = Tkinter.Label(self.control_frame, width = '15', \
       bg = 'white', textvariable = self.turn)
@@ -436,7 +436,7 @@ class backgammonGUI():
       command = undoButton)
     undo_button.pack(side = 'right')
 
-    
+
 
 
     #pack the frames
@@ -458,7 +458,7 @@ class backgammonGUI():
       r = self.die.rollDie()
       self.state.updateRoll(r)
       self.state.switchTurn()
-    
+
       roll_message = 'Roll: ' + str(self.state.roll)
       self.roll.set(roll_message)
       turn_message = "White's Turn"
@@ -471,10 +471,10 @@ class backgammonGUI():
     r = self.die.rollDie()
     self.state.updateRoll(r)
     self.state.switchTurn()
-    
+
     roll_message = 'Roll: ' + str(self.state.roll)
     self.roll.set(roll_message)
-    
+
     if (self.state.turn == 0):
       turn_message = "White's Turn"
     else:
@@ -482,34 +482,29 @@ class backgammonGUI():
 
     self.turn.set(turn_message)
     self.redraw(self.state)
-    
- 
+
+
     if (self.state.turn == 1): #Black
       print roll_message
-      
+
 
       # Calculate and play turn
       bg.playCompTurn(None, self.state, 4, False, self.factors_list)
       self.redraw(self.state)
-      
+
       # Update and return move to other player
       r = self.die.rollDie()
       self.state.updateRoll(r)
       self.state.switchTurn()
-    
+
       roll_message = 'Roll: ' + str(self.state.roll)
       self.roll.set(roll_message)
       turn_message = "White's Turn"
       self.turn.set(turn_message)
 
       if (self.state.existValidMoves() == False):
-        
+
         turn_message = "No Moves for White"
         self.turn.set(turn_message)
         roll_message = "press next turn"
         self.roll.set(roll_message)
-
-
-
-  
-

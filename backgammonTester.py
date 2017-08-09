@@ -1,8 +1,8 @@
 # Wrapper program for playing with GUI
 
-import backgammon as bg 
-import backgammonGUI as bgGUI 
-import dice
+import backgammon as bg
+import backgammonGUI as bgGUI
+import lib.dice as dice
 
 def main():
 

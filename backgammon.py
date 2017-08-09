@@ -1,13 +1,14 @@
-import dice
-import state
+import lib.dice as dice
+import lib.state as state
+import lib.stateTreeNode as stateTreeNode
+import lib.learning as learning
+import lib.plotResults as plotResults
+import backgammonTester
+
 import copy
 import math
 import random
-import stateTreeNode
 import datetime
-import learning
-import plotResults
-import backgammonTester
 import sys
 import operator
 
@@ -25,7 +26,7 @@ def main():
     else:
       next = False
 
-def programLoop():  
+def programLoop():
 
   print "Would you like to play against another person or the computer?"
   print ""
@@ -38,7 +39,7 @@ def programLoop():
   print "6: plot results "
   print "7: GUI "
   option = raw_input("Please make your selection:   ")
-  
+
   good_input = False
 
   while (good_input != True):
@@ -48,10 +49,10 @@ def programLoop():
       continue
     except:
       option = raw_input("Please enter the appropriate option: ")
-  
-  
+
+
   option = int(option)
-  
+
   if (option == 0):
     # Human vs. Human
     print_flag = 1
@@ -85,7 +86,7 @@ def programLoop():
         good_input = True
       else:
         good_input = True
-        
+
     again = playMatch(15, first_strat, second_strat, print_flag, factors_list1, None)
 
     while(again):
@@ -181,12 +182,12 @@ def programLoop():
     ppm = raw_input("How many points per match? ")
 
     a = "_" + str(num_sims) +"_" + str(ppm) + "_" + str(first_strat) + "_" + str(second_strat)
-    
+
 
     #raw_input("wait")
     #print "verify a, then re-run program"
     simulateSession(first_strat, second_strat, num_sims, ppm, factors_list1, factors_list2, a)
-  
+
 
   elif (option == 4):
     # Random strategy simulation to gather learning data
@@ -198,17 +199,17 @@ def programLoop():
     generateSimulations(int(num_games), 12, 10, int(mps), int(ppm), name)
     #print "change generateSimulations numer and restart program"
 
-  elif (option == 5): 
+  elif (option == 5):
     #learning.py
     inFile = raw_input("What file would you like to draw learning examples from? ")
     sizeInput = raw_input("How many learning examples in the file? ")
     outFile = raw_input("What would you like to call file containing the resulting list of weights? ")
     print_flag_in = raw_input("Would you like to print intermediate steps and results -y/Y/yes/Yes?")
     print_flag = False
-    
+
     if(print_flag_in == "y" or again_in == "Y" or again_in == "yes" or again_in == "Yes"):
       print_flag = True
-    
+
     learning.learningFxn(inFile, int(sizeInput), outFile, print_flag)
 
 
@@ -274,7 +275,7 @@ def loadStratFile(fileName):
 
 
 def playMatch(num_points, first_strat, second_strat, print_flag, factors_list1, factors_list2):
-  
+
   white_points = 0
   black_points = 0
 
@@ -295,25 +296,25 @@ def playMatch(num_points, first_strat, second_strat, print_flag, factors_list1, 
     again = True
   else:
     again = False
-  
-  return again  
+
+  return again
 
 def playSingleGame(first_strat, second_strat, print_flag, factors_list1, factors_list2):
   ''' Play a single game'''
-  
+
   winner = -1
   points = 1
-  
+
 
   if (first_strat == 0 and second_strat == 0): #Play 2 humans
     winner, points = playTwoHumans(first_strat, second_strat, print_flag)
- 
+
   elif (first_strat == 0 and second_strat != 0): #Human vs. comp
     winner, points = playHumanVsComp(first_strat, second_strat, print_flag, factors_list1)
 
   elif(first_strat != 0 and second_strat != 0):
     winner, points = playCompVsComp(first_strat, second_strat, print_flag, factors_list1, factors_list2)
-  
+
   if (print_flag):
     if (winner == 0):
       if (points == 1):
@@ -331,7 +332,7 @@ def playSingleGame(first_strat, second_strat, print_flag, factors_list1, factors
         print "Player Two ('x') was the winner with a backgammon (3 points)."
 
   return(winner, points)
-  
+
 
 def checkGammon(state, winner):
 
@@ -367,16 +368,16 @@ def playTwoHumans(first_strat, second_strat, print_flag):
   winner = -1
 
   playTurn(state, first_strat, print_flag)
-  
+
   while (winner == -1):
     roll = die.rollDie()
     state.updateRoll(roll)
     state.switchTurn()
-    
+
     playTurn(state, second_strat, print_flag)
 
     winner = state.testGameOver()
-  
+
   points = checkGammon(state, winner)
   return (winner, points)
 
@@ -414,7 +415,7 @@ def playHumanVsComp(first_strat, second_strat, print_flag, factors_list):
   return (winner, points)
 
 def playCompVsComp(first_strat, second_strat, print_flag, factors_list1, factors_list2):
-  
+
   #set up initial parameters
   die = dice.oneDie(6)
   state = createInitialState(die)
@@ -454,7 +455,7 @@ def playCompTurn(state, strat, print_flag, factors_list):
     #print "playcompturn" + str(factors_list)
     new_state = playStratCompTurn(state, factors_list)
     state.updateFromState(new_state)
-    
+
   elif (int(strat) == 3):
     #Move with state tree
     if (print_flag):
@@ -462,10 +463,10 @@ def playCompTurn(state, strat, print_flag, factors_list):
 
     new_state = moveWithStateTree(state)
     state.updateFromState(new_state)
-    
+
   elif(int(strat) == 2):
     #Play my human-like algo
-    
+
     if (print_flag):
       state.printState()
 
@@ -476,7 +477,7 @@ def playCompTurn(state, strat, print_flag, factors_list):
     if (print_flag):
       state.printState()
     playTurn(state, int(strat), False)
-    
+
 
 
 def playTurn(state, num_flag, print_mode):
@@ -499,21 +500,21 @@ def playTurn(state, num_flag, print_mode):
 
       valid_move = False
 
-      
+
       while (valid_move == False):
         # Generate player moves and check if they are valid
         if (num_flag == 0): #Human Player
           space_to_valid = playHumanTurn(state)
-        elif (num_flag == 1): #Random computer player 
+        elif (num_flag == 1): #Random computer player
           space_to_valid = playRandCompTurn(state)
         valid_move = space_to_valid[0]
-        
+
         if (valid_move != True and state.turn == 0):
           # If invalid, print relevant error
           if (print_mode):
             state.printError(space_to_valid[3])
 
-        
+
       #assign valid move values to actual move varialbes
       space_from = space_to_valid[1]
       space_to = space_to_valid[2]
@@ -524,8 +525,8 @@ def playTurn(state, num_flag, print_mode):
         state.board[space_from] = state.board[space_from] + 1
       else: #White
         state.board[space_from] = state.board[space_from] - 1
-      
-      
+
+
       # Capture opponent piece and put it in jail
       if ((state.board[space_to] < 0 and state.turn == False) or \
         (state.board[space_to] > 0 and state.turn == True)):
@@ -540,14 +541,14 @@ def playTurn(state, num_flag, print_mode):
         state.board[space_to] = state.board[space_to] - 1
       else: #White
         state.board[space_to] = state.board[space_to] + 1
-      
+
       #print state.roll
       state.roll.remove(move_dist)
       #print state.roll
       state.updatePipCount()
 
       val_moves = state.existValidMoves()
-      
+
 
       #print val_moves
 
@@ -563,21 +564,21 @@ def simulateSession(first_strat, second_strat, number_matches, points_per_match,
 
   #a = a + name_learning_file
   ppm = int(points_per_match)
-  fname = "simSessionFile" + a + ".txt" 
+  fname = "simSessionFile" + a + ".txt"
 
   sim_session_file = open(fname, 'a')
 
   matches_won_by_white = 0
   matches_won_by_black = 0
   match_score_string = ""
-  
+
   for x in range(0, number_matches):
     white_score = 0
     black_score = 0
 
     while (white_score < ppm and black_score < ppm):
       winner, points = playCompVsComp(first_strat, second_strat, False, factors_list1, factors_list2)
-          
+
       if (winner == 0):
         white_score = white_score + points
       elif(winner == 1):
@@ -597,12 +598,12 @@ def simulateSession(first_strat, second_strat, number_matches, points_per_match,
     match_score_string = match_score_string + val
 
 
- 
+
   if (matches_won_by_white > matches_won_by_black):
     print "White wins"
   else:
     print "Black wins"
- 
+
   fp1 = "White's score for this round was: " + str(matches_won_by_white) + \
   " while playing " + str(first_strat)
   fp2 = "Black's score for this round was: " + str(matches_won_by_black) + \
@@ -625,8 +626,8 @@ def generateSimulations(num_sims, fia, factor, mps, ppm, name):
 
   if (name == ""):
     a = "_" + str(num_sims) +"s_" + str(mps) + "m_" + str(ppm) + "p"
-    fname = "stratListviaGen" + a + ".txt" 
-  
+    fname = "stratListviaGen" + a + ".txt"
+
   else:
     fname = name + ".txt"
 
@@ -649,7 +650,7 @@ def generateSimulations(num_sims, fia, factor, mps, ppm, name):
     agg_match_score = 0
     agg_rand_match_score = 0
 
-    print "Strategy " +str(x+1) + " of " + str(num_sims) 
+    print "Strategy " +str(x+1) + " of " + str(num_sims)
     #For each simulation num_sim random strategies will be created
     factors_list = []
     for i in range(0, 2):
@@ -665,8 +666,8 @@ def generateSimulations(num_sims, fia, factor, mps, ppm, name):
       while (black_rand_points < ppm and white_rand_points < ppm):
 
         winnerRand, points = playCompVsComp(4, 1, False, factors_list, None)
-      
-               
+
+
         if (winnerRand == 1):
           black_rand_points = black_rand_points + points
         else:
@@ -680,9 +681,9 @@ def generateSimulations(num_sims, fia, factor, mps, ppm, name):
       print (white_rand_points, black_rand_points)
 
       agg_rand_match_score = agg_rand_match_score + (white_rand_points - black_rand_points)
-     
+
     print "vs. random: " + str(rand_matches_won_by_white) + " " + str(agg_rand_match_score)
-      
+
 
     for x in range(0, mps):
       white_points = 0
@@ -704,7 +705,7 @@ def generateSimulations(num_sims, fia, factor, mps, ppm, name):
       print (white_points, black_points)
 
       agg_match_score = agg_match_score + (white_points - black_points)
-        
+
     print "vs. strat: " + str(matches_won_by_white) + " " + str(agg_match_score)
 
     good_strats_string = ""
@@ -720,7 +721,7 @@ def generateSimulations(num_sims, fia, factor, mps, ppm, name):
     for item in factors_list:
       #print str(item) + ", "
       good_strats_string = good_strats_string + str(item) + " "
-          
+
     good_strats_string = good_strats_string + "\n\n\n"
 
     print good_strats_string
@@ -728,47 +729,47 @@ def generateSimulations(num_sims, fia, factor, mps, ppm, name):
     good_strats_file.write(good_strats_string)
     good_strats_file.flush()
 
-  good_strats_file.close()  
+  good_strats_file.close()
 
 def genFactorsList(fia, factor):
   factors_list = []
   for x in range(0, 12):
     strat_val = factor*random.random()
     factors_list.append(strat_val)
-     
+
   factors_list[1] = factors_list[1]
   factors_list[3] = factors_list[3]
-  
-  
-  return factors_list  
 
 
-  
+  return factors_list
+
+
+
 def playStratCompTurn(state, factors_list):
 
   posStates = [state]
   genAllPossMoves(posStates)
-    
+
   best = evalStratMove(factors_list, posStates)
   if (best == None):
     print "crashed in playStratCompTurn by returning Null"
     exit()
- 
+
   return best
-  
+
 
 def evalStratMove(factors_list, posStates):
-  
+
   '''Evaluate all moves in a list and return move with the highest score'''
   cur_max = -1000000
   best_move_state = None
 
   #copy_posStates = copy.deepcopy(posStates)
- 
+
   statesToConsider = elimInvalidMoves(posStates)
 
   for x in range(0, len(statesToConsider)):
-    
+
     #print "evalStratMove" + str(factors_list)
     temp = calcStratMove(statesToConsider[x], factors_list, 0)
     #print temp
@@ -777,10 +778,10 @@ def evalStratMove(factors_list, posStates):
       # If temp move better than current best, remove current best and store temp
       cur_max = temp
       best_move_state = statesToConsider[x]
-      
+
 
   more_moves = best_move_state.existValidMoves()
-  
+
   # Reporting bug where a full move is not returned
   if (more_moves == True):
     print "Error - not a final move state"
@@ -788,7 +789,7 @@ def evalStratMove(factors_list, posStates):
     for item in posStates:
       print item.existValidMoves()
       item.printState()
-    
+
     print "Culled list for move calculation"
     for item in statesToConsider:
       print item.existValidMoves()
@@ -797,7 +798,7 @@ def evalStratMove(factors_list, posStates):
     best_move_state.printState()
     exit(1)
 
-  
+
   return best_move_state
 
 def calcStratMove(state, fl, print_flag):
@@ -806,7 +807,7 @@ def calcStratMove(state, fl, print_flag):
 
   turn = state.turn
   ##fl == factors_list
-  
+
   temp = state.lastOccupiedSpace()
   last_white_space = temp[0]
   last_black_space = temp[1]
@@ -823,59 +824,59 @@ def calcStratMove(state, fl, print_flag):
       strat = 2
     else:
       strat = 1
-   
+
 
   # Score Resets
   white_uncovered_score = 0        #1
   black_uncovered_score = 0
   white_blocade_score = 0
   black_blocade_score = 0          #4
-  
+
   white_covered_score = 0          #5
   black_covered_score = 0
   white_highest_blocade_count = 0
   black_highest_blocade_count = 0  #8
-  
+
   # Factors but not scores
   white_blocade_count = 0          #9
   black_blocade_count = 0
-  
+
   white_blot_points = 0
   black_blot_points = 0            #12
 
-  
+
   for x in range(0, 25): # Tun through board for scores
-    #White blocade 
+    #White blocade
     if (state.board[x] <= 1):
       if (white_blocade_count > white_highest_blocade_count):
         white_highest_blocade_count = white_blocade_count
       white_blocade_count = 0
-    
+
     #Black blocade
     if (state.board[x] >= -1): #Non-black space on black's turn
       if (black_blocade_count > black_highest_blocade_count):
         black_highest_blocade_count = black_blocade_count
       black_blocade_count = 0
-      
+
     # Points for uncovered pieces
     #White uncovered
     if (state.board[x] == 1):
       if(white_blocade_count > white_highest_blocade_count):
         white_highest_blocade_count = white_blocade_count
       white_blocade_count = 0
-      if (x > last_black_space): 
+      if (x > last_black_space):
         if (strat == 1):
           white_blot_points = fl[0] * ((25-x)*fl[1])
         elif (strat == 2):
           white_blot_points = fl[12] * ((25-x)*fl[13])
       white_uncovered_score = white_uncovered_score + white_blot_points
-	
+
     # Black Uncovered
     if (state.board[x] == -1):
       if(black_blocade_count > black_highest_blocade_count):
         black_highest_blocade_count = black_blocade_count
       black_blocade_count = 0
-      if (x < last_white_space): 
+      if (x < last_white_space):
         black_blot_points = fl[2*strat] * ((x)*fl[3*strat])
       black_uncovered_score = black_uncovered_score + black_blot_points
       #print str(x) + " " + str(black_uncovered_score)
@@ -896,14 +897,14 @@ def calcStratMove(state, fl, print_flag):
       if (black_blocade_count > 1):
         black_blocade_score += black_blocade_count*fl[7*strat]
         #print str(x) + " " + str(white_blocade_count)
-  
+
   white_points_scored = state.board[0]*fl[strat*8]
   black_points_scored = state.board[25]*fl[strat*10]
-  white_jail_score = state.board[26]*fl[strat*9]  
+  white_jail_score = state.board[26]*fl[strat*9]
   black_jail_score = state.board[27]*fl[strat*11]
 
 
-  if (state.turn == 1):  
+  if (state.turn == 1):
     score_tuple = (-1*white_points_scored,
     black_points_scored,
     -1*white_jail_score,
@@ -911,11 +912,11 @@ def calcStratMove(state, fl, print_flag):
     white_uncovered_score,
     -1*black_uncovered_score,
     -1*white_blocade_score,
-    black_blocade_score,          
-    -1*white_covered_score,          
+    black_blocade_score,
+    -1*white_covered_score,
     black_covered_score,
     -1*white_highest_blocade_count,
-    black_highest_blocade_count) 
+    black_highest_blocade_count)
 
   elif (state.turn == 0):
     score_tuple = (white_points_scored,
@@ -925,8 +926,8 @@ def calcStratMove(state, fl, print_flag):
     -1*white_uncovered_score,
     black_uncovered_score,
     white_blocade_score,
-    -1*black_blocade_score,          
-    white_covered_score,          
+    -1*black_blocade_score,
+    white_covered_score,
     -1*black_covered_score,
     white_highest_blocade_count,
     -1*black_highest_blocade_count)
@@ -938,8 +939,8 @@ def calcStratMove(state, fl, print_flag):
     print "move value: " + str(move_value),
     print "   score_tuple: " + str(score_tuple)
     state.printState()
-	
-	
+
+
   return move_value
 
 
@@ -948,7 +949,7 @@ def moveWithStateTree(state):
   root = generateMoveTree(state)
   best_move = calcMoveFromStateTree(root)
   if (best_move != None):
-    return best_move.nodeState 
+    return best_move.nodeState
   else:
     return state
 
@@ -956,13 +957,13 @@ def calcMoveFromStateTree(root):
   posMove = root.child
   best_move = posMove
   move_val = -100000
-  
+
   while (posMove != None):
     if (posMove.score > move_val):
       best_move = posMove
       move_val = posMove.score
     posMove = posMove.firstSibling
-  
+
   return best_move
 
 def generateMoveTree(st):
@@ -974,21 +975,21 @@ def generateMoveTree(st):
   stateTreeFile = open('stateTreeFile.txt', 'w')
   stateScore = calcMoveValue1(st, st.turn)
   root = stateTreeNode.stateTreeNode(st, stateScore)
-    
+
   if (root == None):
     #print "continue"
     return root
   else:
     genMoveTree(root, root.nodeState.turn)
     #print "Len root after genMoveTree(): " + str(len(root))
-    
+
     return root
-  
+
 
 def genMoveTree(root, turn):
   '''Given a root (i.e. state), calculate all possible states (w/ genAllPossMoves()) and then
   calculate the average score of opponent when genAllPossMoves() is calculated for each
-  roll for each given state''' 
+  roll for each given state'''
   listOfRolls = [ [1,1,1,1], [1,2], [1,3], [1,4], [1,5], [1,6], [2,2,2,2], [2,3],\
   [2,4], [2,5], [2,6], [3,3,3,3], [3,4], [3,5], [3,6], [4,4,4,4], [4,5], [4,6],\
   [5,5,5,5], [5,6], [6,6,6,6] ]
@@ -1000,7 +1001,7 @@ def genMoveTree(root, turn):
 
   if (rState.existValidMoves() == False):
     #print "no valid moves"
-    # elim extra generation when no moves exist 
+    # elim extra generation when no moves exist
     return
 
   else:
@@ -1016,7 +1017,7 @@ def genMoveTree(root, turn):
         nextNodeScore = calcMoveValue2(stateList[0], 0)
       nextNode = stateTreeNode.stateTreeNode(stateList[0], nextNodeScore)
       root.addChild(nextNode)
-      return 
+      return
 
 
     if (len(stateList) >= 1):
@@ -1026,7 +1027,7 @@ def genMoveTree(root, turn):
         #print "counter: " + str(counter)
         nextNodeScore = 0
         nextNode = stateTreeNode.stateTreeNode(item, nextNodeScore)
-        
+
         cumeScore = 0
         for roll in listOfRolls:
           cpy_state = state.state(item)
@@ -1036,7 +1037,7 @@ def genMoveTree(root, turn):
           genAllPossMoves(oppStateList)
           elimInvalidMoves(oppStateList)
           for x in range(0, len(oppStateList)):
-                  
+
             mv_val = calcMoveValue2(oppStateList[x], cpy_state.turn)
             if (roll == listOfRolls[0] or roll == listOfRolls[6] or roll == listOfRolls[11]\
               or roll == listOfRolls[15] or roll == listOfRolls[18] or roll == listOfRolls[20]):
@@ -1044,7 +1045,7 @@ def genMoveTree(root, turn):
             #print mv_val
             #raw_input("wait")
             cumeScore = cumeScore + mv_val
-        cumeScore = cumeScore/len(oppStateList)  
+        cumeScore = cumeScore/len(oppStateList)
         #print cumeScore
         nextNode.updateScore(cumeScore)
 
@@ -1082,14 +1083,14 @@ def threeBestMoves(stateList):
       temp2State = best2State
 
       best = move_val
-      bestState = st 
+      bestState = st
       best2 = temp1
       best2State = temp1State
       best3 = temp2
       best3State = temp2State
       #print "best"
       continue
-       
+
     elif (move_val > best2):
       temp2 = best2
       temp2State = best2State
@@ -1103,7 +1104,7 @@ def threeBestMoves(stateList):
 
     elif (move_val > best3):
       best3 = move_val
-      best3State = st 
+      best3State = st
       #print "third best"
       continue
 
@@ -1114,7 +1115,7 @@ def threeBestMoves(stateList):
   if (best3State != None):
     if (math.fabs(best3 - best) < 1):
       bestList.append(best2State)
-  
+
   #for item in bestList:
     #print str(item)
 
@@ -1147,13 +1148,13 @@ def genAllPossMoves(posStates):
     else:
       return posStates
 
-    
+
   else: #There exists at least one valid move
     # CURRENT PLAYER HAS PIECE IN JAIL
     if ((givenState.turn == 0 and givenState.board[26] > 0 or \
       givenState.turn == 1 and givenState.board[27] < 0)):
       #print "piece in jail"
-      
+
       for x in range(0, len(givenState.roll)):
         cpy_state = state.state(givenState)
         if (cpy_state.turn == 0): #White
@@ -1162,7 +1163,7 @@ def genAllPossMoves(posStates):
           space_to_valid = cpy_state.checkSpaceTo(27, cpy_state.roll[x])
         #### IF VALID MOVE, THEN EXECUTE
         if (space_to_valid[0] == True):
-          
+
           #UPDATE values
           space_from = space_to_valid[1]
           space_to = space_to_valid[2]
@@ -1173,8 +1174,8 @@ def genAllPossMoves(posStates):
             cpy_state.board[27] = cpy_state.board[27] + 1
           else: #White
             cpy_state.board[26] = cpy_state.board[26] - 1
-      
-      
+
+
           # CAPTURE opponent piece and put it in jail
           if ((cpy_state.board[space_to] < 0 and cpy_state.turn == False) or \
             (cpy_state.board[space_to] > 0 and cpy_state.turn == True)):
@@ -1190,19 +1191,19 @@ def genAllPossMoves(posStates):
             cpy_state.board[space_to] = cpy_state.board[space_to] - 1
           else: #White
             cpy_state.board[space_to] = cpy_state.board[space_to] + 1
-          
+
           cpy_state.roll.remove(cpy_state.roll[x])
           cpy_state.updatePipCount()
 
           if (cpy_state.compareStateToList(posStates) == False):
             #print "not getting here?"
             posStates.append(cpy_state)
-            
-        
+
+
     # CURRENT PLAYER HAS NO PIECES IN JAIL
     else:
       for x in range(1, 25):
-        
+
         # No one to move
         if (givenState.board[x] == 0):
           continue
@@ -1212,9 +1213,9 @@ def genAllPossMoves(posStates):
           or (givenState.board[x] > 0 and givenState.turn == 1)):
           #print "wrong color"
           continue
-          
+
         # Current space a valid space_from
-        else: 
+        else:
           for y in range(0, len(givenState.roll)):
             cpy_state = state.state(givenState)
             if (cpy_state.turn == 0): #White
@@ -1233,8 +1234,8 @@ def genAllPossMoves(posStates):
                 cpy_state.board[space_from] = cpy_state.board[space_from] + 1
               elif (cpy_state.turn == 0): #White
                 cpy_state.board[space_from] = cpy_state.board[space_from] - 1
-          
-          
+
+
               # Capture opponent piece and put it in jail
               if ((cpy_state.board[space_to] < 0 and cpy_state.turn == 0) or \
                 (cpy_state.board[space_to] > 0 and cpy_state.turn == 1)):
@@ -1249,7 +1250,7 @@ def genAllPossMoves(posStates):
                 cpy_state.board[space_to] = cpy_state.board[space_to] - 1
               else: #White
                 cpy_state.board[space_to] = cpy_state.board[space_to] + 1
-              
+
               cpy_state.roll.remove(cpy_state.roll[y])
               cpy_state.updatePipCount()
 
@@ -1273,7 +1274,7 @@ def elimInvalidMoves(stateList):
   if (len(stateList) == 1):
     return stateList
 
-  else: 
+  else:
     new_list = []
 
     for state in stateList:
@@ -1282,7 +1283,7 @@ def elimInvalidMoves(stateList):
 
     if (len(new_list) > 0):
       return new_list
-      
+
 
     else:
       min_pip_sum = 1000
@@ -1330,7 +1331,7 @@ def evalMoves(posStates):
       best_move.append(posStates[x])
 
   #print "Best Move Value: " + str(cur_max)
-  
+
   if (len(best_move) == 1):
     best = best_move[0]
   else:
@@ -1350,7 +1351,7 @@ def calcMoveValue1(state, turn):
   temp = state.lastOccupiedSpace()
   last_white_space = temp[0]
   last_black_space = temp[1]
-  
+
 
   # Only count once
   if (turn == 0): #White
@@ -1365,7 +1366,7 @@ def calcMoveValue1(state, turn):
 
 
   for x in range(0, 25):
-        
+
     if ((state.board[x] >= 0 and turn == 1) or \
       (state.board[x] <=0 and turn == 0)):
       blocade_count = 0
@@ -1377,12 +1378,12 @@ def calcMoveValue1(state, turn):
         blot_points = 0
         blocade_count = 0
         if (state.turn == 0): #White
-          if (x > last_black_space): 
+          if (x > last_black_space):
             blot_points = 5 * ((25-x)*.125)
         elif (state.turn == 1): #Black
           if (x < last_white_space):
             blot_points = 5*((x)*.125)
-        
+
         uncovered_score = uncovered_score + blot_points
 
       # Points for blocades
@@ -1412,7 +1413,7 @@ def calcMoveValue2(state, turn):
     points_scored = 4*state.board[25]
 
   for x in range(0, 25):
-    
+
     if ((state.board[x] >= 0 and turn == 1) or \
       (state.board[x] <=0 and turn == 0)):
       blocade_count = 0
@@ -1434,17 +1435,17 @@ def calcMoveValue2(state, turn):
           blocade_score += blocade_count*2
 
 
-  move_value = own_jail_score + blot_score - points_scored - blocade_score 
+  move_value = own_jail_score + blot_score - points_scored - blocade_score
   return move_value
-  
+
 def playStrategicCompTurn(state):
   '''Plays a computer turn if a non-random strategy is being played'''
   posStates = [state]
   genAllPossMoves(posStates)
-  
+
   best = evalMoves(posStates)
   return best
-  
+
 def playRandCompTurn(state):
   '''Calculate and return a valid, random Computer move'''
   space_from = getCompSpaceFrom(state)
@@ -1490,39 +1491,39 @@ def getCompSpaceFrom(state):
             and state.turn == True)):
           move_from = True
           space_from = test_space
- 
+
     return space_from
 
 def getCompSpaceTo(state, space_from):
   '''Returns the comps selected space plus the largest remaining dice roll'''
   rollcpy = copy.deepcopy(state.roll)
-  
-  
+
+
   if (random.random() > .5):
     # Check the higher or lower value 50% of time - allows both high and low rolls to be
     # checked by comp
     rollcpy.reverse()
-  
+
   test = rollcpy.pop()
 
   if (state.turn == 1):
     if (space_from == 26 + state.turn):
       # If comp is in jail
-            
+
       space_to = test
-    
+
 
     elif (state.allInFinalQuadrant() == False):
       # Comp not in jail && not all in final quadrant
       space_to = space_from + test
-    
+
     else:
-      # If all pieces in final quadrant 
+      # If all pieces in final quadrant
       space_to = space_from + test
       if (space_to > 25):
         space_to = 25
-      
-  
+
+
   elif (state.turn == 0):
     if (space_from == 26 + state.turn):
       # If comp is in jail
@@ -1533,7 +1534,7 @@ def getCompSpaceTo(state, space_from):
       space_to = space_from - test
 
     else:
-      # If all pieces in final quadrant 
+      # If all pieces in final quadrant
       space_to = space_from - test
       if (space_to < 0):
         space_to = 0
@@ -1580,13 +1581,13 @@ def getSpaceTo():
       again = False
     except:
       print "That was not a valid input."
-  
+
   return space_to
 
 
 def createInitialState(die):
   '''Create initial game state given a die object'''
-    
+
   gf = die.goesFirst()
 
   t = gf[0]
