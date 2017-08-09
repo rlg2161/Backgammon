@@ -333,32 +333,6 @@ def playSingleGame(first_strat, second_strat, print_flag, factors_list1, factors
 
   return(winner, points)
 
-
-def checkGammon(state, winner):
-
-  if (winner == -1):
-    return 0
-
-  last_white, last_black = state.lastOccupiedSpace()
-
-  points_for_win = 1
-
-  if (winner == 0): #white won
-    if (state.board[25] == 0):
-      if (last_black < 7):
-        points_for_win = 3
-      else:
-        points_for_win = 2
-
-  if (winner == 1): #black won
-    if(state.board[0] == 0):
-      if(last_white > 18):
-        points_for_win = 3
-      else:
-        points_for_win = 2
-
-  return points_for_win
-
 def playTwoHumans(first_strat, second_strat, print_flag):
   '''Function to manage gameplay between 2 humans'''
 
@@ -378,7 +352,7 @@ def playTwoHumans(first_strat, second_strat, print_flag):
 
     winner = state.testGameOver()
 
-  points = checkGammon(state, winner)
+  points = state.checkGammon(winner)
   return (winner, points)
 
 def playHumanVsComp(first_strat, second_strat, print_flag, factors_list):
@@ -411,7 +385,7 @@ def playHumanVsComp(first_strat, second_strat, print_flag, factors_list):
   if (winner == -1):
     state.printState()
 
-  points = checkGammon(state, winner)
+  points = state.checkGammon(winner)
   return (winner, points)
 
 def playCompVsComp(first_strat, second_strat, print_flag, factors_list1, factors_list2):
@@ -439,7 +413,7 @@ def playCompVsComp(first_strat, second_strat, print_flag, factors_list1, factors
 
     winner = state.testGameOver()
 
-  points = checkGammon(state, winner)
+  points = state.checkGammon(winner)
   return (winner, points)
 
 

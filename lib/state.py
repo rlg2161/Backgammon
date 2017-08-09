@@ -358,6 +358,31 @@ class state():
 
     return (valid_move, orig_space_from, space_to, move_dist)
 
+  def checkGammon(self, winner):
+
+    if (winner == -1):
+      return 0
+
+    last_white, last_black = self.lastOccupiedSpace()
+
+    points_for_win = 1
+
+    if (winner == 0): #white won
+      if (self.board[25] == 0):
+        if (last_black < 7):
+          points_for_win = 3
+        else:
+          points_for_win = 2
+
+    if (winner == 1): #black won
+      if(self.board[0] == 0):
+        if(last_white > 18):
+          points_for_win = 3
+        else:
+          points_for_win = 2
+
+    return points_for_win
+
   def printError(self, num):
     '''Print specific error messages depending on why user move was invalid'''
 
